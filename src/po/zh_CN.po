@@ -1,0 +1,131 @@
+# Simplified Chinese translation of xfce-removable-plugin
+msgid ""
+msgstr ""
+"Project-Id-Version: xfce-removable-plugin\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+
+msgid "Could not mount the device."
+msgstr "无法挂载设备。"
+
+msgid "Could not unmount the device."
+msgstr "无法卸载设备。"
+
+msgid "Device ejected"
+msgstr "设备已弹出"
+
+msgid "Device mounted"
+msgstr "设备已挂载"
+
+msgid "Eject"
+msgstr "弹出"
+
+msgid "Ejecting…"
+msgstr "正在弹出…"
+
+msgid "Mount"
+msgstr "挂载"
+
+msgid "Mount failed"
+msgstr "挂载失败"
+
+msgid "Mounting…"
+msgstr "正在挂载…"
+
+msgid "No removable devices"
+msgstr "没有可移动设备"
+
+msgid "Please wait, do not unplug."
+msgstr "请稍候，请勿拔出。"
+
+msgid "Safe to remove"
+msgstr "可以安全移除"
+
+msgid "Safe to unplug."
+msgstr "可以拔出设备。"
+
+msgid "Unmount"
+msgstr "卸载"
+
+msgid "Unmount failed"
+msgstr "卸载失败"
+
+msgid "Unmounting…"
+msgstr "正在卸载…"
+
+msgid "You can now unplug the device."
+msgstr "现在可以拔出设备。"
+
+msgid "Appearance"
+msgstr "外观"
+
+msgid "Behavior"
+msgstr "行为"
+
+msgid "Close"
+msgstr "关闭"
+
+msgid "Hide button when no removable devices"
+msgstr "没有可移动设备时隐藏按钮"
+
+msgid "Icon size:"
+msgstr "图标大小："
+
+msgid "Open Thunar after mounting"
+msgstr "挂载后打开 Thunar"
+
+msgid "Plugin size:"
+msgstr "插件大小："
+
+msgid "Popup height:"
+msgstr "弹出窗口高度："
+
+msgid "Popup width:"
+msgstr "弹出窗口宽度："
+
+msgid "Properties — Removable Devices"
+msgstr "属性 — 可移动设备"
+
+msgid "Removable devices"
+msgstr "可移动设备"
+
+msgid "Show notifications"
+msgstr "显示通知"
+
+msgid "Square button"
+msgstr "方形按钮"
+
+msgid "Use panel icon size"
+msgstr "使用面板大小作为图标大小"
+
+msgid "Removable device connected"
+msgstr "已连接可移动设备"
+
+msgid "Removable device disconnected"
+msgstr "已断开可移动设备"
+
+msgid "USB device connected"
+msgstr "已连接 USB 设备"
+
+msgid "USB device disconnected"
+msgstr "已断开 USB 设备"
+
+msgid "USB device"
+msgstr "USB 设备"
+
+msgid "Unknown"
+msgstr "未知"
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "设备连接或断开时通知"
+
+msgid "Other devices"
+msgstr "其他设备"
+
+msgid "Also hide when only other devices are present"
+msgstr "仅有其他设备时也隐藏"
+
+msgid "Removable disk"
+msgstr "可移动磁盘"

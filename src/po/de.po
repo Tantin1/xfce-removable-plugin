@@ -1,0 +1,131 @@
+# German translation of xfce-removable-plugin
+msgid ""
+msgstr ""
+"Project-Id-Version: xfce-removable-plugin\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
+
+msgid "Could not mount the device."
+msgstr "Das Gerät konnte nicht eingehängt werden."
+
+msgid "Could not unmount the device."
+msgstr "Das Gerät konnte nicht ausgehängt werden."
+
+msgid "Device ejected"
+msgstr "Gerät ausgeworfen"
+
+msgid "Device mounted"
+msgstr "Gerät eingehängt"
+
+msgid "Eject"
+msgstr "Auswerfen"
+
+msgid "Ejecting…"
+msgstr "Wird ausgeworfen…"
+
+msgid "Mount"
+msgstr "Einhängen"
+
+msgid "Mount failed"
+msgstr "Einhängen fehlgeschlagen"
+
+msgid "Mounting…"
+msgstr "Wird eingehängt…"
+
+msgid "No removable devices"
+msgstr "Keine Wechseldatenträger"
+
+msgid "Please wait, do not unplug."
+msgstr "Bitte warten, nicht trennen."
+
+msgid "Safe to remove"
+msgstr "Sicher entfernen"
+
+msgid "Safe to unplug."
+msgstr "Das Gerät kann jetzt getrennt werden."
+
+msgid "Unmount"
+msgstr "Aushängen"
+
+msgid "Unmount failed"
+msgstr "Aushängen fehlgeschlagen"
+
+msgid "Unmounting…"
+msgstr "Wird ausgehängt…"
+
+msgid "You can now unplug the device."
+msgstr "Sie können das Gerät jetzt trennen."
+
+msgid "Appearance"
+msgstr "Erscheinungsbild"
+
+msgid "Behavior"
+msgstr "Verhalten"
+
+msgid "Close"
+msgstr "Schließen"
+
+msgid "Hide button when no removable devices"
+msgstr "Schaltfläche ausblenden, wenn keine Wechseldatenträger vorhanden sind"
+
+msgid "Icon size:"
+msgstr "Symbolgröße:"
+
+msgid "Open Thunar after mounting"
+msgstr "Thunar nach dem Einhängen öffnen"
+
+msgid "Plugin size:"
+msgstr "Plugin-Größe:"
+
+msgid "Popup height:"
+msgstr "Popup-Höhe:"
+
+msgid "Popup width:"
+msgstr "Popup-Breite:"
+
+msgid "Properties — Removable Devices"
+msgstr "Eigenschaften — Wechseldatenträger"
+
+msgid "Removable devices"
+msgstr "Wechseldatenträger"
+
+msgid "Show notifications"
+msgstr "Benachrichtigungen anzeigen"
+
+msgid "Square button"
+msgstr "Quadratische Schaltfläche"
+
+msgid "Use panel icon size"
+msgstr "Panelgröße für Symbol verwenden"
+
+msgid "Removable device connected"
+msgstr "Wechseldatenträger angeschlossen"
+
+msgid "Removable device disconnected"
+msgstr "Wechseldatenträger getrennt"
+
+msgid "USB device connected"
+msgstr "USB-Gerät angeschlossen"
+
+msgid "USB device disconnected"
+msgstr "USB-Gerät getrennt"
+
+msgid "USB device"
+msgstr "USB-Gerät"
+
+msgid "Unknown"
+msgstr "Unbekannt"
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "Benachrichtigen, wenn Geräte angeschlossen oder getrennt werden"
+
+msgid "Other devices"
+msgstr "Andere Geräte"
+
+msgid "Also hide when only other devices are present"
+msgstr "Auch ausblenden, wenn nur andere Geräte vorhanden sind"
+
+msgid "Removable disk"
+msgstr "Wechseldatenträger"

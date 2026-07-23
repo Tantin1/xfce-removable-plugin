@@ -1,0 +1,131 @@
+# Japanese translation of xfce-removable-plugin
+msgid ""
+msgstr ""
+"Project-Id-Version: xfce-removable-plugin\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
+
+msgid "Could not mount the device."
+msgstr "デバイスをマウントできませんでした。"
+
+msgid "Could not unmount the device."
+msgstr "デバイスをアンマウントできませんでした。"
+
+msgid "Device ejected"
+msgstr "デバイスを取り出しました"
+
+msgid "Device mounted"
+msgstr "デバイスをマウントしました"
+
+msgid "Eject"
+msgstr "取り出す"
+
+msgid "Ejecting…"
+msgstr "取り出し中…"
+
+msgid "Mount"
+msgstr "マウント"
+
+msgid "Mount failed"
+msgstr "マウント失敗"
+
+msgid "Mounting…"
+msgstr "マウント中…"
+
+msgid "No removable devices"
+msgstr "リムーバブルデバイスなし"
+
+msgid "Please wait, do not unplug."
+msgstr "しばらくお待ちください。取り外さないでください。"
+
+msgid "Safe to remove"
+msgstr "安全に取り外せます"
+
+msgid "Safe to unplug."
+msgstr "デバイスを取り外せます。"
+
+msgid "Unmount"
+msgstr "アンマウント"
+
+msgid "Unmount failed"
+msgstr "アンマウント失敗"
+
+msgid "Unmounting…"
+msgstr "アンマウント中…"
+
+msgid "You can now unplug the device."
+msgstr "デバイスを取り外せます。"
+
+msgid "Appearance"
+msgstr "外観"
+
+msgid "Behavior"
+msgstr "動作"
+
+msgid "Close"
+msgstr "閉じる"
+
+msgid "Hide button when no removable devices"
+msgstr "リムーバブルデバイスがない場合はボタンを非表示にする"
+
+msgid "Icon size:"
+msgstr "アイコンサイズ："
+
+msgid "Open Thunar after mounting"
+msgstr "マウント後に Thunar を開く"
+
+msgid "Plugin size:"
+msgstr "プラグインサイズ："
+
+msgid "Popup height:"
+msgstr "ポップアップの高さ："
+
+msgid "Popup width:"
+msgstr "ポップアップの幅："
+
+msgid "Properties — Removable Devices"
+msgstr "プロパティ — リムーバブルデバイス"
+
+msgid "Removable devices"
+msgstr "リムーバブルデバイス"
+
+msgid "Show notifications"
+msgstr "通知を表示"
+
+msgid "Square button"
+msgstr "正方形ボタン"
+
+msgid "Use panel icon size"
+msgstr "アイコンにパネルサイズを使用"
+
+msgid "Removable device connected"
+msgstr "リムーバブルデバイスが接続されました"
+
+msgid "Removable device disconnected"
+msgstr "リムーバブルデバイスが切断されました"
+
+msgid "USB device connected"
+msgstr "USB デバイスが接続されました"
+
+msgid "USB device disconnected"
+msgstr "USB デバイスが切断されました"
+
+msgid "USB device"
+msgstr "USB デバイス"
+
+msgid "Unknown"
+msgstr "不明"
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "デバイスの接続/切断時に通知する"
+
+msgid "Other devices"
+msgstr "その他のデバイス"
+
+msgid "Also hide when only other devices are present"
+msgstr "他のデバイスしかない場合も非表示にする"
+
+msgid "Removable disk"
+msgstr "リムーバブルディスク"

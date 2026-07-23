@@ -1,0 +1,131 @@
+# Arabic translation of xfce-removable-plugin
+msgid ""
+msgstr ""
+"Project-Id-Version: xfce-removable-plugin\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ar\n"
+
+msgid "Could not mount the device."
+msgstr "تعذّر تحميل الجهاز."
+
+msgid "Could not unmount the device."
+msgstr "تعذّر إلغاء تحميل الجهاز."
+
+msgid "Device ejected"
+msgstr "تم إخراج الجهاز"
+
+msgid "Device mounted"
+msgstr "تم تحميل الجهاز"
+
+msgid "Eject"
+msgstr "إخراج"
+
+msgid "Ejecting…"
+msgstr "جارٍ الإخراج…"
+
+msgid "Mount"
+msgstr "تحميل"
+
+msgid "Mount failed"
+msgstr "فشل التحميل"
+
+msgid "Mounting…"
+msgstr "جارٍ التحميل…"
+
+msgid "No removable devices"
+msgstr "لا توجد أجهزة قابلة للإزالة"
+
+msgid "Please wait, do not unplug."
+msgstr "يرجى الانتظار، لا تفصل الجهاز."
+
+msgid "Safe to remove"
+msgstr "آمن للإزالة"
+
+msgid "Safe to unplug."
+msgstr "يمكنك الآن فصل الجهاز."
+
+msgid "Unmount"
+msgstr "إلغاء التحميل"
+
+msgid "Unmount failed"
+msgstr "فشل إلغاء التحميل"
+
+msgid "Unmounting…"
+msgstr "جارٍ إلغاء التحميل…"
+
+msgid "You can now unplug the device."
+msgstr "يمكنك الآن فصل الجهاز."
+
+msgid "Appearance"
+msgstr "المظهر"
+
+msgid "Behavior"
+msgstr "السلوك"
+
+msgid "Close"
+msgstr "إغلاق"
+
+msgid "Hide button when no removable devices"
+msgstr "إخفاء الزر عند عدم وجود أجهزة قابلة للإزالة"
+
+msgid "Icon size:"
+msgstr "حجم الأيقونة:"
+
+msgid "Open Thunar after mounting"
+msgstr "فتح Thunar بعد التحميل"
+
+msgid "Plugin size:"
+msgstr "حجم الإضافة:"
+
+msgid "Popup height:"
+msgstr "ارتفاع النافذة المنبثقة:"
+
+msgid "Popup width:"
+msgstr "عرض النافذة المنبثقة:"
+
+msgid "Properties — Removable Devices"
+msgstr "الخصائص — الأجهزة القابلة للإزالة"
+
+msgid "Removable devices"
+msgstr "الأجهزة القابلة للإزالة"
+
+msgid "Show notifications"
+msgstr "إظهار الإشعارات"
+
+msgid "Square button"
+msgstr "زر مربع"
+
+msgid "Use panel icon size"
+msgstr "استخدام حجم اللوحة للأيقونة"
+
+msgid "Removable device connected"
+msgstr "تم توصيل جهاز قابل للإزالة"
+
+msgid "Removable device disconnected"
+msgstr "تم فصل جهاز قابل للإزالة"
+
+msgid "USB device connected"
+msgstr "تم توصيل جهاز USB"
+
+msgid "USB device disconnected"
+msgstr "تم فصل جهاز USB"
+
+msgid "USB device"
+msgstr "جهاز USB"
+
+msgid "Unknown"
+msgstr "غير معروف"
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "إشعار عند توصيل أو فصل الأجهزة"
+
+msgid "Other devices"
+msgstr "أجهزة أخرى"
+
+msgid "Also hide when only other devices are present"
+msgstr "إخفاء أيضاً عند وجود أجهزة أخرى فقط"
+
+msgid "Removable disk"
+msgstr "قرص قابل للإزالة"

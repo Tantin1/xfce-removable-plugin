@@ -1,0 +1,180 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025
+# This file is distributed under the same license as the xfce-removable-plugin package.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: xfce-removable-plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-01 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: popup.c
+msgid "Could not mount the device."
+msgstr ""
+
+#: popup.c
+msgid "Could not unmount the device."
+msgstr ""
+
+#: popup.c
+msgid "Device ejected"
+msgstr ""
+
+#: popup.c
+msgid "Device mounted"
+msgstr ""
+
+#: popup.c
+msgid "Eject"
+msgstr ""
+
+#: popup.c
+msgid "Ejecting…"
+msgstr ""
+
+#: popup.c
+msgid "Mount"
+msgstr ""
+
+#: popup.c
+msgid "Mount failed"
+msgstr ""
+
+#: popup.c
+msgid "Mounting…"
+msgstr ""
+
+#: popup.c
+msgid "No removable devices"
+msgstr ""
+
+#: popup.c
+msgid "Other devices"
+msgstr ""
+
+#: popup.c
+msgid "Please wait, do not unplug."
+msgstr ""
+
+#: popup.c
+msgid "Removable disk"
+msgstr ""
+
+#: popup.c
+msgid "Safe to remove"
+msgstr ""
+
+#: popup.c
+msgid "Safe to unplug."
+msgstr ""
+
+#: popup.c
+msgid "Unmount"
+msgstr ""
+
+#: popup.c
+msgid "Unmount failed"
+msgstr ""
+
+#: popup.c
+msgid "Unmounting…"
+msgstr ""
+
+#: popup.c
+msgid "You can now unplug the device."
+msgstr ""
+
+#: plugin.c
+msgid "Also hide when only other devices are present"
+msgstr ""
+
+#: plugin.c
+msgid "Appearance"
+msgstr ""
+
+#: plugin.c
+msgid "Behavior"
+msgstr ""
+
+#: plugin.c
+msgid "Close"
+msgstr ""
+
+#: plugin.c
+msgid "Hide button when no removable devices"
+msgstr ""
+
+#: plugin.c
+msgid "Icon size:"
+msgstr ""
+
+#: plugin.c
+msgid "Notify when devices are connected or disconnected"
+msgstr ""
+
+#: plugin.c
+msgid "Open Thunar after mounting"
+msgstr ""
+
+#: plugin.c
+msgid "Plugin size:"
+msgstr ""
+
+#: plugin.c
+msgid "Popup height:"
+msgstr ""
+
+#: plugin.c
+msgid "Popup width:"
+msgstr ""
+
+#: plugin.c
+msgid "Properties — Removable Devices"
+msgstr ""
+
+#: plugin.c
+msgid "Removable device connected"
+msgstr ""
+
+#: plugin.c
+msgid "Removable device disconnected"
+msgstr ""
+
+#: plugin.c
+msgid "Removable devices"
+msgstr ""
+
+#: plugin.c
+msgid "Show notifications"
+msgstr ""
+
+#: plugin.c
+msgid "Square button"
+msgstr ""
+
+#: plugin.c
+msgid "USB device"
+msgstr ""
+
+#: plugin.c
+msgid "USB device connected"
+msgstr ""
+
+#: plugin.c
+msgid "USB device disconnected"
+msgstr ""
+
+#: plugin.c
+msgid "Unknown"
+msgstr ""
+
+#: plugin.c
+msgid "Use panel icon size"
+msgstr ""

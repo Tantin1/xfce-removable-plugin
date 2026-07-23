@@ -1,0 +1,131 @@
+# Dutch translation of xfce-removable-plugin
+msgid ""
+msgstr ""
+"Project-Id-Version: xfce-removable-plugin\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: nl\n"
+
+msgid "Could not mount the device."
+msgstr "Het apparaat kon niet worden aangekoppeld."
+
+msgid "Could not unmount the device."
+msgstr "Het apparaat kon niet worden ontkoppeld."
+
+msgid "Device ejected"
+msgstr "Apparaat uitgeworpen"
+
+msgid "Device mounted"
+msgstr "Apparaat aangekoppeld"
+
+msgid "Eject"
+msgstr "Uitwerpen"
+
+msgid "Ejecting…"
+msgstr "Uitwerpen…"
+
+msgid "Mount"
+msgstr "Koppelen"
+
+msgid "Mount failed"
+msgstr "Koppelen mislukt"
+
+msgid "Mounting…"
+msgstr "Koppelen…"
+
+msgid "No removable devices"
+msgstr "Geen verwijderbare apparaten"
+
+msgid "Please wait, do not unplug."
+msgstr "Even geduld, niet loskoppelen."
+
+msgid "Safe to remove"
+msgstr "Veilig verwijderen"
+
+msgid "Safe to unplug."
+msgstr "U kunt het apparaat nu loskoppelen."
+
+msgid "Unmount"
+msgstr "Ontkoppelen"
+
+msgid "Unmount failed"
+msgstr "Ontkoppelen mislukt"
+
+msgid "Unmounting…"
+msgstr "Ontkoppelen…"
+
+msgid "You can now unplug the device."
+msgstr "U kunt het apparaat nu loskoppelen."
+
+msgid "Appearance"
+msgstr "Uiterlijk"
+
+msgid "Behavior"
+msgstr "Gedrag"
+
+msgid "Close"
+msgstr "Sluiten"
+
+msgid "Hide button when no removable devices"
+msgstr "Knop verbergen als er geen verwijderbare apparaten zijn"
+
+msgid "Icon size:"
+msgstr "Pictogramgrootte:"
+
+msgid "Open Thunar after mounting"
+msgstr "Thunar openen na koppelen"
+
+msgid "Plugin size:"
+msgstr "Plugingrootte:"
+
+msgid "Popup height:"
+msgstr "Popuphoogte:"
+
+msgid "Popup width:"
+msgstr "Popupbreedte:"
+
+msgid "Properties — Removable Devices"
+msgstr "Eigenschappen — Verwijderbare apparaten"
+
+msgid "Removable devices"
+msgstr "Verwijderbare apparaten"
+
+msgid "Show notifications"
+msgstr "Meldingen weergeven"
+
+msgid "Square button"
+msgstr "Vierkante knop"
+
+msgid "Use panel icon size"
+msgstr "Panelgrootte gebruiken voor pictogram"
+
+msgid "Removable device connected"
+msgstr "Verwijderbaar apparaat aangesloten"
+
+msgid "Removable device disconnected"
+msgstr "Verwijderbaar apparaat losgekoppeld"
+
+msgid "USB device connected"
+msgstr "USB-apparaat aangesloten"
+
+msgid "USB device disconnected"
+msgstr "USB-apparaat losgekoppeld"
+
+msgid "USB device"
+msgstr "USB-apparaat"
+
+msgid "Unknown"
+msgstr "Onbekend"
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "Melden wanneer apparaten worden aangesloten of losgekoppeld"
+
+msgid "Other devices"
+msgstr "Andere apparaten"
+
+msgid "Also hide when only other devices are present"
+msgstr "Ook verbergen wanneer er alleen andere apparaten zijn"
+
+msgid "Removable disk"
+msgstr "Verwijderbare schijf"

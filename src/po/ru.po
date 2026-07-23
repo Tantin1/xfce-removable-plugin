@@ -1,0 +1,131 @@
+# Russian translation of xfce-removable-plugin
+msgid ""
+msgstr ""
+"Project-Id-Version: xfce-removable-plugin\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru\n"
+
+msgid "Could not mount the device."
+msgstr "Не удалось подключить устройство."
+
+msgid "Could not unmount the device."
+msgstr "Не удалось отключить устройство."
+
+msgid "Device ejected"
+msgstr "Устройство извлечено"
+
+msgid "Device mounted"
+msgstr "Устройство подключено"
+
+msgid "Eject"
+msgstr "Извлечь"
+
+msgid "Ejecting…"
+msgstr "Извлечение…"
+
+msgid "Mount"
+msgstr "Подключить"
+
+msgid "Mount failed"
+msgstr "Ошибка подключения"
+
+msgid "Mounting…"
+msgstr "Подключение…"
+
+msgid "No removable devices"
+msgstr "Нет съёмных устройств"
+
+msgid "Please wait, do not unplug."
+msgstr "Подождите, не отключайте устройство."
+
+msgid "Safe to remove"
+msgstr "Безопасное извлечение"
+
+msgid "Safe to unplug."
+msgstr "Устройство можно отключить."
+
+msgid "Unmount"
+msgstr "Отключить"
+
+msgid "Unmount failed"
+msgstr "Ошибка отключения"
+
+msgid "Unmounting…"
+msgstr "Отключение…"
+
+msgid "You can now unplug the device."
+msgstr "Теперь можно отключить устройство."
+
+msgid "Appearance"
+msgstr "Внешний вид"
+
+msgid "Behavior"
+msgstr "Поведение"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Hide button when no removable devices"
+msgstr "Скрывать кнопку, если нет съёмных устройств"
+
+msgid "Icon size:"
+msgstr "Размер значка:"
+
+msgid "Open Thunar after mounting"
+msgstr "Открывать Thunar после подключения"
+
+msgid "Plugin size:"
+msgstr "Размер плагина:"
+
+msgid "Popup height:"
+msgstr "Высота всплывающего окна:"
+
+msgid "Popup width:"
+msgstr "Ширина всплывающего окна:"
+
+msgid "Properties — Removable Devices"
+msgstr "Свойства — Съёмные устройства"
+
+msgid "Removable devices"
+msgstr "Съёмные устройства"
+
+msgid "Show notifications"
+msgstr "Показывать уведомления"
+
+msgid "Square button"
+msgstr "Квадратная кнопка"
+
+msgid "Use panel icon size"
+msgstr "Использовать размер панели для значка"
+
+msgid "Removable device connected"
+msgstr "Съёмное устройство подключено"
+
+msgid "Removable device disconnected"
+msgstr "Съёмное устройство отключено"
+
+msgid "USB device connected"
+msgstr "USB-устройство подключено"
+
+msgid "USB device disconnected"
+msgstr "USB-устройство отключено"
+
+msgid "USB device"
+msgstr "USB-устройство"
+
+msgid "Unknown"
+msgstr "Неизвестное"
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "Уведомлять о подключении и отключении устройств"
+
+msgid "Other devices"
+msgstr "Другие устройства"
+
+msgid "Also hide when only other devices are present"
+msgstr "Скрывать также, если есть только другие устройства"
+
+msgid "Removable disk"
+msgstr "Съёмный диск"

@@ -1,0 +1,131 @@
+# French translation of xfce-removable-plugin
+msgid ""
+msgstr ""
+"Project-Id-Version: xfce-removable-plugin\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+
+msgid "Could not mount the device."
+msgstr "Impossible de monter le périphérique."
+
+msgid "Could not unmount the device."
+msgstr "Impossible de démonter le périphérique."
+
+msgid "Device ejected"
+msgstr "Périphérique éjecté"
+
+msgid "Device mounted"
+msgstr "Périphérique monté"
+
+msgid "Eject"
+msgstr "Éjecter"
+
+msgid "Ejecting…"
+msgstr "Éjection…"
+
+msgid "Mount"
+msgstr "Monter"
+
+msgid "Mount failed"
+msgstr "Échec du montage"
+
+msgid "Mounting…"
+msgstr "Montage…"
+
+msgid "No removable devices"
+msgstr "Aucun périphérique amovible"
+
+msgid "Please wait, do not unplug."
+msgstr "Veuillez patienter, ne débranchez pas."
+
+msgid "Safe to remove"
+msgstr "Retrait sécurisé"
+
+msgid "Safe to unplug."
+msgstr "Vous pouvez débrancher le périphérique."
+
+msgid "Unmount"
+msgstr "Démonter"
+
+msgid "Unmount failed"
+msgstr "Échec du démontage"
+
+msgid "Unmounting…"
+msgstr "Démontage…"
+
+msgid "You can now unplug the device."
+msgstr "Vous pouvez maintenant débrancher le périphérique."
+
+msgid "Appearance"
+msgstr "Apparence"
+
+msgid "Behavior"
+msgstr "Comportement"
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Hide button when no removable devices"
+msgstr "Masquer le bouton s'il n'y a pas de périphériques amovibles"
+
+msgid "Icon size:"
+msgstr "Taille de l'icône :"
+
+msgid "Open Thunar after mounting"
+msgstr "Ouvrir Thunar après le montage"
+
+msgid "Plugin size:"
+msgstr "Taille du plugin :"
+
+msgid "Popup height:"
+msgstr "Hauteur du popup :"
+
+msgid "Popup width:"
+msgstr "Largeur du popup :"
+
+msgid "Properties — Removable Devices"
+msgstr "Propriétés — Périphériques amovibles"
+
+msgid "Removable devices"
+msgstr "Périphériques amovibles"
+
+msgid "Show notifications"
+msgstr "Afficher les notifications"
+
+msgid "Square button"
+msgstr "Bouton carré"
+
+msgid "Use panel icon size"
+msgstr "Utiliser la taille du panneau pour l'icône"
+
+msgid "Removable device connected"
+msgstr "Périphérique amovible connecté"
+
+msgid "Removable device disconnected"
+msgstr "Périphérique amovible déconnecté"
+
+msgid "USB device connected"
+msgstr "Périphérique USB connecté"
+
+msgid "USB device disconnected"
+msgstr "Périphérique USB déconnecté"
+
+msgid "USB device"
+msgstr "Périphérique USB"
+
+msgid "Unknown"
+msgstr "Inconnu"
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "Notifier la connexion ou la déconnexion d'un périphérique"
+
+msgid "Other devices"
+msgstr "Autres périphériques"
+
+msgid "Also hide when only other devices are present"
+msgstr "Masquer aussi quand il n'y a que d'autres périphériques"
+
+msgid "Removable disk"
+msgstr "Disque amovible"

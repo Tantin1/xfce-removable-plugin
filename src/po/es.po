@@ -1,0 +1,131 @@
+# Spanish translation of xfce-removable-plugin
+msgid ""
+msgstr ""
+"Project-Id-Version: xfce-removable-plugin\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es\n"
+
+msgid "Could not mount the device."
+msgstr "No se pudo montar el dispositivo."
+
+msgid "Could not unmount the device."
+msgstr "No se pudo desmontar el dispositivo."
+
+msgid "Device ejected"
+msgstr "Dispositivo expulsado"
+
+msgid "Device mounted"
+msgstr "Dispositivo montado"
+
+msgid "Eject"
+msgstr "Expulsar"
+
+msgid "Ejecting…"
+msgstr "Expulsando…"
+
+msgid "Mount"
+msgstr "Montar"
+
+msgid "Mount failed"
+msgstr "Error al montar"
+
+msgid "Mounting…"
+msgstr "Montando…"
+
+msgid "No removable devices"
+msgstr "No hay dispositivos extraíbles"
+
+msgid "Please wait, do not unplug."
+msgstr "Por favor espere, no desconecte."
+
+msgid "Safe to remove"
+msgstr "Seguro para retirar"
+
+msgid "Safe to unplug."
+msgstr "Puede desconectar el dispositivo."
+
+msgid "Unmount"
+msgstr "Desmontar"
+
+msgid "Unmount failed"
+msgstr "Error al desmontar"
+
+msgid "Unmounting…"
+msgstr "Desmontando…"
+
+msgid "You can now unplug the device."
+msgstr "Ya puede desconectar el dispositivo."
+
+msgid "Appearance"
+msgstr "Apariencia"
+
+msgid "Behavior"
+msgstr "Comportamiento"
+
+msgid "Close"
+msgstr "Cerrar"
+
+msgid "Hide button when no removable devices"
+msgstr "Ocultar botón si no hay dispositivos extraíbles"
+
+msgid "Icon size:"
+msgstr "Tamaño del ícono:"
+
+msgid "Open Thunar after mounting"
+msgstr "Abrir Thunar al montar"
+
+msgid "Plugin size:"
+msgstr "Tamaño del plugin:"
+
+msgid "Popup height:"
+msgstr "Alto del popup:"
+
+msgid "Popup width:"
+msgstr "Ancho del popup:"
+
+msgid "Properties — Removable Devices"
+msgstr "Propiedades — Dispositivos extraíbles"
+
+msgid "Removable devices"
+msgstr "Dispositivos extraíbles"
+
+msgid "Show notifications"
+msgstr "Mostrar notificaciones"
+
+msgid "Square button"
+msgstr "Botón cuadrado"
+
+msgid "Use panel icon size"
+msgstr "Usar tamaño del panel para el ícono"
+
+msgid "Removable device connected"
+msgstr "Dispositivo extraíble conectado"
+
+msgid "Removable device disconnected"
+msgstr "Dispositivo extraíble desconectado"
+
+msgid "USB device connected"
+msgstr "Dispositivo USB conectado"
+
+msgid "USB device disconnected"
+msgstr "Dispositivo USB desconectado"
+
+msgid "USB device"
+msgstr "Dispositivo USB"
+
+msgid "Unknown"
+msgstr "Desconocido"
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "Notificar cuando se conecten o desconecten dispositivos"
+
+msgid "Other devices"
+msgstr "Otros dispositivos"
+
+msgid "Also hide when only other devices are present"
+msgstr "Ocultar también cuando solo haya otros dispositivos"
+
+msgid "Removable disk"
+msgstr "Disco extraíble"

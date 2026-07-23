@@ -1,0 +1,131 @@
+# Czech translation of xfce-removable-plugin
+msgid ""
+msgstr ""
+"Project-Id-Version: xfce-removable-plugin\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: cs\n"
+
+msgid "Could not mount the device."
+msgstr "Zařízení nelze připojit."
+
+msgid "Could not unmount the device."
+msgstr "Zařízení nelze odpojit."
+
+msgid "Device ejected"
+msgstr "Zařízení vysunuto"
+
+msgid "Device mounted"
+msgstr "Zařízení připojeno"
+
+msgid "Eject"
+msgstr "Vysunout"
+
+msgid "Ejecting…"
+msgstr "Vysouvání…"
+
+msgid "Mount"
+msgstr "Připojit"
+
+msgid "Mount failed"
+msgstr "Připojení se nezdařilo"
+
+msgid "Mounting…"
+msgstr "Připojování…"
+
+msgid "No removable devices"
+msgstr "Žádná vyměnitelná zařízení"
+
+msgid "Please wait, do not unplug."
+msgstr "Počkejte prosím, neodpojujte."
+
+msgid "Safe to remove"
+msgstr "Lze bezpečně odebrat"
+
+msgid "Safe to unplug."
+msgstr "Zařízení lze odpojit."
+
+msgid "Unmount"
+msgstr "Odpojit"
+
+msgid "Unmount failed"
+msgstr "Odpojení se nezdařilo"
+
+msgid "Unmounting…"
+msgstr "Odpojování…"
+
+msgid "You can now unplug the device."
+msgstr "Nyní můžete zařízení odpojit."
+
+msgid "Appearance"
+msgstr "Vzhled"
+
+msgid "Behavior"
+msgstr "Chování"
+
+msgid "Close"
+msgstr "Zavřít"
+
+msgid "Hide button when no removable devices"
+msgstr "Skrýt tlačítko, pokud nejsou připojena žádná vyměnitelná zařízení"
+
+msgid "Icon size:"
+msgstr "Velikost ikony:"
+
+msgid "Open Thunar after mounting"
+msgstr "Otevřít Thunar po připojení"
+
+msgid "Plugin size:"
+msgstr "Velikost pluginu:"
+
+msgid "Popup height:"
+msgstr "Výška vyskakovacího okna:"
+
+msgid "Popup width:"
+msgstr "Šířka vyskakovacího okna:"
+
+msgid "Properties — Removable Devices"
+msgstr "Vlastnosti — Vyměnitelná zařízení"
+
+msgid "Removable devices"
+msgstr "Vyměnitelná zařízení"
+
+msgid "Show notifications"
+msgstr "Zobrazovat oznámení"
+
+msgid "Square button"
+msgstr "Čtvercové tlačítko"
+
+msgid "Use panel icon size"
+msgstr "Použít velikost panelu pro ikonu"
+
+msgid "Removable device connected"
+msgstr "Vyměnitelné zařízení připojeno"
+
+msgid "Removable device disconnected"
+msgstr "Vyměnitelné zařízení odpojeno"
+
+msgid "USB device connected"
+msgstr "USB zařízení připojeno"
+
+msgid "USB device disconnected"
+msgstr "USB zařízení odpojeno"
+
+msgid "USB device"
+msgstr "USB zařízení"
+
+msgid "Unknown"
+msgstr "Neznámé"
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "Upozornit při připojení nebo odpojení zařízení"
+
+msgid "Other devices"
+msgstr "Ostatní zařízení"
+
+msgid "Also hide when only other devices are present"
+msgstr "Skrýt také, pokud jsou přítomna pouze ostatní zařízení"
+
+msgid "Removable disk"
+msgstr "Vyměnitelný disk"

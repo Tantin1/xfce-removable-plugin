@@ -1,0 +1,11 @@
+build/
+*.o
+*.so
+*.a
+*.pc
+*.desktop
+!*.desktop.in
+/po/*.po
+/po/*.pot
+/po/stamp-po
+CONTEXT.md
