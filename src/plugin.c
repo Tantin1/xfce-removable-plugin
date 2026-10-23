@@ -9,12 +9,9 @@
 #include "popup.h"
 #include "ud-dbus.h"
 
-#ifdef ENABLE_NLS
-#include <libintl.h>
-#define _(x) gettext(x)
-#else
-#define _(x) (x)
-#endif
+/* _() = dgettext (GETTEXT_PACKAGE, …): en Wayland todos los plugins comparten
+   el proceso del panel, y textdomain() cambiaría el idioma de los demás */
+#include <glib/gi18n-lib.h>
 
 /* ---------- defaults ---------- */
 
@@ -57,6 +54,7 @@ typedef struct {
     /* snapshots para detectar enchufado/desenchufado */
     GHashTable      *seen_storage;   /* object_path -> label/device */
     GHashTable      *seen_usb;       /* syspath     -> name|type    */
+    GHashTable      *seen_phones;    /* devfile/URI -> name         */
 
     /* CSS tamaño del botón */
     GtkCssProvider  *button_css;
@@ -112,13 +110,11 @@ apply_config (RemovablePlugin *rp)
 
 /* ---------- configuración persistente ---------- */
 
-#define CONFIG_PATH "xfce4/panel/xfce-removable-plugin.ini"
-
-static gchar *
-get_config_path (void)
-{
-    return g_build_filename (g_get_user_config_dir (), CONFIG_PATH, NULL);
-}
+/* Un archivo por instancia del plugin (lo administra el panel:
+   ~/.config/xfce4/panel/xfce-removable-plugin-<id>.rc), así dos instancias
+   no se pisan. Si la instancia todavía no tiene el suyo, se lee el .ini
+   compartido de versiones anteriores para no perder la configuración. */
+#define LEGACY_CONFIG_PATH "xfce4/panel/xfce-removable-plugin.ini"
 
 /* lee una clave booleana respetando el default si la clave no existe */
 static gboolean
@@ -144,8 +140,11 @@ static void
 load_config (RemovablePlugin *rp)
 {
     GKeyFile *kf   = g_key_file_new ();
-    gchar    *path = get_config_path ();
+    gchar    *path = xfce_panel_plugin_lookup_rc_file (rp->plugin);
     GError   *err  = NULL;
+
+    if (!path)
+        path = g_build_filename (g_get_user_config_dir (), LEGACY_CONFIG_PATH, NULL);
 
     rp->square_button       = DEFAULT_SQUARE_BUTTON;
     rp->plugin_size         = DEFAULT_PLUGIN_SIZE;
@@ -184,12 +183,15 @@ out:
 static void
 save_config (RemovablePlugin *rp)
 {
-    GKeyFile *kf   = g_key_file_new ();
-    gchar    *path = get_config_path ();
-    gchar    *dir  = g_path_get_dirname (path);
+    gchar    *path = xfce_panel_plugin_save_location (rp->plugin, TRUE);
     GError   *err  = NULL;
 
-    g_mkdir_with_parents (dir, 0755);
+    if (!path) {
+        g_warning ("xfce-removable-plugin: el panel no dio ruta para guardar la config");
+        return;
+    }
+
+    GKeyFile *kf = g_key_file_new ();
 
     g_key_file_set_boolean (kf, "appearance", "square_button",      rp->square_button);
     g_key_file_set_integer  (kf, "appearance", "plugin_size",        rp->plugin_size);
@@ -209,38 +211,36 @@ save_config (RemovablePlugin *rp)
     }
 
     g_key_file_free (kf);
-    g_free (dir);
     g_free (path);
 }
 
 /* ---------- visibilidad del botón ---------- */
 
 static void
-plugin_update_button_visibility (RemovablePlugin *rp)
+apply_button_visibility (RemovablePlugin *rp, const UdScan *scan)
 {
-    if (!rp->hide_if_empty) {
+    /* los teléfonos cuentan como dispositivos "principales", no como "otros" */
+    gboolean show = !rp->hide_if_empty ||
+                    scan->storage != NULL ||
+                    scan->phones  != NULL ||
+                    (!rp->hide_if_only_other && scan->usb != NULL);
+
+    if (show) {
         gtk_widget_show (rp->button);
         return;
-    }
-    GSList *devices = ud_get_devices (rp->conn);
-    if (devices) {
-        gtk_widget_show (rp->button);
-        ud_device_list_free (devices);
-        return;
-    }
-    /* no hay almacenamiento extraíble */
-    if (!rp->hide_if_only_other) {
-        /* mostrar si hay otros dispositivos */
-        GSList *usb = ud_get_usb_devices ();
-        if (usb) {
-            gtk_widget_show (rp->button);
-            ud_usb_device_list_free (usb);
-            return;
-        }
     }
     gtk_widget_hide (rp->button);
     if (rp->popup_open)
         popup_hide (rp->popup);
+}
+
+/* para cuando no hay listas a mano (cambios en Propiedades) */
+static void
+plugin_update_button_visibility (RemovablePlugin *rp)
+{
+    UdScan *scan = ud_scan (rp->conn);
+    apply_button_visibility (rp, scan);
+    ud_scan_free (scan);
 }
 
 /* ---------- toggle del popup ---------- */
@@ -281,17 +281,6 @@ format_size_short (guint64 bytes)
     return g_strdup_printf ("%.0f KB", bytes / 1e3);
 }
 
-static const gchar *
-icon_for_usb_type (const gchar *type)
-{
-    if (!type)                                          return "drive-removable-media";
-    if (g_str_equal (type, "Printer"))                  return "printer";
-    if (g_str_equal (type, "Audio device"))             return "audio-card";
-    if (g_str_equal (type, "Camera / Webcam"))          return "camera-web";
-    if (g_str_equal (type, "Gamepad / Joystick"))       return "input-gaming";
-    return "drive-removable-media";
-}
-
 static void
 notify_simple (const gchar *summary, const gchar *body, const gchar *icon)
 {
@@ -302,54 +291,64 @@ notify_simple (const gchar *summary, const gchar *body, const gchar *icon)
 }
 
 /* construye las tablas con el estado actual y, si silent==FALSE, notifica
-   las diferencias contra las tablas anteriores en rp->seen_storage / rp->seen_usb */
+   las diferencias contra las tablas anteriores en rp->seen_storage / rp->seen_usb.
+   No libera devs/usb: son del llamador. */
 static void
-update_snapshots (RemovablePlugin *rp, gboolean silent)
+update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
 {
+    GSList     *devs        = scan->storage;
     GHashTable *new_storage = g_hash_table_new_full (g_str_hash, g_str_equal,
                                                      g_free, g_free);
     GHashTable *new_usb     = g_hash_table_new_full (g_str_hash, g_str_equal,
                                                      g_free, g_free);
+    GHashTable *new_phones  = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                                     g_free, g_free);
 
     /* almacenamiento — agrupado por drive_path para no notificar
-       una vez por cada partición */
-    if (rp->conn) {
-        GSList *devs = ud_get_devices (rp->conn);
-        for (GSList *l = devs; l; l = l->next) {
-            UdDevice *d = l->data;
-            if (!d->drive_path) continue;
-            if (g_hash_table_contains (new_storage, d->drive_path)) {
-                /* otra partición del mismo disco: sumar tamaño */
-                gchar **prev = g_strsplit ((const gchar *) g_hash_table_lookup (
-                                               new_storage, d->drive_path), "|", 2);
-                guint64 prev_size = prev[1] ? g_ascii_strtoull (prev[1], NULL, 10) : 0;
-                gchar *value = g_strdup_printf ("%s|%" G_GUINT64_FORMAT,
-                                                prev[0] ? prev[0] : "",
-                                                prev_size + d->size);
-                g_hash_table_replace (new_storage, g_strdup (d->drive_path), value);
-                g_strfreev (prev);
-                continue;
-            }
-            /* primera partición vista de este disco: tomar nombre del Drive */
-            gchar *drive_name = ud_get_drive_name (rp->conn, d->drive_path);
-            const gchar *display = (drive_name && *drive_name) ? drive_name :
-                                   ((d->label && *d->label) ? d->label : d->device);
+       una vez por cada partición. Valor: "nombre|tamaño" */
+    for (GSList *l = devs; l; l = l->next) {
+        UdDevice *d = l->data;
+        if (!d->drive_path) continue;
+        if (g_hash_table_contains (new_storage, d->drive_path)) {
+            /* otra partición del mismo disco: sumar tamaño */
+            gchar **prev = g_strsplit ((const gchar *) g_hash_table_lookup (
+                                           new_storage, d->drive_path), "|", 2);
+            guint64 prev_size = prev[1] ? g_ascii_strtoull (prev[1], NULL, 10) : 0;
             gchar *value = g_strdup_printf ("%s|%" G_GUINT64_FORMAT,
-                                            display ? display : "", d->size);
+                                            prev[0] ? prev[0] : "",
+                                            prev_size + d->size);
             g_hash_table_replace (new_storage, g_strdup (d->drive_path), value);
-            g_free (drive_name);
+            g_strfreev (prev);
+            continue;
         }
-        ud_device_list_free (devs);
+        /* primera partición vista de este disco: nombre del Drive */
+        const gchar *display = (d->drive_name && *d->drive_name) ? d->drive_name :
+                               ((d->label && *d->label) ? d->label : d->device);
+        gchar *value = g_strdup_printf ("%s|%" G_GUINT64_FORMAT,
+                                        display ? display : "", d->size);
+        g_hash_table_replace (new_storage, g_strdup (d->drive_path), value);
     }
 
-    /* otros USB */
-    GSList *usb = ud_get_usb_devices ();
-    for (GSList *l = usb; l; l = l->next) {
+    /* teléfonos. Clave = devfile USB (o URI), igual para los que vienen de gvfs
+       y para los UD_USB_PHONE que gvfs todavía no tomó: así el paso de uno a
+       otro (gvfs tarda un poco más que udev) no notifica desconexión+conexión */
+    for (GSList *l = scan->phones; l; l = l->next) {
+        UdPhone *ph = l->data;
+        if (!ph->key) continue;
+        g_hash_table_replace (new_phones, g_strdup (ph->key), g_strdup (ph->name ? ph->name : ""));
+    }
+
+    /* otros USB. Valor: "nombre|tipo" (tipo = UdUsbType como entero) */
+    for (GSList *l = scan->usb; l; l = l->next) {
         UdUsbDevice *u = l->data;
+        if (u->type == UD_USB_PHONE) {
+            const gchar *k = u->devfile ? u->devfile : u->syspath;
+            if (k && !g_hash_table_contains (new_phones, k))
+                g_hash_table_replace (new_phones, g_strdup (k), g_strdup (u->name ? u->name : ""));
+            continue;
+        }
         if (!u->syspath) continue;
-        gchar *value = g_strdup_printf ("%s|%s",
-                                        u->name ? u->name : "",
-                                        u->type ? u->type : "");
+        gchar *value = g_strdup_printf ("%s|%d", u->name ? u->name : "", (gint) u->type);
         g_hash_table_replace (new_usb, g_strdup (u->syspath), value);
     }
 
@@ -374,17 +373,35 @@ update_snapshots (RemovablePlugin *rp, gboolean silent)
         g_hash_table_iter_init (&it, new_usb);
         while (g_hash_table_iter_next (&it, &key, &value)) {
             if (!rp->seen_usb || !g_hash_table_contains (rp->seen_usb, key)) {
-                gchar **parts = g_strsplit ((const gchar *) value, "|", 2);
-                gchar  *body  = g_strdup_printf ("%s — %s",
-                                                 (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
-                                                 (parts[1] && *parts[1]) ? parts[1] : _("USB device"));
-                notify_simple (_("USB device connected"), body,
-                               icon_for_usb_type (parts[1]));
+                gchar   **parts = g_strsplit ((const gchar *) value, "|", 2);
+                UdUsbType type  = parts[1] ? (UdUsbType) g_ascii_strtoll (parts[1], NULL, 10)
+                                           : UD_USB_OTHER;
+                gchar    *body  = g_strdup_printf ("%s — %s",
+                                                   (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
+                                                   _(ud_usb_type_label (type)));
+                notify_simple (_("USB device connected"), body, ud_usb_type_icon (type));
                 g_free (body); g_strfreev (parts);
             }
         }
 
+        g_hash_table_iter_init (&it, new_phones);
+        while (g_hash_table_iter_next (&it, &key, &value)) {
+            if (!rp->seen_phones || !g_hash_table_contains (rp->seen_phones, key))
+                notify_simple (_("Phone or camera connected"),
+                               *(const gchar *) value ? (const gchar *) value : _("Unknown"),
+                               "phone");
+        }
+
         /* desenchufado: en seen pero no en new */
+        if (rp->seen_phones) {
+            g_hash_table_iter_init (&it, rp->seen_phones);
+            while (g_hash_table_iter_next (&it, &key, &value)) {
+                if (!g_hash_table_contains (new_phones, key))
+                    notify_simple (_("Phone or camera disconnected"),
+                                   *(const gchar *) value ? (const gchar *) value : _("Unknown"),
+                                   "phone");
+            }
+        }
         if (rp->seen_storage) {
             g_hash_table_iter_init (&it, rp->seen_storage);
             while (g_hash_table_iter_next (&it, &key, &value)) {
@@ -401,22 +418,24 @@ update_snapshots (RemovablePlugin *rp, gboolean silent)
             g_hash_table_iter_init (&it, rp->seen_usb);
             while (g_hash_table_iter_next (&it, &key, &value)) {
                 if (!g_hash_table_contains (new_usb, key)) {
-                    gchar **parts = g_strsplit ((const gchar *) value, "|", 2);
+                    gchar   **parts = g_strsplit ((const gchar *) value, "|", 2);
+                    UdUsbType type  = parts[1] ? (UdUsbType) g_ascii_strtoll (parts[1], NULL, 10)
+                                               : UD_USB_OTHER;
                     notify_simple (_("USB device disconnected"),
                                    (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
-                                   icon_for_usb_type (parts[1]));
+                                   ud_usb_type_icon (type));
                     g_strfreev (parts);
                 }
             }
         }
     }
 
-    ud_usb_device_list_free (usb);
-
     if (rp->seen_storage) g_hash_table_destroy (rp->seen_storage);
     if (rp->seen_usb)     g_hash_table_destroy (rp->seen_usb);
+    if (rp->seen_phones)  g_hash_table_destroy (rp->seen_phones);
     rp->seen_storage = new_storage;
     rp->seen_usb     = new_usb;
+    rp->seen_phones  = new_phones;
 }
 
 /* ---------- refresco por señal DBus ---------- */
@@ -424,10 +443,15 @@ update_snapshots (RemovablePlugin *rp, gboolean silent)
 static void
 plugin_on_device_change (RemovablePlugin *rp)
 {
-    update_snapshots (rp, FALSE);
-    plugin_update_button_visibility (rp);
+    /* un solo escaneo por refresco, compartido por snapshots, botón y popup */
+    UdScan *scan = ud_scan (rp->conn);
+
+    update_snapshots (rp, scan, FALSE);
+    apply_button_visibility (rp, scan);
     if (rp->popup_open)
-        popup_refresh (rp->popup, rp->conn);
+        popup_refresh (rp->popup, rp->conn, scan);
+
+    ud_scan_free (scan);
 }
 
 /* ---------- ventana de Propiedades ---------- */
@@ -545,6 +569,10 @@ on_props_dialog_destroy (GtkWidget *win, PropsDialog *pd)
 static void
 on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
 {
+    /* con el popup abierto él tiene el teclado y el diálogo no lo recibiría */
+    if (rp->popup_open)
+        popup_hide (rp->popup);
+
     PropsDialog *pd = g_new0 (PropsDialog, 1);
     pd->rp = rp;
 
@@ -640,7 +668,7 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     gtk_grid_attach (GTK_GRID (grid_bh), pd->notify_check, 0, row, 2, 1);
     row++;
 
-    pd->thunar_check = gtk_check_button_new_with_label (_("Open Thunar after mounting"));
+    pd->thunar_check = gtk_check_button_new_with_label (_("Open file manager after mounting"));
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->thunar_check), rp->open_thunar);
     gtk_grid_attach (GTK_GRID (grid_bh), pd->thunar_check, 0, row, 2, 1);
     row++;
@@ -699,6 +727,14 @@ on_size_changed (XfcePanelPlugin *plugin, gint size, RemovablePlugin *rp)
 }
 
 static void
+on_mode_changed (XfcePanelPlugin *plugin, XfcePanelPluginMode mode, RemovablePlugin *rp)
+{
+    (void) plugin;
+    (void) mode;
+    apply_config (rp);
+}
+
+static void
 removable_plugin_free (XfcePanelPlugin *plugin, RemovablePlugin *rp)
 {
     (void) plugin;
@@ -713,6 +749,8 @@ removable_plugin_free (XfcePanelPlugin *plugin, RemovablePlugin *rp)
         g_hash_table_destroy (rp->seen_storage);
     if (rp->seen_usb)
         g_hash_table_destroy (rp->seen_usb);
+    if (rp->seen_phones)
+        g_hash_table_destroy (rp->seen_phones);
     g_free (rp);
 }
 
@@ -724,7 +762,7 @@ removable_plugin_construct (XfcePanelPlugin *plugin)
 #ifdef ENABLE_NLS
     bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
     bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
-    textdomain (GETTEXT_PACKAGE);
+    /* sin textdomain(): ver wayland-notas §3.2 */
 #endif
 
     notify_init ("xfce-removable-plugin");
@@ -765,13 +803,17 @@ removable_plugin_construct (XfcePanelPlugin *plugin)
                                          (UdSignalCallback) plugin_on_device_change, rp);
 
     /* snapshot inicial silencioso para no notificar lo ya enchufado */
-    update_snapshots (rp, TRUE);
-
-    plugin_update_button_visibility (rp);
+    {
+        UdScan *scan = ud_scan (rp->conn);
+        update_snapshots (rp, scan, TRUE);
+        apply_button_visibility (rp, scan);
+        ud_scan_free (scan);
+    }
 
     xfce_panel_plugin_menu_show_configure (plugin);
     g_signal_connect (plugin, "configure-plugin", G_CALLBACK (on_configure_plugin), rp);
     g_signal_connect (plugin, "size-changed",     G_CALLBACK (on_size_changed),     rp);
+    g_signal_connect (plugin, "mode-changed",     G_CALLBACK (on_mode_changed),     rp);
     g_signal_connect (plugin, "free-data",        G_CALLBACK (removable_plugin_free), rp);
 }
 

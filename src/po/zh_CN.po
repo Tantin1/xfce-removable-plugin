@@ -2,13 +2,46 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: zh_CN\n"
+
+#, c-format
+msgid "%s free of %s"
+msgstr "%s 可用，共 %s"
+
+msgid "Also hide when only other devices are present"
+msgstr "仅有其他设备时也隐藏"
+
+msgid "Appearance"
+msgstr "外观"
+
+msgid "Audio device"
+msgstr "音频设备"
+
+msgid "Behavior"
+msgstr "行为"
+
+msgid "Camera (PTP)"
+msgstr "相机 (PTP)"
+
+msgid "Camera / Webcam"
+msgstr "相机 / 摄像头"
+
+msgid "Close"
+msgstr "关闭"
+
+msgid "Could not close the connection to the device."
+msgstr "无法关闭与设备的连接。"
 
 msgid "Could not mount the device."
 msgstr "无法挂载设备。"
+
+msgid "Could not open the device. If it is a phone, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "无法打开设备。如果是手机，请解锁并在其 USB 通知中选择“文件传输”。"
 
 msgid "Could not unmount the device."
 msgstr "无法卸载设备。"
@@ -22,8 +55,20 @@ msgstr "设备已挂载"
 msgid "Eject"
 msgstr "弹出"
 
+msgid "Eject failed"
+msgstr "弹出失败"
+
 msgid "Ejecting…"
 msgstr "正在弹出…"
+
+msgid "Gamepad / Joystick"
+msgstr "游戏手柄 / 摇杆"
+
+msgid "Hide button when no removable devices"
+msgstr "没有可移动设备时隐藏按钮"
+
+msgid "Icon size:"
+msgstr "图标大小："
 
 msgid "Mount"
 msgstr "挂载"
@@ -37,44 +82,41 @@ msgstr "正在挂载…"
 msgid "No removable devices"
 msgstr "没有可移动设备"
 
+msgid "Not authorized to perform this operation."
+msgstr "无权执行此操作。"
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "设备连接或断开时通知"
+
+msgid "Open file manager after mounting"
+msgstr "挂载后打开文件管理器"
+
+msgid "Open folder"
+msgstr "打开文件夹"
+
+msgid "Other devices"
+msgstr "其他设备"
+
+msgid "Phone"
+msgstr "手机"
+
+msgid "Phone (MTP)"
+msgstr "手机 (MTP)"
+
+msgid "Phone / Camera"
+msgstr "手机 / 相机"
+
+msgid "Phone or camera connected"
+msgstr "手机或相机已连接"
+
+msgid "Phone or camera disconnected"
+msgstr "手机或相机已断开"
+
+msgid "Phone ready"
+msgstr "手机已就绪"
+
 msgid "Please wait, do not unplug."
 msgstr "请稍候，请勿拔出。"
-
-msgid "Safe to remove"
-msgstr "可以安全移除"
-
-msgid "Safe to unplug."
-msgstr "可以拔出设备。"
-
-msgid "Unmount"
-msgstr "卸载"
-
-msgid "Unmount failed"
-msgstr "卸载失败"
-
-msgid "Unmounting…"
-msgstr "正在卸载…"
-
-msgid "You can now unplug the device."
-msgstr "现在可以拔出设备。"
-
-msgid "Appearance"
-msgstr "外观"
-
-msgid "Behavior"
-msgstr "行为"
-
-msgid "Close"
-msgstr "关闭"
-
-msgid "Hide button when no removable devices"
-msgstr "没有可移动设备时隐藏按钮"
-
-msgid "Icon size:"
-msgstr "图标大小："
-
-msgid "Open Thunar after mounting"
-msgstr "挂载后打开 Thunar"
 
 msgid "Plugin size:"
 msgstr "插件大小："
@@ -85,20 +127,11 @@ msgstr "弹出窗口高度："
 msgid "Popup width:"
 msgstr "弹出窗口宽度："
 
+msgid "Printer"
+msgstr "打印机"
+
 msgid "Properties — Removable Devices"
 msgstr "属性 — 可移动设备"
-
-msgid "Removable devices"
-msgstr "可移动设备"
-
-msgid "Show notifications"
-msgstr "显示通知"
-
-msgid "Square button"
-msgstr "方形按钮"
-
-msgid "Use panel icon size"
-msgstr "使用面板大小作为图标大小"
 
 msgid "Removable device connected"
 msgstr "已连接可移动设备"
@@ -106,26 +139,62 @@ msgstr "已连接可移动设备"
 msgid "Removable device disconnected"
 msgstr "已断开可移动设备"
 
+msgid "Removable devices"
+msgstr "可移动设备"
+
+msgid "Removable disk"
+msgstr "可移动磁盘"
+
+msgid "Safe to remove"
+msgstr "可以安全移除"
+
+msgid "Safe to unplug."
+msgstr "可以拔出设备。"
+
+msgid "Safely remove"
+msgstr "安全移除"
+
+msgid "Show notifications"
+msgstr "显示通知"
+
+msgid "Square button"
+msgstr "方形按钮"
+
+msgid "The device is in use by another application. Close any open files or terminals on it and try again."
+msgstr "设备正被其他应用程序使用。请关闭其上打开的文件或终端后重试。"
+
+msgid "The partitions were unmounted, but the drive could not be ejected."
+msgstr "分区已卸载，但无法弹出驱动器。"
+
+msgid "USB device"
+msgstr "USB 设备"
+
 msgid "USB device connected"
 msgstr "已连接 USB 设备"
 
 msgid "USB device disconnected"
 msgstr "已断开 USB 设备"
 
-msgid "USB device"
-msgstr "USB 设备"
-
 msgid "Unknown"
 msgstr "未知"
 
-msgid "Notify when devices are connected or disconnected"
-msgstr "设备连接或断开时通知"
+msgid "Unmount"
+msgstr "卸载"
 
-msgid "Other devices"
-msgstr "其他设备"
+msgid "Unmount failed"
+msgstr "卸载失败"
 
-msgid "Also hide when only other devices are present"
-msgstr "仅有其他设备时也隐藏"
+msgid "Unmounting…"
+msgstr "正在卸载…"
 
-msgid "Removable disk"
-msgstr "可移动磁盘"
+msgid "Use panel icon size"
+msgstr "使用面板大小作为图标大小"
+
+msgid "You can now unplug the device."
+msgstr "现在可以拔出设备。"
+
+msgid "iPhone / iPad"
+msgstr "iPhone / iPad"
+
+msgid "not mounted"
+msgstr "未挂载"

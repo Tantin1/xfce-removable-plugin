@@ -2,13 +2,46 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: nl\n"
+
+#, c-format
+msgid "%s free of %s"
+msgstr "%s vrij van %s"
+
+msgid "Also hide when only other devices are present"
+msgstr "Ook verbergen wanneer er alleen andere apparaten zijn"
+
+msgid "Appearance"
+msgstr "Uiterlijk"
+
+msgid "Audio device"
+msgstr "Audioapparaat"
+
+msgid "Behavior"
+msgstr "Gedrag"
+
+msgid "Camera (PTP)"
+msgstr "Camera (PTP)"
+
+msgid "Camera / Webcam"
+msgstr "Camera / Webcam"
+
+msgid "Close"
+msgstr "Sluiten"
+
+msgid "Could not close the connection to the device."
+msgstr "Kan de verbinding met het apparaat niet sluiten."
 
 msgid "Could not mount the device."
 msgstr "Het apparaat kon niet worden aangekoppeld."
+
+msgid "Could not open the device. If it is a phone, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "Kan het apparaat niet openen. Als het een telefoon is, ontgrendel deze en kies ‘Bestandsoverdracht’ in de USB-melding."
 
 msgid "Could not unmount the device."
 msgstr "Het apparaat kon niet worden ontkoppeld."
@@ -22,8 +55,20 @@ msgstr "Apparaat aangekoppeld"
 msgid "Eject"
 msgstr "Uitwerpen"
 
+msgid "Eject failed"
+msgstr "Uitwerpen mislukt"
+
 msgid "Ejecting…"
 msgstr "Uitwerpen…"
+
+msgid "Gamepad / Joystick"
+msgstr "Gamepad / Joystick"
+
+msgid "Hide button when no removable devices"
+msgstr "Knop verbergen als er geen verwijderbare apparaten zijn"
+
+msgid "Icon size:"
+msgstr "Pictogramgrootte:"
 
 msgid "Mount"
 msgstr "Koppelen"
@@ -37,44 +82,41 @@ msgstr "Koppelen…"
 msgid "No removable devices"
 msgstr "Geen verwijderbare apparaten"
 
+msgid "Not authorized to perform this operation."
+msgstr "Niet bevoegd om deze bewerking uit te voeren."
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "Melden wanneer apparaten worden aangesloten of losgekoppeld"
+
+msgid "Open file manager after mounting"
+msgstr "Bestandsbeheerder openen na koppelen"
+
+msgid "Open folder"
+msgstr "Map openen"
+
+msgid "Other devices"
+msgstr "Andere apparaten"
+
+msgid "Phone"
+msgstr "Telefoon"
+
+msgid "Phone (MTP)"
+msgstr "Telefoon (MTP)"
+
+msgid "Phone / Camera"
+msgstr "Telefoon / Camera"
+
+msgid "Phone or camera connected"
+msgstr "Telefoon of camera aangesloten"
+
+msgid "Phone or camera disconnected"
+msgstr "Telefoon of camera losgekoppeld"
+
+msgid "Phone ready"
+msgstr "Telefoon gereed"
+
 msgid "Please wait, do not unplug."
 msgstr "Even geduld, niet loskoppelen."
-
-msgid "Safe to remove"
-msgstr "Veilig verwijderen"
-
-msgid "Safe to unplug."
-msgstr "U kunt het apparaat nu loskoppelen."
-
-msgid "Unmount"
-msgstr "Ontkoppelen"
-
-msgid "Unmount failed"
-msgstr "Ontkoppelen mislukt"
-
-msgid "Unmounting…"
-msgstr "Ontkoppelen…"
-
-msgid "You can now unplug the device."
-msgstr "U kunt het apparaat nu loskoppelen."
-
-msgid "Appearance"
-msgstr "Uiterlijk"
-
-msgid "Behavior"
-msgstr "Gedrag"
-
-msgid "Close"
-msgstr "Sluiten"
-
-msgid "Hide button when no removable devices"
-msgstr "Knop verbergen als er geen verwijderbare apparaten zijn"
-
-msgid "Icon size:"
-msgstr "Pictogramgrootte:"
-
-msgid "Open Thunar after mounting"
-msgstr "Thunar openen na koppelen"
 
 msgid "Plugin size:"
 msgstr "Plugingrootte:"
@@ -85,20 +127,11 @@ msgstr "Popuphoogte:"
 msgid "Popup width:"
 msgstr "Popupbreedte:"
 
+msgid "Printer"
+msgstr "Printer"
+
 msgid "Properties — Removable Devices"
 msgstr "Eigenschappen — Verwijderbare apparaten"
-
-msgid "Removable devices"
-msgstr "Verwijderbare apparaten"
-
-msgid "Show notifications"
-msgstr "Meldingen weergeven"
-
-msgid "Square button"
-msgstr "Vierkante knop"
-
-msgid "Use panel icon size"
-msgstr "Panelgrootte gebruiken voor pictogram"
 
 msgid "Removable device connected"
 msgstr "Verwijderbaar apparaat aangesloten"
@@ -106,26 +139,62 @@ msgstr "Verwijderbaar apparaat aangesloten"
 msgid "Removable device disconnected"
 msgstr "Verwijderbaar apparaat losgekoppeld"
 
+msgid "Removable devices"
+msgstr "Verwijderbare apparaten"
+
+msgid "Removable disk"
+msgstr "Verwijderbare schijf"
+
+msgid "Safe to remove"
+msgstr "Veilig verwijderen"
+
+msgid "Safe to unplug."
+msgstr "U kunt het apparaat nu loskoppelen."
+
+msgid "Safely remove"
+msgstr "Veilig verwijderen"
+
+msgid "Show notifications"
+msgstr "Meldingen weergeven"
+
+msgid "Square button"
+msgstr "Vierkante knop"
+
+msgid "The device is in use by another application. Close any open files or terminals on it and try again."
+msgstr "Het apparaat wordt gebruikt door een ander programma. Sluit geopende bestanden of terminals erop en probeer het opnieuw."
+
+msgid "The partitions were unmounted, but the drive could not be ejected."
+msgstr "De partities zijn ontkoppeld, maar het station kon niet worden uitgeworpen."
+
+msgid "USB device"
+msgstr "USB-apparaat"
+
 msgid "USB device connected"
 msgstr "USB-apparaat aangesloten"
 
 msgid "USB device disconnected"
 msgstr "USB-apparaat losgekoppeld"
 
-msgid "USB device"
-msgstr "USB-apparaat"
-
 msgid "Unknown"
 msgstr "Onbekend"
 
-msgid "Notify when devices are connected or disconnected"
-msgstr "Melden wanneer apparaten worden aangesloten of losgekoppeld"
+msgid "Unmount"
+msgstr "Ontkoppelen"
 
-msgid "Other devices"
-msgstr "Andere apparaten"
+msgid "Unmount failed"
+msgstr "Ontkoppelen mislukt"
 
-msgid "Also hide when only other devices are present"
-msgstr "Ook verbergen wanneer er alleen andere apparaten zijn"
+msgid "Unmounting…"
+msgstr "Ontkoppelen…"
 
-msgid "Removable disk"
-msgstr "Verwijderbare schijf"
+msgid "Use panel icon size"
+msgstr "Panelgrootte gebruiken voor pictogram"
+
+msgid "You can now unplug the device."
+msgstr "U kunt het apparaat nu loskoppelen."
+
+msgid "iPhone / iPad"
+msgstr "iPhone / iPad"
+
+msgid "not mounted"
+msgstr "niet gekoppeld"

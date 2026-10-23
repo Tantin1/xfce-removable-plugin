@@ -2,13 +2,46 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: tr\n"
+
+#, c-format
+msgid "%s free of %s"
+msgstr "%s boş, toplam %s"
+
+msgid "Also hide when only other devices are present"
+msgstr "Yalnızca diğer aygıtlar varsa da gizle"
+
+msgid "Appearance"
+msgstr "Görünüm"
+
+msgid "Audio device"
+msgstr "Ses aygıtı"
+
+msgid "Behavior"
+msgstr "Davranış"
+
+msgid "Camera (PTP)"
+msgstr "Kamera (PTP)"
+
+msgid "Camera / Webcam"
+msgstr "Kamera / Web kamerası"
+
+msgid "Close"
+msgstr "Kapat"
+
+msgid "Could not close the connection to the device."
+msgstr "Aygıtla bağlantı kapatılamadı."
 
 msgid "Could not mount the device."
 msgstr "Aygıt bağlanamadı."
+
+msgid "Could not open the device. If it is a phone, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "Aygıt açılamadı. Bir telefonsa kilidini açın ve USB bildiriminde \"Dosya aktarımı\"nı seçin."
 
 msgid "Could not unmount the device."
 msgstr "Aygıt çıkarılamadı."
@@ -22,8 +55,20 @@ msgstr "Aygıt bağlandı"
 msgid "Eject"
 msgstr "Çıkar"
 
+msgid "Eject failed"
+msgstr "Çıkarma başarısız"
+
 msgid "Ejecting…"
 msgstr "Çıkarılıyor…"
+
+msgid "Gamepad / Joystick"
+msgstr "Oyun kumandası / Joystick"
+
+msgid "Hide button when no removable devices"
+msgstr "Çıkarılabilir aygıt yokken düğmeyi gizle"
+
+msgid "Icon size:"
+msgstr "Simge boyutu:"
 
 msgid "Mount"
 msgstr "Bağla"
@@ -37,44 +82,41 @@ msgstr "Bağlanıyor…"
 msgid "No removable devices"
 msgstr "Çıkarılabilir aygıt yok"
 
+msgid "Not authorized to perform this operation."
+msgstr "Bu işlemi gerçekleştirme yetkiniz yok."
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "Aygıtlar bağlandığında veya çıkarıldığında bildir"
+
+msgid "Open file manager after mounting"
+msgstr "Bağladıktan sonra dosya yöneticisini aç"
+
+msgid "Open folder"
+msgstr "Klasörü aç"
+
+msgid "Other devices"
+msgstr "Diğer aygıtlar"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Phone (MTP)"
+msgstr "Telefon (MTP)"
+
+msgid "Phone / Camera"
+msgstr "Telefon / Kamera"
+
+msgid "Phone or camera connected"
+msgstr "Telefon veya kamera bağlandı"
+
+msgid "Phone or camera disconnected"
+msgstr "Telefon veya kamera çıkarıldı"
+
+msgid "Phone ready"
+msgstr "Telefon hazır"
+
 msgid "Please wait, do not unplug."
 msgstr "Lütfen bekleyin, fişi çekmeyin."
-
-msgid "Safe to remove"
-msgstr "Güvenli kaldırma"
-
-msgid "Safe to unplug."
-msgstr "Aygıtı güvenle çıkarabilirsiniz."
-
-msgid "Unmount"
-msgstr "Çıkar"
-
-msgid "Unmount failed"
-msgstr "Çıkarma başarısız"
-
-msgid "Unmounting…"
-msgstr "Çıkarılıyor…"
-
-msgid "You can now unplug the device."
-msgstr "Aygıtı artık çıkarabilirsiniz."
-
-msgid "Appearance"
-msgstr "Görünüm"
-
-msgid "Behavior"
-msgstr "Davranış"
-
-msgid "Close"
-msgstr "Kapat"
-
-msgid "Hide button when no removable devices"
-msgstr "Çıkarılabilir aygıt yokken düğmeyi gizle"
-
-msgid "Icon size:"
-msgstr "Simge boyutu:"
-
-msgid "Open Thunar after mounting"
-msgstr "Bağladıktan sonra Thunar'ı aç"
 
 msgid "Plugin size:"
 msgstr "Eklenti boyutu:"
@@ -85,20 +127,11 @@ msgstr "Açılır pencere yüksekliği:"
 msgid "Popup width:"
 msgstr "Açılır pencere genişliği:"
 
+msgid "Printer"
+msgstr "Yazıcı"
+
 msgid "Properties — Removable Devices"
 msgstr "Özellikler — Çıkarılabilir Aygıtlar"
-
-msgid "Removable devices"
-msgstr "Çıkarılabilir aygıtlar"
-
-msgid "Show notifications"
-msgstr "Bildirimleri göster"
-
-msgid "Square button"
-msgstr "Kare düğme"
-
-msgid "Use panel icon size"
-msgstr "Simge için panel boyutunu kullan"
 
 msgid "Removable device connected"
 msgstr "Çıkarılabilir aygıt bağlandı"
@@ -106,26 +139,62 @@ msgstr "Çıkarılabilir aygıt bağlandı"
 msgid "Removable device disconnected"
 msgstr "Çıkarılabilir aygıt çıkarıldı"
 
+msgid "Removable devices"
+msgstr "Çıkarılabilir aygıtlar"
+
+msgid "Removable disk"
+msgstr "Çıkarılabilir disk"
+
+msgid "Safe to remove"
+msgstr "Güvenli kaldırma"
+
+msgid "Safe to unplug."
+msgstr "Aygıtı güvenle çıkarabilirsiniz."
+
+msgid "Safely remove"
+msgstr "Güvenle kaldır"
+
+msgid "Show notifications"
+msgstr "Bildirimleri göster"
+
+msgid "Square button"
+msgstr "Kare düğme"
+
+msgid "The device is in use by another application. Close any open files or terminals on it and try again."
+msgstr "Aygıt başka bir uygulama tarafından kullanılıyor. Üzerinde açık olan dosyaları veya uçbirimleri kapatıp yeniden deneyin."
+
+msgid "The partitions were unmounted, but the drive could not be ejected."
+msgstr "Bölümler ayrıldı, ancak sürücü çıkarılamadı."
+
+msgid "USB device"
+msgstr "USB aygıtı"
+
 msgid "USB device connected"
 msgstr "USB aygıtı bağlandı"
 
 msgid "USB device disconnected"
 msgstr "USB aygıtı çıkarıldı"
 
-msgid "USB device"
-msgstr "USB aygıtı"
-
 msgid "Unknown"
 msgstr "Bilinmiyor"
 
-msgid "Notify when devices are connected or disconnected"
-msgstr "Aygıtlar bağlandığında veya çıkarıldığında bildir"
+msgid "Unmount"
+msgstr "Çıkar"
 
-msgid "Other devices"
-msgstr "Diğer aygıtlar"
+msgid "Unmount failed"
+msgstr "Çıkarma başarısız"
 
-msgid "Also hide when only other devices are present"
-msgstr "Yalnızca diğer aygıtlar varsa da gizle"
+msgid "Unmounting…"
+msgstr "Çıkarılıyor…"
 
-msgid "Removable disk"
-msgstr "Çıkarılabilir disk"
+msgid "Use panel icon size"
+msgstr "Simge için panel boyutunu kullan"
+
+msgid "You can now unplug the device."
+msgstr "Aygıtı artık çıkarabilirsiniz."
+
+msgid "iPhone / iPad"
+msgstr "iPhone / iPad"
+
+msgid "not mounted"
+msgstr "bağlı değil"

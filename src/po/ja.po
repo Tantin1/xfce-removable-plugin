@@ -2,13 +2,46 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ja\n"
+
+#, c-format
+msgid "%s free of %s"
+msgstr "空き %s / %s"
+
+msgid "Also hide when only other devices are present"
+msgstr "他のデバイスしかない場合も非表示にする"
+
+msgid "Appearance"
+msgstr "外観"
+
+msgid "Audio device"
+msgstr "オーディオデバイス"
+
+msgid "Behavior"
+msgstr "動作"
+
+msgid "Camera (PTP)"
+msgstr "カメラ (PTP)"
+
+msgid "Camera / Webcam"
+msgstr "カメラ / Web カメラ"
+
+msgid "Close"
+msgstr "閉じる"
+
+msgid "Could not close the connection to the device."
+msgstr "デバイスとの接続を閉じられませんでした。"
 
 msgid "Could not mount the device."
 msgstr "デバイスをマウントできませんでした。"
+
+msgid "Could not open the device. If it is a phone, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "デバイスを開けませんでした。スマートフォンの場合はロックを解除し、USB 通知で「ファイル転送」を選んでください。"
 
 msgid "Could not unmount the device."
 msgstr "デバイスをアンマウントできませんでした。"
@@ -22,8 +55,20 @@ msgstr "デバイスをマウントしました"
 msgid "Eject"
 msgstr "取り出す"
 
+msgid "Eject failed"
+msgstr "取り出し失敗"
+
 msgid "Ejecting…"
 msgstr "取り出し中…"
+
+msgid "Gamepad / Joystick"
+msgstr "ゲームパッド / ジョイスティック"
+
+msgid "Hide button when no removable devices"
+msgstr "リムーバブルデバイスがない場合はボタンを非表示にする"
+
+msgid "Icon size:"
+msgstr "アイコンサイズ："
 
 msgid "Mount"
 msgstr "マウント"
@@ -37,44 +82,41 @@ msgstr "マウント中…"
 msgid "No removable devices"
 msgstr "リムーバブルデバイスなし"
 
+msgid "Not authorized to perform this operation."
+msgstr "この操作を実行する権限がありません。"
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "デバイスの接続/切断時に通知する"
+
+msgid "Open file manager after mounting"
+msgstr "マウント後にファイルマネージャーを開く"
+
+msgid "Open folder"
+msgstr "フォルダーを開く"
+
+msgid "Other devices"
+msgstr "その他のデバイス"
+
+msgid "Phone"
+msgstr "スマートフォン"
+
+msgid "Phone (MTP)"
+msgstr "スマートフォン (MTP)"
+
+msgid "Phone / Camera"
+msgstr "スマートフォン / カメラ"
+
+msgid "Phone or camera connected"
+msgstr "スマートフォンまたはカメラが接続されました"
+
+msgid "Phone or camera disconnected"
+msgstr "スマートフォンまたはカメラが切断されました"
+
+msgid "Phone ready"
+msgstr "スマートフォンの準備完了"
+
 msgid "Please wait, do not unplug."
 msgstr "しばらくお待ちください。取り外さないでください。"
-
-msgid "Safe to remove"
-msgstr "安全に取り外せます"
-
-msgid "Safe to unplug."
-msgstr "デバイスを取り外せます。"
-
-msgid "Unmount"
-msgstr "アンマウント"
-
-msgid "Unmount failed"
-msgstr "アンマウント失敗"
-
-msgid "Unmounting…"
-msgstr "アンマウント中…"
-
-msgid "You can now unplug the device."
-msgstr "デバイスを取り外せます。"
-
-msgid "Appearance"
-msgstr "外観"
-
-msgid "Behavior"
-msgstr "動作"
-
-msgid "Close"
-msgstr "閉じる"
-
-msgid "Hide button when no removable devices"
-msgstr "リムーバブルデバイスがない場合はボタンを非表示にする"
-
-msgid "Icon size:"
-msgstr "アイコンサイズ："
-
-msgid "Open Thunar after mounting"
-msgstr "マウント後に Thunar を開く"
 
 msgid "Plugin size:"
 msgstr "プラグインサイズ："
@@ -85,20 +127,11 @@ msgstr "ポップアップの高さ："
 msgid "Popup width:"
 msgstr "ポップアップの幅："
 
+msgid "Printer"
+msgstr "プリンター"
+
 msgid "Properties — Removable Devices"
 msgstr "プロパティ — リムーバブルデバイス"
-
-msgid "Removable devices"
-msgstr "リムーバブルデバイス"
-
-msgid "Show notifications"
-msgstr "通知を表示"
-
-msgid "Square button"
-msgstr "正方形ボタン"
-
-msgid "Use panel icon size"
-msgstr "アイコンにパネルサイズを使用"
 
 msgid "Removable device connected"
 msgstr "リムーバブルデバイスが接続されました"
@@ -106,26 +139,62 @@ msgstr "リムーバブルデバイスが接続されました"
 msgid "Removable device disconnected"
 msgstr "リムーバブルデバイスが切断されました"
 
+msgid "Removable devices"
+msgstr "リムーバブルデバイス"
+
+msgid "Removable disk"
+msgstr "リムーバブルディスク"
+
+msgid "Safe to remove"
+msgstr "安全に取り外せます"
+
+msgid "Safe to unplug."
+msgstr "デバイスを取り外せます。"
+
+msgid "Safely remove"
+msgstr "安全に取り外す"
+
+msgid "Show notifications"
+msgstr "通知を表示"
+
+msgid "Square button"
+msgstr "正方形ボタン"
+
+msgid "The device is in use by another application. Close any open files or terminals on it and try again."
+msgstr "デバイスは別のアプリケーションで使用中です。デバイス上で開いているファイルや端末を閉じてから、もう一度お試しください。"
+
+msgid "The partitions were unmounted, but the drive could not be ejected."
+msgstr "パーティションはアンマウントされましたが、ドライブを取り出せませんでした。"
+
+msgid "USB device"
+msgstr "USB デバイス"
+
 msgid "USB device connected"
 msgstr "USB デバイスが接続されました"
 
 msgid "USB device disconnected"
 msgstr "USB デバイスが切断されました"
 
-msgid "USB device"
-msgstr "USB デバイス"
-
 msgid "Unknown"
 msgstr "不明"
 
-msgid "Notify when devices are connected or disconnected"
-msgstr "デバイスの接続/切断時に通知する"
+msgid "Unmount"
+msgstr "アンマウント"
 
-msgid "Other devices"
-msgstr "その他のデバイス"
+msgid "Unmount failed"
+msgstr "アンマウント失敗"
 
-msgid "Also hide when only other devices are present"
-msgstr "他のデバイスしかない場合も非表示にする"
+msgid "Unmounting…"
+msgstr "アンマウント中…"
 
-msgid "Removable disk"
-msgstr "リムーバブルディスク"
+msgid "Use panel icon size"
+msgstr "アイコンにパネルサイズを使用"
+
+msgid "You can now unplug the device."
+msgstr "デバイスを取り外せます。"
+
+msgid "iPhone / iPad"
+msgstr "iPhone / iPad"
+
+msgid "not mounted"
+msgstr "未マウント"

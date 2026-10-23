@@ -2,13 +2,46 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru\n"
+
+#, c-format
+msgid "%s free of %s"
+msgstr "Свободно %s из %s"
+
+msgid "Also hide when only other devices are present"
+msgstr "Скрывать также, если есть только другие устройства"
+
+msgid "Appearance"
+msgstr "Внешний вид"
+
+msgid "Audio device"
+msgstr "Аудиоустройство"
+
+msgid "Behavior"
+msgstr "Поведение"
+
+msgid "Camera (PTP)"
+msgstr "Камера (PTP)"
+
+msgid "Camera / Webcam"
+msgstr "Камера / веб-камера"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Could not close the connection to the device."
+msgstr "Не удалось закрыть соединение с устройством."
 
 msgid "Could not mount the device."
 msgstr "Не удалось подключить устройство."
+
+msgid "Could not open the device. If it is a phone, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "Не удалось открыть устройство. Если это телефон, разблокируйте его и выберите «Передача файлов» в уведомлении о USB."
 
 msgid "Could not unmount the device."
 msgstr "Не удалось отключить устройство."
@@ -22,8 +55,20 @@ msgstr "Устройство подключено"
 msgid "Eject"
 msgstr "Извлечь"
 
+msgid "Eject failed"
+msgstr "Ошибка извлечения"
+
 msgid "Ejecting…"
 msgstr "Извлечение…"
+
+msgid "Gamepad / Joystick"
+msgstr "Геймпад / джойстик"
+
+msgid "Hide button when no removable devices"
+msgstr "Скрывать кнопку, если нет съёмных устройств"
+
+msgid "Icon size:"
+msgstr "Размер значка:"
 
 msgid "Mount"
 msgstr "Подключить"
@@ -37,44 +82,41 @@ msgstr "Подключение…"
 msgid "No removable devices"
 msgstr "Нет съёмных устройств"
 
+msgid "Not authorized to perform this operation."
+msgstr "Нет прав на выполнение этой операции."
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "Уведомлять о подключении и отключении устройств"
+
+msgid "Open file manager after mounting"
+msgstr "Открывать файловый менеджер после подключения"
+
+msgid "Open folder"
+msgstr "Открыть папку"
+
+msgid "Other devices"
+msgstr "Другие устройства"
+
+msgid "Phone"
+msgstr "Телефон"
+
+msgid "Phone (MTP)"
+msgstr "Телефон (MTP)"
+
+msgid "Phone / Camera"
+msgstr "Телефон / камера"
+
+msgid "Phone or camera connected"
+msgstr "Телефон или камера подключены"
+
+msgid "Phone or camera disconnected"
+msgstr "Телефон или камера отключены"
+
+msgid "Phone ready"
+msgstr "Телефон готов"
+
 msgid "Please wait, do not unplug."
 msgstr "Подождите, не отключайте устройство."
-
-msgid "Safe to remove"
-msgstr "Безопасное извлечение"
-
-msgid "Safe to unplug."
-msgstr "Устройство можно отключить."
-
-msgid "Unmount"
-msgstr "Отключить"
-
-msgid "Unmount failed"
-msgstr "Ошибка отключения"
-
-msgid "Unmounting…"
-msgstr "Отключение…"
-
-msgid "You can now unplug the device."
-msgstr "Теперь можно отключить устройство."
-
-msgid "Appearance"
-msgstr "Внешний вид"
-
-msgid "Behavior"
-msgstr "Поведение"
-
-msgid "Close"
-msgstr "Закрыть"
-
-msgid "Hide button when no removable devices"
-msgstr "Скрывать кнопку, если нет съёмных устройств"
-
-msgid "Icon size:"
-msgstr "Размер значка:"
-
-msgid "Open Thunar after mounting"
-msgstr "Открывать Thunar после подключения"
 
 msgid "Plugin size:"
 msgstr "Размер плагина:"
@@ -85,20 +127,11 @@ msgstr "Высота всплывающего окна:"
 msgid "Popup width:"
 msgstr "Ширина всплывающего окна:"
 
+msgid "Printer"
+msgstr "Принтер"
+
 msgid "Properties — Removable Devices"
 msgstr "Свойства — Съёмные устройства"
-
-msgid "Removable devices"
-msgstr "Съёмные устройства"
-
-msgid "Show notifications"
-msgstr "Показывать уведомления"
-
-msgid "Square button"
-msgstr "Квадратная кнопка"
-
-msgid "Use panel icon size"
-msgstr "Использовать размер панели для значка"
 
 msgid "Removable device connected"
 msgstr "Съёмное устройство подключено"
@@ -106,26 +139,62 @@ msgstr "Съёмное устройство подключено"
 msgid "Removable device disconnected"
 msgstr "Съёмное устройство отключено"
 
+msgid "Removable devices"
+msgstr "Съёмные устройства"
+
+msgid "Removable disk"
+msgstr "Съёмный диск"
+
+msgid "Safe to remove"
+msgstr "Безопасное извлечение"
+
+msgid "Safe to unplug."
+msgstr "Устройство можно отключить."
+
+msgid "Safely remove"
+msgstr "Безопасно извлечь"
+
+msgid "Show notifications"
+msgstr "Показывать уведомления"
+
+msgid "Square button"
+msgstr "Квадратная кнопка"
+
+msgid "The device is in use by another application. Close any open files or terminals on it and try again."
+msgstr "Устройство используется другим приложением. Закройте открытые на нём файлы или терминалы и повторите попытку."
+
+msgid "The partitions were unmounted, but the drive could not be ejected."
+msgstr "Разделы отключены, но извлечь накопитель не удалось."
+
+msgid "USB device"
+msgstr "USB-устройство"
+
 msgid "USB device connected"
 msgstr "USB-устройство подключено"
 
 msgid "USB device disconnected"
 msgstr "USB-устройство отключено"
 
-msgid "USB device"
-msgstr "USB-устройство"
-
 msgid "Unknown"
 msgstr "Неизвестное"
 
-msgid "Notify when devices are connected or disconnected"
-msgstr "Уведомлять о подключении и отключении устройств"
+msgid "Unmount"
+msgstr "Отключить"
 
-msgid "Other devices"
-msgstr "Другие устройства"
+msgid "Unmount failed"
+msgstr "Ошибка отключения"
 
-msgid "Also hide when only other devices are present"
-msgstr "Скрывать также, если есть только другие устройства"
+msgid "Unmounting…"
+msgstr "Отключение…"
 
-msgid "Removable disk"
-msgstr "Съёмный диск"
+msgid "Use panel icon size"
+msgstr "Использовать размер панели для значка"
+
+msgid "You can now unplug the device."
+msgstr "Теперь можно отключить устройство."
+
+msgid "iPhone / iPad"
+msgstr "iPhone / iPad"
+
+msgid "not mounted"
+msgstr "не подключено"

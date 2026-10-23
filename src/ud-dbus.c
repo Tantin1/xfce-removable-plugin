@@ -2,6 +2,9 @@
 #include <string.h>
 #include <gudev/gudev.h>
 
+/* marca cadenas para xgettext; se traducen con _() al mostrarlas en la UI */
+#define N_(x) (x)
+
 /* ---------- conexión ---------- */
 
 GDBusConnection *
@@ -17,118 +20,135 @@ ud_dbus_connect (void)
     return conn;
 }
 
-/* ---------- helpers ---------- */
+/* ---------- lectura de propiedades desde GetManagedObjects ----------
+ *
+ * GetManagedObjects ya trae todas las interfaces y propiedades de todos los
+ * objetos (bloques y drives) en una sola llamada: no hace falta volver a
+ * consultar el bus por cada propiedad.
+ */
+
+/* convierte un "ay" de UDisks2 (terminado en NUL) a string */
+static gchar *
+bytes_to_str (GVariant *v)
+{
+    gsize        len   = 0;
+    const gchar *bytes = g_variant_get_fixed_array (v, &len, 1);
+    while (len > 0 && bytes[len - 1] == '\0')
+        len--;
+    return (len > 0) ? g_strndup (bytes, len) : NULL;
+}
 
 static gchar *
-get_string_prop (GDBusConnection *conn,
-                 const gchar     *object_path,
-                 const gchar     *iface,
-                 const gchar     *prop)
+prop_str (GVariant *props, const gchar *key)
 {
-    GError   *err = NULL;
-    GVariant *ret = g_dbus_connection_call_sync (
-        conn, UD_BUS_NAME, object_path,
-        "org.freedesktop.DBus.Properties", "Get",
-        g_variant_new ("(ss)", iface, prop),
-        G_VARIANT_TYPE ("(v)"),
-        G_DBUS_CALL_FLAGS_NONE, 2000, NULL, &err);
-    if (!ret) { g_clear_error (&err); return g_strdup (""); }
-
-    GVariant *val;
-    g_variant_get (ret, "(v)", &val);
-
-    gchar *str = NULL;
-    if (g_variant_is_of_type (val, G_VARIANT_TYPE_STRING) ||
-        g_variant_is_of_type (val, G_VARIANT_TYPE_OBJECT_PATH)) {
-        str = g_variant_dup_string (val, NULL);
-    } else if (g_variant_is_of_type (val, G_VARIANT_TYPE ("ay"))) {
-        gsize len;
-        const guchar *bytes = g_variant_get_fixed_array (val, &len, 1);
-        if (bytes && len > 0) {
-            if (bytes[len - 1] == '\0') len--;
-            str = g_strndup ((const gchar *) bytes, len);
-        }
+    gchar    *str = NULL;
+    GVariant *v   = props ? g_variant_lookup_value (props, key, NULL) : NULL;
+    if (v) {
+        if (g_variant_is_of_type (v, G_VARIANT_TYPE_STRING) ||
+            g_variant_is_of_type (v, G_VARIANT_TYPE_OBJECT_PATH))
+            str = g_variant_dup_string (v, NULL);
+        else if (g_variant_is_of_type (v, G_VARIANT_TYPE_BYTESTRING))
+            str = bytes_to_str (v);
+        g_variant_unref (v);
     }
-
-    g_variant_unref (val);
-    g_variant_unref (ret);
     return str ? str : g_strdup ("");
 }
 
-static guint64
-get_uint64_prop (GDBusConnection *conn,
-                 const gchar     *object_path,
-                 const gchar     *iface,
-                 const gchar     *prop)
-{
-    GError   *err = NULL;
-    GVariant *ret = g_dbus_connection_call_sync (
-        conn, UD_BUS_NAME, object_path,
-        "org.freedesktop.DBus.Properties", "Get",
-        g_variant_new ("(ss)", iface, prop),
-        G_VARIANT_TYPE ("(v)"),
-        G_DBUS_CALL_FLAGS_NONE, 2000, NULL, &err);
-    if (!ret) { g_clear_error (&err); return 0; }
-    GVariant *val;
-    g_variant_get (ret, "(v)", &val);
-    guint64 n = g_variant_get_uint64 (val);
-    g_variant_unref (val);
-    g_variant_unref (ret);
-    return n;
-}
-
 static gboolean
-get_bool_prop (GDBusConnection *conn,
-               const gchar     *object_path,
-               const gchar     *iface,
-               const gchar     *prop)
+prop_bool (GVariant *props, const gchar *key)
 {
-    GError   *err = NULL;
-    GVariant *ret = g_dbus_connection_call_sync (
-        conn, UD_BUS_NAME, object_path,
-        "org.freedesktop.DBus.Properties", "Get",
-        g_variant_new ("(ss)", iface, prop),
-        G_VARIANT_TYPE ("(v)"),
-        G_DBUS_CALL_FLAGS_NONE, 2000, NULL, &err);
-    if (!ret) { g_clear_error (&err); return FALSE; }
-    GVariant *val;
-    g_variant_get (ret, "(v)", &val);
-    gboolean b = g_variant_get_boolean (val);
-    g_variant_unref (val);
-    g_variant_unref (ret);
+    gboolean b = FALSE;
+    if (props)
+        g_variant_lookup (props, key, "b", &b);
     return b;
 }
 
-static gchar *
-get_mount_point (GDBusConnection *conn, const gchar *object_path)
+static guint64
+prop_u64 (GVariant *props, const gchar *key)
 {
-    GError   *err = NULL;
-    GVariant *ret = g_dbus_connection_call_sync (
-        conn, UD_BUS_NAME, object_path,
-        "org.freedesktop.DBus.Properties", "Get",
-        g_variant_new ("(ss)", UD_FILESYSTEM_IFACE, "MountPoints"),
-        G_VARIANT_TYPE ("(v)"),
-        G_DBUS_CALL_FLAGS_NONE, 2000, NULL, &err);
-    if (!ret) { g_clear_error (&err); return NULL; }
+    guint64 n = 0;
+    if (props)
+        g_variant_lookup (props, key, "t", &n);
+    return n;
+}
 
-    GVariant *val;
-    g_variant_get (ret, "(v)", &val);
+static gchar *
+prop_first_mount_point (GVariant *fs_props)
+{
+    gchar    *mp = NULL;
+    GVariant *v  = g_variant_lookup_value (fs_props, "MountPoints", G_VARIANT_TYPE ("aay"));
+    if (v) {
+        if (g_variant_n_children (v) > 0) {
+            GVariant *first = g_variant_get_child_value (v, 0);
+            mp = bytes_to_str (first);
+            g_variant_unref (first);
+        }
+        g_variant_unref (v);
+    }
+    return mp;
+}
 
-    gchar *result = NULL;
-    GVariantIter iter;
-    g_variant_iter_init (&iter, val);
-    GVariant *entry;
-    if ((entry = g_variant_iter_next_value (&iter))) {
-        gsize len;
-        const guchar *bytes = g_variant_get_fixed_array (entry, &len, 1);
-        if (bytes && len > 0)
-            result = g_strndup ((const gchar *) bytes, len);
-        g_variant_unref (entry);
+static gchar *
+drive_display_name (GVariant *drive_props)
+{
+    gchar *vendor = g_strstrip (prop_str (drive_props, "Vendor"));
+    gchar *model  = g_strstrip (prop_str (drive_props, "Model"));
+    gchar *name;
+
+    if (*vendor && *model) name = g_strdup_printf ("%s %s", vendor, model);
+    else if (*model)       name = g_strdup (model);
+    else                   name = g_strdup (vendor);
+
+    g_free (vendor);
+    g_free (model);
+    return name;
+}
+
+/* devuelve un UdDevice si el objeto es un filesystem en un drive extraíble */
+static UdDevice *
+parse_block (const gchar *path, GVariant *ifaces, GHashTable *drives)
+{
+    UdDevice *dev   = NULL;
+    GVariant *block = g_variant_lookup_value (ifaces, UD_BLOCK_IFACE,      G_VARIANT_TYPE_VARDICT);
+    GVariant *fs    = g_variant_lookup_value (ifaces, UD_FILESYSTEM_IFACE, G_VARIANT_TYPE_VARDICT);
+    GVariant *part  = g_variant_lookup_value (ifaces, UD_PARTITION_IFACE,  G_VARIANT_TYPE_VARDICT);
+
+    if (block && fs &&
+        !prop_bool (block, "HintIgnore") && !prop_bool (block, "HintSystem")) {
+        gchar    *drive_path = prop_str (block, "Drive");
+        GVariant *drive      = g_hash_table_lookup (drives, drive_path);
+
+        if (drive && prop_bool (drive, "Removable")) {
+            dev                = g_new0 (UdDevice, 1);
+            dev->object_path   = g_strdup (path);
+            dev->drive_path    = drive_path;
+            drive_path         = NULL;
+            dev->device        = prop_str (block, "Device");
+            dev->label         = prop_str (block, "IdLabel");
+            dev->fs_type       = prop_str (block, "IdType");
+            dev->size          = prop_u64 (block, "Size");
+            dev->mount_point   = prop_first_mount_point (fs);
+            dev->mounted       = (dev->mount_point != NULL);
+            dev->is_partition  = (part != NULL);
+            dev->drive_name    = drive_display_name (drive);
+            dev->ejectable     = prop_bool (drive, "Ejectable");
+            dev->can_power_off = prop_bool (drive, "CanPowerOff");
+        }
+        g_free (drive_path);
     }
 
-    g_variant_unref (val);
-    g_variant_unref (ret);
-    return result;
+    if (block) g_variant_unref (block);
+    if (fs)    g_variant_unref (fs);
+    if (part)  g_variant_unref (part);
+    return dev;
+}
+
+static gint
+compare_devices (gconstpointer a, gconstpointer b)
+{
+    const UdDevice *da = a, *db = b;
+    gint c = g_strcmp0 (da->drive_path, db->drive_path);
+    return (c != 0) ? c : g_strcmp0 (da->device, db->device);
 }
 
 /* ---------- ud_get_devices ---------- */
@@ -136,6 +156,9 @@ get_mount_point (GDBusConnection *conn, const gchar *object_path)
 GSList *
 ud_get_devices (GDBusConnection *conn)
 {
+    if (!conn)
+        return NULL;
+
     GError   *err = NULL;
     GVariant *ret = g_dbus_connection_call_sync (
         conn, UD_BUS_NAME, UD_OBJECT_PATH,
@@ -149,82 +172,38 @@ ud_get_devices (GDBusConnection *conn)
         return NULL;
     }
 
-    GSList       *list = NULL;
-    GVariant     *objects;
-    GVariantIter  obj_iter;
-    gchar        *obj_path;
-    GVariant     *ifaces;
+    GVariant    *objects = g_variant_get_child_value (ret, 0);
+    GHashTable  *drives  = g_hash_table_new_full (g_str_hash, g_str_equal, g_free,
+                                                  (GDestroyNotify) g_variant_unref);
+    GSList      *list    = NULL;
+    GVariantIter iter;
+    const gchar *path;
+    GVariant    *ifaces;
 
-    g_variant_get (ret, "(@a{oa{sa{sv}}})", &objects);
-    g_variant_iter_init (&obj_iter, objects);
-
-    while (g_variant_iter_next (&obj_iter, "{o@a{sa{sv}}}", &obj_path, &ifaces)) {
-        if (!g_str_has_prefix (obj_path, UD_OBJECT_PATH "/block_devices/")) {
-            g_free (obj_path);
-            g_variant_unref (ifaces);
-            continue;
-        }
-
-        gboolean has_block = FALSE;
-        gboolean has_fs    = FALSE;
-        GVariantIter iface_iter;
-        gchar *iface_name;
-        GVariant *iface_props;
-        g_variant_iter_init (&iface_iter, ifaces);
-        while (g_variant_iter_next (&iface_iter, "{s@a{sv}}", &iface_name, &iface_props)) {
-            if (g_strcmp0 (iface_name, UD_BLOCK_IFACE) == 0)      has_block = TRUE;
-            if (g_strcmp0 (iface_name, UD_FILESYSTEM_IFACE) == 0) has_fs    = TRUE;
-            g_free (iface_name);
-            g_variant_unref (iface_props);
-        }
-
-        if (!has_block || !has_fs) {
-            g_free (obj_path);
-            g_variant_unref (ifaces);
-            continue;
-        }
-
-        gboolean hint_ignore = get_bool_prop (conn, obj_path, UD_BLOCK_IFACE, "HintIgnore");
-        gboolean hint_system = get_bool_prop (conn, obj_path, UD_BLOCK_IFACE, "HintSystem");
-        if (hint_ignore || hint_system) {
-            g_free (obj_path);
-            g_variant_unref (ifaces);
-            continue;
-        }
-
-        gchar *drive_path = get_string_prop (conn, obj_path, UD_BLOCK_IFACE, "Drive");
-        if (!drive_path || g_strcmp0 (drive_path, "/") == 0) {
-            g_free (drive_path);
-            g_free (obj_path);
-            g_variant_unref (ifaces);
-            continue;
-        }
-
-        gboolean removable = get_bool_prop (conn, drive_path, UD_DRIVE_IFACE, "Removable");
-        if (!removable) {
-            g_free (drive_path);
-            g_free (obj_path);
-            g_variant_unref (ifaces);
-            continue;
-        }
-
-        UdDevice *dev    = g_new0 (UdDevice, 1);
-        dev->object_path = obj_path;
-        dev->drive_path  = drive_path;
-        dev->device      = get_string_prop (conn, obj_path, UD_BLOCK_IFACE, "Device");
-        dev->label       = get_string_prop (conn, obj_path, UD_BLOCK_IFACE, "IdLabel");
-        dev->size        = get_uint64_prop  (conn, obj_path, UD_BLOCK_IFACE, "Size");
-        dev->ejectable   = get_bool_prop    (conn, drive_path, UD_DRIVE_IFACE, "Ejectable");
-        dev->mount_point = get_mount_point  (conn, obj_path);
-        dev->mounted     = (dev->mount_point != NULL);
-
-        list = g_slist_append (list, dev);
+    /* 1ª pasada: propiedades de los drives */
+    g_variant_iter_init (&iter, objects);
+    while (g_variant_iter_next (&iter, "{&o@a{sa{sv}}}", &path, &ifaces)) {
+        GVariant *drive = g_variant_lookup_value (ifaces, UD_DRIVE_IFACE, G_VARIANT_TYPE_VARDICT);
+        if (drive)
+            g_hash_table_insert (drives, g_strdup (path), drive);
         g_variant_unref (ifaces);
     }
 
+    /* 2ª pasada: bloques con filesystem */
+    g_variant_iter_init (&iter, objects);
+    while (g_variant_iter_next (&iter, "{&o@a{sa{sv}}}", &path, &ifaces)) {
+        UdDevice *dev = parse_block (path, ifaces, drives);
+        if (dev)
+            list = g_slist_prepend (list, dev);
+        g_variant_unref (ifaces);
+    }
+
+    g_hash_table_destroy (drives);
     g_variant_unref (objects);
     g_variant_unref (ret);
-    return list;
+
+    /* orden estable entre refrescos (GetManagedObjects no garantiza orden) */
+    return g_slist_sort (list, compare_devices);
 }
 
 void
@@ -235,95 +214,104 @@ ud_device_list_free (GSList *list)
         g_free (dev->object_path);
         g_free (dev->device);
         g_free (dev->label);
+        g_free (dev->fs_type);
         g_free (dev->drive_path);
+        g_free (dev->drive_name);
         g_free (dev->mount_point);
         g_free (dev);
     }
     g_slist_free (list);
 }
 
-/* ---------- mount / unmount / eject ---------- */
+/* ---------- mount / unmount / eject / power off asíncronos ---------- */
 
-gchar *
-ud_mount (GDBusConnection *conn, const gchar *object_path)
+typedef struct {
+    UdResultCallback callback;
+    gpointer         user_data;
+    gboolean         returns_string;
+} UdAsyncOp;
+
+static void
+on_async_call_done (GObject *source, GAsyncResult *res, gpointer data)
 {
-    GError   *err = NULL;
-    GVariant *ret = g_dbus_connection_call_sync (
-        conn, UD_BUS_NAME, object_path,
-        UD_FILESYSTEM_IFACE, "Mount",
-        g_variant_new ("(a{sv})", NULL),
-        G_VARIANT_TYPE ("(s)"),
-        G_DBUS_CALL_FLAGS_NONE, 10000, NULL, &err);
-    if (!ret) {
-        g_warning ("ud_mount: %s", err ? err->message : "error");
-        g_clear_error (&err);
-        return NULL;
+    UdAsyncOp *op  = data;
+    GError    *err = NULL;
+    gchar     *str = NULL;
+    GVariant  *ret = g_dbus_connection_call_finish (G_DBUS_CONNECTION (source), res, &err);
+    gboolean   ok  = (ret != NULL);
+
+    if (ok) {
+        if (op->returns_string)
+            g_variant_get (ret, "(s)", &str);
+        g_variant_unref (ret);
+    } else {
+        g_warning ("ud-dbus: %s", err ? err->message : "error");
     }
-    gchar *mp;
-    g_variant_get (ret, "(s)", &mp);
-    g_variant_unref (ret);
-    return mp;
+
+    if (op->callback)
+        op->callback (ok, str, err, op->user_data);
+
+    g_free (str);
+    g_clear_error (&err);
+    g_free (op);
 }
 
-gboolean
-ud_unmount (GDBusConnection *conn, const gchar *object_path)
+static void
+ud_call_async (GDBusConnection    *conn,
+               const gchar        *object_path,
+               const gchar        *iface,
+               const gchar        *method,
+               const GVariantType *reply_type,
+               gboolean            returns_string,
+               UdResultCallback    callback,
+               gpointer            user_data)
 {
-    GError   *err = NULL;
-    GVariant *ret = g_dbus_connection_call_sync (
-        conn, UD_BUS_NAME, object_path,
-        UD_FILESYSTEM_IFACE, "Unmount",
-        g_variant_new ("(a{sv})", NULL),
-        G_VARIANT_TYPE ("()"),
-        G_DBUS_CALL_FLAGS_NONE, 10000, NULL, &err);
-    if (!ret) {
-        g_warning ("ud_unmount: %s", err ? err->message : "error");
-        g_clear_error (&err);
-        return FALSE;
-    }
-    g_variant_unref (ret);
-    return TRUE;
+    UdAsyncOp *op      = g_new0 (UdAsyncOp, 1);
+    op->callback       = callback;
+    op->user_data      = user_data;
+    op->returns_string = returns_string;
+
+    /* ALLOW_INTERACTIVE_AUTHORIZATION: deja que polkit pida contraseña si hace falta.
+       Timeout G_MAXINT: el usuario puede tardar en escribirla, y un desmontaje
+       con caché sucio puede demorar; al ser asíncrono no bloquea nada. */
+    g_dbus_connection_call (conn, UD_BUS_NAME, object_path, iface, method,
+                            g_variant_new ("(a{sv})", NULL),
+                            reply_type,
+                            G_DBUS_CALL_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION,
+                            G_MAXINT, NULL,
+                            on_async_call_done, op);
 }
 
-gboolean
-ud_eject (GDBusConnection *conn, const gchar *drive_path)
+void
+ud_mount_async (GDBusConnection *conn, const gchar *object_path,
+                UdResultCallback callback, gpointer user_data)
 {
-    GError   *err = NULL;
-    GVariant *ret = g_dbus_connection_call_sync (
-        conn, UD_BUS_NAME, drive_path,
-        UD_DRIVE_IFACE, "Eject",
-        g_variant_new ("(a{sv})", NULL),
-        G_VARIANT_TYPE ("()"),
-        G_DBUS_CALL_FLAGS_NONE, 10000, NULL, &err);
-    if (!ret) {
-        g_warning ("ud_eject: %s", err ? err->message : "error");
-        g_clear_error (&err);
-        return FALSE;
-    }
-    g_variant_unref (ret);
-    return TRUE;
+    ud_call_async (conn, object_path, UD_FILESYSTEM_IFACE, "Mount",
+                   G_VARIANT_TYPE ("(s)"), TRUE, callback, user_data);
 }
 
-/* ---------- nombre del drive (Vendor + Model) ---------- */
-
-gchar *
-ud_get_drive_name (GDBusConnection *conn, const gchar *drive_path)
+void
+ud_unmount_async (GDBusConnection *conn, const gchar *object_path,
+                  UdResultCallback callback, gpointer user_data)
 {
-    gchar *vendor = get_string_prop (conn, drive_path, UD_DRIVE_IFACE, "Vendor");
-    gchar *model  = get_string_prop (conn, drive_path, UD_DRIVE_IFACE, "Model");
-    gchar *name;
+    ud_call_async (conn, object_path, UD_FILESYSTEM_IFACE, "Unmount",
+                   G_VARIANT_TYPE ("()"), FALSE, callback, user_data);
+}
 
-    if (vendor && *vendor && model && *model)
-        name = g_strdup_printf ("%s %s", vendor, model);
-    else if (model && *model)
-        name = g_strdup (model);
-    else if (vendor && *vendor)
-        name = g_strdup (vendor);
-    else
-        name = g_strdup ("");
+void
+ud_eject_async (GDBusConnection *conn, const gchar *drive_path,
+                UdResultCallback callback, gpointer user_data)
+{
+    ud_call_async (conn, drive_path, UD_DRIVE_IFACE, "Eject",
+                   G_VARIANT_TYPE ("()"), FALSE, callback, user_data);
+}
 
-    g_free (vendor);
-    g_free (model);
-    return name;
+void
+ud_power_off_async (GDBusConnection *conn, const gchar *drive_path,
+                    UdResultCallback callback, gpointer user_data)
+{
+    ud_call_async (conn, drive_path, UD_DRIVE_IFACE, "PowerOff",
+                   G_VARIANT_TYPE ("()"), FALSE, callback, user_data);
 }
 
 /* ---------- señales ---------- */
@@ -332,6 +320,7 @@ struct UdSubscription {
     UdSignalCallback callback;
     gpointer         user_data;
     GUdevClient     *udev_client;
+    GVolumeMonitor  *volume_monitor;   /* teléfonos/cámaras vía gvfs */
     guint            debounce_id;
     guint            ids[3];
 };
@@ -345,44 +334,44 @@ on_debounce_fire (gpointer data)
     return G_SOURCE_REMOVE;
 }
 
+/* debounce 300ms para TODAS las fuentes: un enchufado dispara varios uevents
+   (uno por interfaz USB) y varios InterfacesAdded (uno por partición) */
 static void
-on_udev_uevent (GUdevClient *client, const gchar *action,
-                GUdevDevice *device, gpointer user_data)
+schedule_refresh (UdSubscription *sd)
 {
-    (void) client; (void) device;
-    UdSubscription *sd = user_data;
-
-    if (g_strcmp0 (action, "add") != 0 && g_strcmp0 (action, "remove") != 0)
-        return;
-
-    /* debounce 300ms: un solo enchufado dispara varios uevents (uno por interfaz) */
     if (sd->debounce_id != 0)
         g_source_remove (sd->debounce_id);
     sd->debounce_id = g_timeout_add (300, on_debounce_fire, sd);
 }
 
 static void
-on_interfaces_changed (GDBusConnection *conn,
-                       const gchar *sender, const gchar *object_path,
-                       const gchar *iface, const gchar *signal,
-                       GVariant *params, gpointer user_data)
+on_udev_uevent (GUdevClient *client, const gchar *action,
+                GUdevDevice *device, gpointer user_data)
 {
-    (void) conn; (void) sender; (void) object_path;
-    (void) iface; (void) signal; (void) params;
-    UdSubscription *sd = user_data;
-    sd->callback (sd->user_data);
+    (void) client; (void) device;
+    if (g_strcmp0 (action, "add") != 0 && g_strcmp0 (action, "remove") != 0)
+        return;
+    schedule_refresh (user_data);
 }
 
 static void
-on_properties_changed (GDBusConnection *conn,
-                       const gchar *sender, const gchar *object_path,
-                       const gchar *iface, const gchar *signal,
-                       GVariant *params, gpointer user_data)
+on_dbus_signal (GDBusConnection *conn,
+                const gchar *sender, const gchar *object_path,
+                const gchar *iface, const gchar *signal,
+                GVariant *params, gpointer user_data)
 {
     (void) conn; (void) sender; (void) object_path;
     (void) iface; (void) signal; (void) params;
-    UdSubscription *sd = user_data;
-    sd->callback (sd->user_data);
+    schedule_refresh (user_data);
+}
+
+/* volume-added/removed/changed y mount-added/removed/changed:
+   todas son (GVolumeMonitor *, GObject *, gpointer) */
+static void
+on_volume_monitor_changed (GVolumeMonitor *vm, GObject *obj, gpointer user_data)
+{
+    (void) vm; (void) obj;
+    schedule_refresh (user_data);
 }
 
 UdSubscription *
@@ -400,23 +389,34 @@ ud_subscribe (GDBusConnection *conn,
     g_signal_connect (sd->udev_client, "uevent",
                       G_CALLBACK (on_udev_uevent), sd);
 
+    /* singleton por proceso (en Wayland lo comparten todos los plugins):
+       solo se conectan señales con nuestro dato y se desconectan al salir */
+    sd->volume_monitor = g_volume_monitor_get ();
+    static const gchar *vm_signals[] = {
+        "volume-added", "volume-removed", "volume-changed",
+        "mount-added",  "mount-removed",  "mount-changed",
+    };
+    for (gsize i = 0; i < G_N_ELEMENTS (vm_signals); i++)
+        g_signal_connect (sd->volume_monitor, vm_signals[i],
+                          G_CALLBACK (on_volume_monitor_changed), sd);
+
     sd->ids[0] = g_dbus_connection_signal_subscribe (
         conn, UD_BUS_NAME,
         "org.freedesktop.DBus.ObjectManager", "InterfacesAdded",
         UD_OBJECT_PATH, NULL, G_DBUS_SIGNAL_FLAGS_NONE,
-        on_interfaces_changed, sd, NULL);
+        on_dbus_signal, sd, NULL);
 
     sd->ids[1] = g_dbus_connection_signal_subscribe (
         conn, UD_BUS_NAME,
         "org.freedesktop.DBus.ObjectManager", "InterfacesRemoved",
         UD_OBJECT_PATH, NULL, G_DBUS_SIGNAL_FLAGS_NONE,
-        on_interfaces_changed, sd, NULL);
+        on_dbus_signal, sd, NULL);
 
     sd->ids[2] = g_dbus_connection_signal_subscribe (
         conn, UD_BUS_NAME,
         "org.freedesktop.DBus.Properties", "PropertiesChanged",
         NULL, UD_FILESYSTEM_IFACE, G_DBUS_SIGNAL_FLAGS_NONE,
-        on_properties_changed, sd, NULL);
+        on_dbus_signal, sd, NULL);
 
     return sd;
 }
@@ -432,7 +432,41 @@ ud_unsubscribe (GDBusConnection *conn, UdSubscription *sub)
         g_source_remove (sub->debounce_id);
     if (sub->udev_client)
         g_object_unref (sub->udev_client);
+    if (sub->volume_monitor) {
+        g_signal_handlers_disconnect_by_data (sub->volume_monitor, sub);
+        g_object_unref (sub->volume_monitor);
+    }
     g_free (sub);
+}
+
+/* ---------- tipos de USB no-almacenamiento ---------- */
+
+const gchar *
+ud_usb_type_label (UdUsbType type)
+{
+    switch (type) {
+    case UD_USB_PRINTER: return N_("Printer");
+    case UD_USB_AUDIO:   return N_("Audio device");
+    case UD_USB_CAMERA:  return N_("Camera / Webcam");
+    case UD_USB_GAMEPAD: return N_("Gamepad / Joystick");
+    case UD_USB_PHONE:   return N_("Phone / Camera");
+    case UD_USB_OTHER:
+    default:             return N_("USB device");
+    }
+}
+
+const gchar *
+ud_usb_type_icon (UdUsbType type)
+{
+    switch (type) {
+    case UD_USB_PRINTER: return "printer";
+    case UD_USB_AUDIO:   return "audio-card";
+    case UD_USB_CAMERA:  return "camera-web";
+    case UD_USB_GAMEPAD: return "input-gaming";
+    case UD_USB_PHONE:   return "phone";
+    case UD_USB_OTHER:
+    default:             return "drive-removable-media";
+    }
 }
 
 /* ---------- ud_get_usb_devices ---------- */
@@ -440,7 +474,7 @@ ud_unsubscribe (GDBusConnection *conn, UdSubscription *sub)
 /*
  * Estrategia: iterar subsistema "usb" buscando usb_device,
  * filtrar hubs (clase 09) y almacenamiento (usb-storage/uas),
- * deduplicar por ID_SERIAL, estimar tipo por subsistema hijo o clase USB.
+ * deduplicar por ID_SERIAL, estimar tipo por clase de interfaz USB.
  */
 GSList *
 ud_get_usb_devices (void)
@@ -508,12 +542,11 @@ ud_get_usb_devices (void)
         for (gchar *c = name; *c; c++) if (*c == '_') *c = ' ';
 
         /* leer interfaces del dispositivo desde sysfs */
-        gchar *sysfs_path = g_strdup (g_udev_device_get_sysfs_path (dev));
-        gchar *iface_glob = g_strdup_printf ("%s/*/bInterfaceClass", sysfs_path);
-        GDir  *sysfs_dir  = g_dir_open (sysfs_path, 0, NULL);
+        const gchar *sysfs_path = g_udev_device_get_sysfs_path (dev);
+        GDir        *sysfs_dir  = g_dir_open (sysfs_path, 0, NULL);
         gboolean has_hid = FALSE, has_vendor = FALSE, has_printer = FALSE;
         gboolean has_audio = FALSE, has_video = FALSE, has_bt = FALSE;
-        gint     hid_count = 0;
+        gboolean has_image = FALSE;   /* 06: Still Image (PTP / MTP de Android) */
 
         if (sysfs_dir) {
             const gchar *entry;
@@ -522,51 +555,50 @@ ud_get_usb_devices (void)
                 gchar *iface_class = NULL;
                 if (g_file_get_contents (iface_path, &iface_class, NULL, NULL)) {
                     g_strstrip (iface_class);
-                    if (g_strcmp0 (iface_class, "03") == 0) { has_hid = TRUE; hid_count++; }
-                    if (g_strcmp0 (iface_class, "ff") == 0) has_vendor = TRUE;
+                    if (g_strcmp0 (iface_class, "03") == 0) has_hid     = TRUE;
+                    if (g_strcmp0 (iface_class, "ff") == 0) has_vendor  = TRUE;
                     if (g_strcmp0 (iface_class, "07") == 0) has_printer = TRUE;
-                    if (g_strcmp0 (iface_class, "01") == 0) has_audio = TRUE;
-                    if (g_strcmp0 (iface_class, "0e") == 0) has_video = TRUE;
-                    if (g_strcmp0 (iface_class, "e0") == 0) has_bt = TRUE;
+                    if (g_strcmp0 (iface_class, "01") == 0) has_audio   = TRUE;
+                    if (g_strcmp0 (iface_class, "0e") == 0) has_video   = TRUE;
+                    if (g_strcmp0 (iface_class, "e0") == 0) has_bt      = TRUE;
+                    if (g_strcmp0 (iface_class, "06") == 0) has_image   = TRUE;
                     g_free (iface_class);
                 }
                 g_free (iface_path);
             }
             g_dir_close (sysfs_dir);
         }
-        g_free (sysfs_path);
-        g_free (iface_glob);
+
+        /* las reglas udev de libmtp marcan los teléfonos MTP (aunque usen clase ff) */
+        if (g_strcmp0 (g_udev_device_get_property (dev, "ID_MTP_DEVICE"), "1") == 0)
+            has_image = TRUE;
+
+        gboolean relevant = has_printer || has_audio || has_video || has_image;
 
         /* filtrar: HID puro sin vendor = teclado/mouse/receptor → excluir */
-        if (has_hid && !has_vendor && !has_printer && !has_audio && !has_video) {
-            g_object_unref (dev);
-            continue;
-        }
-
         /* filtrar: vendor puro sin HID = WiFi/otros → excluir */
-        if (has_vendor && !has_hid && !has_printer && !has_audio && !has_video) {
-            g_object_unref (dev);
-            continue;
-        }
-
         /* filtrar: Bluetooth (clase e0) → excluir */
-        if (has_bt && !has_printer && !has_audio && !has_video && !has_hid) {
+        if ((has_hid && !has_vendor && !relevant) ||
+            (has_vendor && !has_hid && !relevant) ||
+            (has_bt && !has_hid && !relevant)) {
+            g_free (name);
             g_object_unref (dev);
             continue;
         }
 
-        /* tipo */
-        gchar *type = NULL;
-        if (has_printer)                type = g_strdup ("Printer");
-        else if (has_audio)             type = g_strdup ("Audio device");
-        else if (has_video)             type = g_strdup ("Camera / Webcam");
-        else if (has_hid && has_vendor) type = g_strdup ("Gamepad / Joystick");
-        else                            type = g_strdup ("USB device");
+        UdUsbType type;
+        if (has_image)                  type = UD_USB_PHONE;
+        else if (has_printer)           type = UD_USB_PRINTER;
+        else if (has_audio)             type = UD_USB_AUDIO;
+        else if (has_video)             type = UD_USB_CAMERA;
+        else if (has_hid && has_vendor) type = UD_USB_GAMEPAD;
+        else                            type = UD_USB_OTHER;
 
         UdUsbDevice *ud = g_new0 (UdUsbDevice, 1);
         ud->name    = name;
         ud->type    = type;
-        ud->syspath = g_strdup (g_udev_device_get_sysfs_path (dev));
+        ud->syspath = g_strdup (sysfs_path);
+        ud->devfile = g_strdup (g_udev_device_get_device_file (dev));
         result = g_slist_append (result, ud);
 
         g_object_unref (dev);
@@ -584,8 +616,8 @@ ud_usb_device_list_free (GSList *list)
     for (GSList *l = list; l; l = l->next) {
         UdUsbDevice *dev = l->data;
         g_free (dev->name);
-        g_free (dev->type);
         g_free (dev->syspath);
+        g_free (dev->devfile);
         g_free (dev);
     }
     g_slist_free (list);

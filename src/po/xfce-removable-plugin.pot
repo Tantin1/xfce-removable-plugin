@@ -16,7 +16,48 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: popup.c
+#, c-format
+msgid "%s free of %s"
+msgstr ""
+
+#: plugin.c
+msgid "Also hide when only other devices are present"
+msgstr ""
+
+#: plugin.c
+msgid "Appearance"
+msgstr ""
+
+#: ud-dbus.c
+msgid "Audio device"
+msgstr ""
+
+#: plugin.c
+msgid "Behavior"
+msgstr ""
+
+#: popup.c
+msgid "Camera (PTP)"
+msgstr ""
+
+#: ud-dbus.c
+msgid "Camera / Webcam"
+msgstr ""
+
+#: plugin.c
+msgid "Close"
+msgstr ""
+
+#: popup.c
+msgid "Could not close the connection to the device."
+msgstr ""
+
+#: popup.c
 msgid "Could not mount the device."
+msgstr ""
+
+#: popup.c
+msgid "Could not open the device. If it is a phone, unlock it and choose \"File transfer\" in its USB notification."
 msgstr ""
 
 #: popup.c
@@ -36,7 +77,23 @@ msgid "Eject"
 msgstr ""
 
 #: popup.c
+msgid "Eject failed"
+msgstr ""
+
+#: popup.c
 msgid "Ejecting…"
+msgstr ""
+
+#: ud-dbus.c
+msgid "Gamepad / Joystick"
+msgstr ""
+
+#: plugin.c
+msgid "Hide button when no removable devices"
+msgstr ""
+
+#: plugin.c
+msgid "Icon size:"
 msgstr ""
 
 #: popup.c
@@ -56,63 +113,7 @@ msgid "No removable devices"
 msgstr ""
 
 #: popup.c
-msgid "Other devices"
-msgstr ""
-
-#: popup.c
-msgid "Please wait, do not unplug."
-msgstr ""
-
-#: popup.c
-msgid "Removable disk"
-msgstr ""
-
-#: popup.c
-msgid "Safe to remove"
-msgstr ""
-
-#: popup.c
-msgid "Safe to unplug."
-msgstr ""
-
-#: popup.c
-msgid "Unmount"
-msgstr ""
-
-#: popup.c
-msgid "Unmount failed"
-msgstr ""
-
-#: popup.c
-msgid "Unmounting…"
-msgstr ""
-
-#: popup.c
-msgid "You can now unplug the device."
-msgstr ""
-
-#: plugin.c
-msgid "Also hide when only other devices are present"
-msgstr ""
-
-#: plugin.c
-msgid "Appearance"
-msgstr ""
-
-#: plugin.c
-msgid "Behavior"
-msgstr ""
-
-#: plugin.c
-msgid "Close"
-msgstr ""
-
-#: plugin.c
-msgid "Hide button when no removable devices"
-msgstr ""
-
-#: plugin.c
-msgid "Icon size:"
+msgid "Not authorized to perform this operation."
 msgstr ""
 
 #: plugin.c
@@ -120,7 +121,43 @@ msgid "Notify when devices are connected or disconnected"
 msgstr ""
 
 #: plugin.c
-msgid "Open Thunar after mounting"
+msgid "Open file manager after mounting"
+msgstr ""
+
+#: popup.c
+msgid "Open folder"
+msgstr ""
+
+#: popup.c
+msgid "Other devices"
+msgstr ""
+
+#: popup.c
+msgid "Phone"
+msgstr ""
+
+#: popup.c
+msgid "Phone (MTP)"
+msgstr ""
+
+#: ud-dbus.c
+msgid "Phone / Camera"
+msgstr ""
+
+#: plugin.c
+msgid "Phone or camera connected"
+msgstr ""
+
+#: plugin.c
+msgid "Phone or camera disconnected"
+msgstr ""
+
+#: popup.c
+msgid "Phone ready"
+msgstr ""
+
+#: popup.c
+msgid "Please wait, do not unplug."
 msgstr ""
 
 #: plugin.c
@@ -133,6 +170,10 @@ msgstr ""
 
 #: plugin.c
 msgid "Popup width:"
+msgstr ""
+
+#: ud-dbus.c
+msgid "Printer"
 msgstr ""
 
 #: plugin.c
@@ -151,6 +192,22 @@ msgstr ""
 msgid "Removable devices"
 msgstr ""
 
+#: popup.c
+msgid "Removable disk"
+msgstr ""
+
+#: popup.c
+msgid "Safe to remove"
+msgstr ""
+
+#: popup.c
+msgid "Safe to unplug."
+msgstr ""
+
+#: popup.c
+msgid "Safely remove"
+msgstr ""
+
 #: plugin.c
 msgid "Show notifications"
 msgstr ""
@@ -159,7 +216,15 @@ msgstr ""
 msgid "Square button"
 msgstr ""
 
-#: plugin.c
+#: popup.c
+msgid "The device is in use by another application. Close any open files or terminals on it and try again."
+msgstr ""
+
+#: popup.c
+msgid "The partitions were unmounted, but the drive could not be ejected."
+msgstr ""
+
+#: ud-dbus.c
 msgid "USB device"
 msgstr ""
 
@@ -175,6 +240,30 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
+#: popup.c
+msgid "Unmount"
+msgstr ""
+
+#: popup.c
+msgid "Unmount failed"
+msgstr ""
+
+#: popup.c
+msgid "Unmounting…"
+msgstr ""
+
 #: plugin.c
 msgid "Use panel icon size"
+msgstr ""
+
+#: popup.c
+msgid "You can now unplug the device."
+msgstr ""
+
+#: popup.c
+msgid "iPhone / iPad"
+msgstr ""
+
+#: popup.c
+msgid "not mounted"
 msgstr ""

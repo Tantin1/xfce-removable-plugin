@@ -10,6 +10,7 @@ Inspired by KDE Plasma's Device Notifier, built natively for Xfce using UDisks2 
 - Groups partitions under their parent disk with expand/collapse
 - Mount / Unmount buttons per partition with intermediate state feedback ("Mounting…" / "Unmounting…")
 - Eject button on the disk header — unmounts all partitions before ejecting
+- **Phones and cameras**: Android phones in file-transfer mode (MTP), cameras (PTP) and iPhones (afc), via gvfs — mount, open in the file manager, safely remove
 - **Other devices** section: joysticks, gamepads, printers, audio devices, webcams — detected via GUdev, filtered by USB interface class
 - Desktop notifications on connect/disconnect (libnotify), configurable
 - Opens Thunar after mounting, configurable
@@ -28,6 +29,7 @@ Inspired by KDE Plasma's Device Notifier, built natively for Xfce using UDisks2 
 | libnotify | ≥ 0.7 |
 | gudev-1.0 | any |
 | GLib / GIO | (bundled with GTK) |
+| gvfs, gvfs-mtp / gvfs-gphoto2 / gvfs-afc | runtime, optional (phones and cameras section) |
 
 ## Build
 
@@ -75,7 +77,9 @@ Right-click the panel button → **Properties**.
 
 **Other USB devices** (`ud_get_usb_devices`): GUdev enumeration of `usb_device` nodes, filtered by USB interface class:
 - Excluded: hubs (class 09), pure storage (usb-storage/uas driver), pure HID without vendor class (keyboards/mice/receivers), pure vendor class without HID (WiFi dongles), Bluetooth (class e0)
-- Included and typed: Printer (07), Audio device (01), Camera/Webcam (0e), Gamepad/Joystick (03+ff combined)
+- Included and typed: Phone / Camera (06 or `ID_MTP_DEVICE`, only when gvfs does not list it), Printer (07), Audio device (01), Camera/Webcam (0e), Gamepad/Joystick (03+ff combined)
+
+**Phones and cameras** (`ud_get_phones`): gvfs volumes and mounts whose URI scheme is `mtp`, `gphoto2` or `afc`. They are matched to USB devices through `/dev/bus/usb/…` and removed from *Other devices*.
 
 ## License
 

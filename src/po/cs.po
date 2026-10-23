@@ -2,13 +2,46 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: cs\n"
+
+#, c-format
+msgid "%s free of %s"
+msgstr "%s volno z %s"
+
+msgid "Also hide when only other devices are present"
+msgstr "Skrýt také, pokud jsou přítomna pouze ostatní zařízení"
+
+msgid "Appearance"
+msgstr "Vzhled"
+
+msgid "Audio device"
+msgstr "Zvukové zařízení"
+
+msgid "Behavior"
+msgstr "Chování"
+
+msgid "Camera (PTP)"
+msgstr "Fotoaparát (PTP)"
+
+msgid "Camera / Webcam"
+msgstr "Fotoaparát / Webkamera"
+
+msgid "Close"
+msgstr "Zavřít"
+
+msgid "Could not close the connection to the device."
+msgstr "Spojení se zařízením nelze ukončit."
 
 msgid "Could not mount the device."
 msgstr "Zařízení nelze připojit."
+
+msgid "Could not open the device. If it is a phone, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "Zařízení nelze otevřít. Pokud jde o telefon, odemkněte ho a v jeho oznámení USB zvolte „Přenos souborů“."
 
 msgid "Could not unmount the device."
 msgstr "Zařízení nelze odpojit."
@@ -22,8 +55,20 @@ msgstr "Zařízení připojeno"
 msgid "Eject"
 msgstr "Vysunout"
 
+msgid "Eject failed"
+msgstr "Vysunutí se nezdařilo"
+
 msgid "Ejecting…"
 msgstr "Vysouvání…"
+
+msgid "Gamepad / Joystick"
+msgstr "Gamepad / Joystick"
+
+msgid "Hide button when no removable devices"
+msgstr "Skrýt tlačítko, pokud nejsou připojena žádná vyměnitelná zařízení"
+
+msgid "Icon size:"
+msgstr "Velikost ikony:"
 
 msgid "Mount"
 msgstr "Připojit"
@@ -37,44 +82,41 @@ msgstr "Připojování…"
 msgid "No removable devices"
 msgstr "Žádná vyměnitelná zařízení"
 
+msgid "Not authorized to perform this operation."
+msgstr "Nemáte oprávnění k provedení této operace."
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "Upozornit při připojení nebo odpojení zařízení"
+
+msgid "Open file manager after mounting"
+msgstr "Po připojení otevřít správce souborů"
+
+msgid "Open folder"
+msgstr "Otevřít složku"
+
+msgid "Other devices"
+msgstr "Ostatní zařízení"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Phone (MTP)"
+msgstr "Telefon (MTP)"
+
+msgid "Phone / Camera"
+msgstr "Telefon / Fotoaparát"
+
+msgid "Phone or camera connected"
+msgstr "Telefon nebo fotoaparát připojen"
+
+msgid "Phone or camera disconnected"
+msgstr "Telefon nebo fotoaparát odpojen"
+
+msgid "Phone ready"
+msgstr "Telefon připraven"
+
 msgid "Please wait, do not unplug."
 msgstr "Počkejte prosím, neodpojujte."
-
-msgid "Safe to remove"
-msgstr "Lze bezpečně odebrat"
-
-msgid "Safe to unplug."
-msgstr "Zařízení lze odpojit."
-
-msgid "Unmount"
-msgstr "Odpojit"
-
-msgid "Unmount failed"
-msgstr "Odpojení se nezdařilo"
-
-msgid "Unmounting…"
-msgstr "Odpojování…"
-
-msgid "You can now unplug the device."
-msgstr "Nyní můžete zařízení odpojit."
-
-msgid "Appearance"
-msgstr "Vzhled"
-
-msgid "Behavior"
-msgstr "Chování"
-
-msgid "Close"
-msgstr "Zavřít"
-
-msgid "Hide button when no removable devices"
-msgstr "Skrýt tlačítko, pokud nejsou připojena žádná vyměnitelná zařízení"
-
-msgid "Icon size:"
-msgstr "Velikost ikony:"
-
-msgid "Open Thunar after mounting"
-msgstr "Otevřít Thunar po připojení"
 
 msgid "Plugin size:"
 msgstr "Velikost pluginu:"
@@ -85,20 +127,11 @@ msgstr "Výška vyskakovacího okna:"
 msgid "Popup width:"
 msgstr "Šířka vyskakovacího okna:"
 
+msgid "Printer"
+msgstr "Tiskárna"
+
 msgid "Properties — Removable Devices"
 msgstr "Vlastnosti — Vyměnitelná zařízení"
-
-msgid "Removable devices"
-msgstr "Vyměnitelná zařízení"
-
-msgid "Show notifications"
-msgstr "Zobrazovat oznámení"
-
-msgid "Square button"
-msgstr "Čtvercové tlačítko"
-
-msgid "Use panel icon size"
-msgstr "Použít velikost panelu pro ikonu"
 
 msgid "Removable device connected"
 msgstr "Vyměnitelné zařízení připojeno"
@@ -106,26 +139,62 @@ msgstr "Vyměnitelné zařízení připojeno"
 msgid "Removable device disconnected"
 msgstr "Vyměnitelné zařízení odpojeno"
 
+msgid "Removable devices"
+msgstr "Vyměnitelná zařízení"
+
+msgid "Removable disk"
+msgstr "Vyměnitelný disk"
+
+msgid "Safe to remove"
+msgstr "Lze bezpečně odebrat"
+
+msgid "Safe to unplug."
+msgstr "Zařízení lze odpojit."
+
+msgid "Safely remove"
+msgstr "Bezpečně odebrat"
+
+msgid "Show notifications"
+msgstr "Zobrazovat oznámení"
+
+msgid "Square button"
+msgstr "Čtvercové tlačítko"
+
+msgid "The device is in use by another application. Close any open files or terminals on it and try again."
+msgstr "Zařízení používá jiná aplikace. Zavřete na něm otevřené soubory nebo terminály a zkuste to znovu."
+
+msgid "The partitions were unmounted, but the drive could not be ejected."
+msgstr "Oddíly byly odpojeny, ale jednotku se nepodařilo vysunout."
+
+msgid "USB device"
+msgstr "USB zařízení"
+
 msgid "USB device connected"
 msgstr "USB zařízení připojeno"
 
 msgid "USB device disconnected"
 msgstr "USB zařízení odpojeno"
 
-msgid "USB device"
-msgstr "USB zařízení"
-
 msgid "Unknown"
 msgstr "Neznámé"
 
-msgid "Notify when devices are connected or disconnected"
-msgstr "Upozornit při připojení nebo odpojení zařízení"
+msgid "Unmount"
+msgstr "Odpojit"
 
-msgid "Other devices"
-msgstr "Ostatní zařízení"
+msgid "Unmount failed"
+msgstr "Odpojení se nezdařilo"
 
-msgid "Also hide when only other devices are present"
-msgstr "Skrýt také, pokud jsou přítomna pouze ostatní zařízení"
+msgid "Unmounting…"
+msgstr "Odpojování…"
 
-msgid "Removable disk"
-msgstr "Vyměnitelný disk"
+msgid "Use panel icon size"
+msgstr "Použít velikost panelu pro ikonu"
+
+msgid "You can now unplug the device."
+msgstr "Nyní můžete zařízení odpojit."
+
+msgid "iPhone / iPad"
+msgstr "iPhone / iPad"
+
+msgid "not mounted"
+msgstr "nepřipojeno"

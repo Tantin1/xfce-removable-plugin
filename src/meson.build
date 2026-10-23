@@ -18,7 +18,7 @@ gettext_pkg = 'xfce-removable-plugin'
 
 # --- plugin ---
 shared_module('xfce-removable-plugin',
-  sources : ['plugin.c', 'popup.c', 'ud-dbus.c'],
+  sources : ['plugin.c', 'popup.c', 'ud-dbus.c', 'ud-phones.c'],
   dependencies : [gtk3, xfce4panel, libnotify, gudev, libintl],
   c_args : [
     '-DGETTEXT_PACKAGE="' + gettext_pkg + '"',

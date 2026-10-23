@@ -2,13 +2,46 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: it\n"
+
+#, c-format
+msgid "%s free of %s"
+msgstr "%s liberi su %s"
+
+msgid "Also hide when only other devices are present"
+msgstr "Nascondi anche quando ci sono solo altri dispositivi"
+
+msgid "Appearance"
+msgstr "Aspetto"
+
+msgid "Audio device"
+msgstr "Dispositivo audio"
+
+msgid "Behavior"
+msgstr "Comportamento"
+
+msgid "Camera (PTP)"
+msgstr "Fotocamera (PTP)"
+
+msgid "Camera / Webcam"
+msgstr "Fotocamera / Webcam"
+
+msgid "Close"
+msgstr "Chiudi"
+
+msgid "Could not close the connection to the device."
+msgstr "Impossibile chiudere la connessione con il dispositivo."
 
 msgid "Could not mount the device."
 msgstr "Impossibile montare il dispositivo."
+
+msgid "Could not open the device. If it is a phone, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "Impossibile aprire il dispositivo. Se è un telefono, sbloccalo e scegli «Trasferimento file» nella notifica USB."
 
 msgid "Could not unmount the device."
 msgstr "Impossibile smontare il dispositivo."
@@ -22,8 +55,20 @@ msgstr "Dispositivo montato"
 msgid "Eject"
 msgstr "Espelli"
 
+msgid "Eject failed"
+msgstr "Espulsione non riuscita"
+
 msgid "Ejecting…"
 msgstr "Espulsione…"
+
+msgid "Gamepad / Joystick"
+msgstr "Gamepad / Joystick"
+
+msgid "Hide button when no removable devices"
+msgstr "Nascondi il pulsante quando non ci sono dispositivi rimovibili"
+
+msgid "Icon size:"
+msgstr "Dimensione icona:"
 
 msgid "Mount"
 msgstr "Monta"
@@ -37,44 +82,41 @@ msgstr "Montaggio…"
 msgid "No removable devices"
 msgstr "Nessun dispositivo rimovibile"
 
+msgid "Not authorized to perform this operation."
+msgstr "Non autorizzato a eseguire questa operazione."
+
+msgid "Notify when devices are connected or disconnected"
+msgstr "Notifica quando si collegano o si scollegano dispositivi"
+
+msgid "Open file manager after mounting"
+msgstr "Apri il gestore di file dopo il montaggio"
+
+msgid "Open folder"
+msgstr "Apri cartella"
+
+msgid "Other devices"
+msgstr "Altri dispositivi"
+
+msgid "Phone"
+msgstr "Telefono"
+
+msgid "Phone (MTP)"
+msgstr "Telefono (MTP)"
+
+msgid "Phone / Camera"
+msgstr "Telefono / Fotocamera"
+
+msgid "Phone or camera connected"
+msgstr "Telefono o fotocamera collegato"
+
+msgid "Phone or camera disconnected"
+msgstr "Telefono o fotocamera scollegato"
+
+msgid "Phone ready"
+msgstr "Telefono pronto"
+
 msgid "Please wait, do not unplug."
 msgstr "Attendere, non scollegare."
-
-msgid "Safe to remove"
-msgstr "Rimozione sicura"
-
-msgid "Safe to unplug."
-msgstr "È possibile scollegare il dispositivo."
-
-msgid "Unmount"
-msgstr "Smonta"
-
-msgid "Unmount failed"
-msgstr "Smontaggio non riuscito"
-
-msgid "Unmounting…"
-msgstr "Smontaggio…"
-
-msgid "You can now unplug the device."
-msgstr "Ora è possibile scollegare il dispositivo."
-
-msgid "Appearance"
-msgstr "Aspetto"
-
-msgid "Behavior"
-msgstr "Comportamento"
-
-msgid "Close"
-msgstr "Chiudi"
-
-msgid "Hide button when no removable devices"
-msgstr "Nascondi il pulsante quando non ci sono dispositivi rimovibili"
-
-msgid "Icon size:"
-msgstr "Dimensione icona:"
-
-msgid "Open Thunar after mounting"
-msgstr "Apri Thunar dopo il montaggio"
 
 msgid "Plugin size:"
 msgstr "Dimensione plugin:"
@@ -85,20 +127,11 @@ msgstr "Altezza popup:"
 msgid "Popup width:"
 msgstr "Larghezza popup:"
 
+msgid "Printer"
+msgstr "Stampante"
+
 msgid "Properties — Removable Devices"
 msgstr "Proprietà — Dispositivi rimovibili"
-
-msgid "Removable devices"
-msgstr "Dispositivi rimovibili"
-
-msgid "Show notifications"
-msgstr "Mostra notifiche"
-
-msgid "Square button"
-msgstr "Pulsante quadrato"
-
-msgid "Use panel icon size"
-msgstr "Usa dimensione pannello per l'icona"
 
 msgid "Removable device connected"
 msgstr "Dispositivo rimovibile collegato"
@@ -106,26 +139,62 @@ msgstr "Dispositivo rimovibile collegato"
 msgid "Removable device disconnected"
 msgstr "Dispositivo rimovibile scollegato"
 
+msgid "Removable devices"
+msgstr "Dispositivi rimovibili"
+
+msgid "Removable disk"
+msgstr "Disco rimovibile"
+
+msgid "Safe to remove"
+msgstr "Rimozione sicura"
+
+msgid "Safe to unplug."
+msgstr "È possibile scollegare il dispositivo."
+
+msgid "Safely remove"
+msgstr "Rimozione sicura"
+
+msgid "Show notifications"
+msgstr "Mostra notifiche"
+
+msgid "Square button"
+msgstr "Pulsante quadrato"
+
+msgid "The device is in use by another application. Close any open files or terminals on it and try again."
+msgstr "Il dispositivo è in uso da un'altra applicazione. Chiudi i file o i terminali aperti su di esso e riprova."
+
+msgid "The partitions were unmounted, but the drive could not be ejected."
+msgstr "Le partizioni sono state smontate, ma non è stato possibile espellere l'unità."
+
+msgid "USB device"
+msgstr "Dispositivo USB"
+
 msgid "USB device connected"
 msgstr "Dispositivo USB collegato"
 
 msgid "USB device disconnected"
 msgstr "Dispositivo USB scollegato"
 
-msgid "USB device"
-msgstr "Dispositivo USB"
-
 msgid "Unknown"
 msgstr "Sconosciuto"
 
-msgid "Notify when devices are connected or disconnected"
-msgstr "Notifica quando si collegano o si scollegano dispositivi"
+msgid "Unmount"
+msgstr "Smonta"
 
-msgid "Other devices"
-msgstr "Altri dispositivi"
+msgid "Unmount failed"
+msgstr "Smontaggio non riuscito"
 
-msgid "Also hide when only other devices are present"
-msgstr "Nascondi anche quando ci sono solo altri dispositivi"
+msgid "Unmounting…"
+msgstr "Smontaggio…"
 
-msgid "Removable disk"
-msgstr "Disco rimovibile"
+msgid "Use panel icon size"
+msgstr "Usa dimensione pannello per l'icona"
+
+msgid "You can now unplug the device."
+msgstr "Ora è possibile scollegare il dispositivo."
+
+msgid "iPhone / iPad"
+msgstr "iPhone / iPad"
+
+msgid "not mounted"
+msgstr "non montato"
