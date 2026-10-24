@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"POT-Creation-Date: 2026-10-24 18:56+0000\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,14 @@ msgstr "%s libres de %s"
 msgid "Also hide when only other devices are present"
 msgstr "Ocultar también cuando solo haya otros dispositivos"
 
+#. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "Apariencia"
 
 msgid "Audio device"
 msgstr "Dispositivo de audio"
 
+#. ---- frame Comportamiento ----
 msgid "Behavior"
 msgstr "Comportamiento"
 
@@ -64,14 +66,24 @@ msgstr "Expulsando…"
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
+msgid "Graphics tablet"
+msgstr "Tableta gráfica"
+
 msgid "Hide button when no removable devices"
 msgstr "Ocultar botón si no hay dispositivos extraíbles"
 
+#. tamaño del ícono
 msgid "Icon size:"
 msgstr "Tamaño del ícono:"
 
+msgid "MIDI device"
+msgstr "Dispositivo MIDI"
+
 msgid "Mount"
 msgstr "Montar"
+
+msgid "Mount and safely remove drives, phones and other USB devices"
+msgstr "Montar y quitar con seguridad unidades, teléfonos y otros dispositivos USB"
 
 msgid "Mount failed"
 msgstr "Error al montar"
@@ -118,12 +130,15 @@ msgstr "Teléfono listo"
 msgid "Please wait, do not unplug."
 msgstr "Por favor espere, no desconecte."
 
+#. tamaño del plugin
 msgid "Plugin size:"
 msgstr "Tamaño del plugin:"
 
+#. alto del popup
 msgid "Popup height:"
 msgstr "Alto del popup:"
 
+#. ancho del popup
 msgid "Popup width:"
 msgstr "Ancho del popup:"
 
@@ -132,6 +147,9 @@ msgstr "Impresora"
 
 msgid "Properties — Removable Devices"
 msgstr "Propiedades — Dispositivos extraíbles"
+
+msgid "Removable Devices"
+msgstr "Dispositivos extraíbles"
 
 msgid "Removable device connected"
 msgstr "Dispositivo extraíble conectado"
@@ -154,9 +172,16 @@ msgstr "Puede desconectar el dispositivo."
 msgid "Safely remove"
 msgstr "Quitar con seguridad"
 
+msgid "Security key / Smart card"
+msgstr "Llave de seguridad / Tarjeta inteligente"
+
+msgid "Serial device / Board"
+msgstr "Dispositivo serie / Placa"
+
 msgid "Show notifications"
 msgstr "Mostrar notificaciones"
 
+#. botón cuadrado
 msgid "Square button"
 msgstr "Botón cuadrado"
 
@@ -187,6 +212,7 @@ msgstr "Error al desmontar"
 msgid "Unmounting…"
 msgstr "Desmontando…"
 
+#. ícono del panel
 msgid "Use panel icon size"
 msgstr "Usar tamaño del panel para el ícono"
 

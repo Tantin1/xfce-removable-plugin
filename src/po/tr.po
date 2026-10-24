@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"POT-Creation-Date: 2026-10-24 18:56+0000\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,14 @@ msgstr "%s boş, toplam %s"
 msgid "Also hide when only other devices are present"
 msgstr "Yalnızca diğer aygıtlar varsa da gizle"
 
+#. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "Görünüm"
 
 msgid "Audio device"
 msgstr "Ses aygıtı"
 
+#. ---- frame Comportamiento ----
 msgid "Behavior"
 msgstr "Davranış"
 
@@ -64,14 +66,24 @@ msgstr "Çıkarılıyor…"
 msgid "Gamepad / Joystick"
 msgstr "Oyun kumandası / Joystick"
 
+msgid "Graphics tablet"
+msgstr "Grafik tableti"
+
 msgid "Hide button when no removable devices"
 msgstr "Çıkarılabilir aygıt yokken düğmeyi gizle"
 
+#. tamaño del ícono
 msgid "Icon size:"
 msgstr "Simge boyutu:"
 
+msgid "MIDI device"
+msgstr "MIDI aygıtı"
+
 msgid "Mount"
 msgstr "Bağla"
+
+msgid "Mount and safely remove drives, phones and other USB devices"
+msgstr "Sürücüleri, telefonları ve diğer USB aygıtlarını bağlayın ve güvenle kaldırın"
 
 msgid "Mount failed"
 msgstr "Bağlama başarısız"
@@ -118,12 +130,15 @@ msgstr "Telefon hazır"
 msgid "Please wait, do not unplug."
 msgstr "Lütfen bekleyin, fişi çekmeyin."
 
+#. tamaño del plugin
 msgid "Plugin size:"
 msgstr "Eklenti boyutu:"
 
+#. alto del popup
 msgid "Popup height:"
 msgstr "Açılır pencere yüksekliği:"
 
+#. ancho del popup
 msgid "Popup width:"
 msgstr "Açılır pencere genişliği:"
 
@@ -132,6 +147,9 @@ msgstr "Yazıcı"
 
 msgid "Properties — Removable Devices"
 msgstr "Özellikler — Çıkarılabilir Aygıtlar"
+
+msgid "Removable Devices"
+msgstr "Çıkarılabilir aygıtlar"
 
 msgid "Removable device connected"
 msgstr "Çıkarılabilir aygıt bağlandı"
@@ -154,9 +172,16 @@ msgstr "Aygıtı güvenle çıkarabilirsiniz."
 msgid "Safely remove"
 msgstr "Güvenle kaldır"
 
+msgid "Security key / Smart card"
+msgstr "Güvenlik anahtarı / Akıllı kart"
+
+msgid "Serial device / Board"
+msgstr "Seri aygıt / Kart"
+
 msgid "Show notifications"
 msgstr "Bildirimleri göster"
 
+#. botón cuadrado
 msgid "Square button"
 msgstr "Kare düğme"
 
@@ -187,6 +212,7 @@ msgstr "Çıkarma başarısız"
 msgid "Unmounting…"
 msgstr "Çıkarılıyor…"
 
+#. ícono del panel
 msgid "Use panel icon size"
 msgstr "Simge için panel boyutunu kullan"
 

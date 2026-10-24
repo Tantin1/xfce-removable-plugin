@@ -1,0 +1,7 @@
+# Carpeta donde se instala el .so del plugin.
+# Vacío (por defecto): la que usa el panel instalado, tomada de libxfce4panel
+# por pkg-config (<libdir>/xfce4/panel/plugins). El panel solo busca ahí:
+# ignora X-XFCE-Module-Path del .desktop (xfce4-panel, panel-module.c).
+# Forzarla solo para casos especiales (p. ej. compilar en un chroot de otra distro).
+option('plugin-dir', type : 'string', value : '',
+       description : 'Carpeta de módulos del panel (vacío = la de libxfce4panel)')

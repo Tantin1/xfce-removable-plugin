@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"POT-Creation-Date: 2026-10-24 18:56+0000\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,14 @@ msgstr "%s vrij van %s"
 msgid "Also hide when only other devices are present"
 msgstr "Ook verbergen wanneer er alleen andere apparaten zijn"
 
+#. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "Uiterlijk"
 
 msgid "Audio device"
 msgstr "Audioapparaat"
 
+#. ---- frame Comportamiento ----
 msgid "Behavior"
 msgstr "Gedrag"
 
@@ -64,14 +66,24 @@ msgstr "Uitwerpen…"
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
+msgid "Graphics tablet"
+msgstr "Tekentablet"
+
 msgid "Hide button when no removable devices"
 msgstr "Knop verbergen als er geen verwijderbare apparaten zijn"
 
+#. tamaño del ícono
 msgid "Icon size:"
 msgstr "Pictogramgrootte:"
 
+msgid "MIDI device"
+msgstr "MIDI-apparaat"
+
 msgid "Mount"
 msgstr "Koppelen"
+
+msgid "Mount and safely remove drives, phones and other USB devices"
+msgstr "Stations, telefoons en andere USB-apparaten koppelen en veilig verwijderen"
 
 msgid "Mount failed"
 msgstr "Koppelen mislukt"
@@ -118,12 +130,15 @@ msgstr "Telefoon gereed"
 msgid "Please wait, do not unplug."
 msgstr "Even geduld, niet loskoppelen."
 
+#. tamaño del plugin
 msgid "Plugin size:"
 msgstr "Plugingrootte:"
 
+#. alto del popup
 msgid "Popup height:"
 msgstr "Popuphoogte:"
 
+#. ancho del popup
 msgid "Popup width:"
 msgstr "Popupbreedte:"
 
@@ -132,6 +147,9 @@ msgstr "Printer"
 
 msgid "Properties — Removable Devices"
 msgstr "Eigenschappen — Verwijderbare apparaten"
+
+msgid "Removable Devices"
+msgstr "Verwijderbare apparaten"
 
 msgid "Removable device connected"
 msgstr "Verwijderbaar apparaat aangesloten"
@@ -154,9 +172,16 @@ msgstr "U kunt het apparaat nu loskoppelen."
 msgid "Safely remove"
 msgstr "Veilig verwijderen"
 
+msgid "Security key / Smart card"
+msgstr "Beveiligingssleutel / Smartcard"
+
+msgid "Serial device / Board"
+msgstr "Serieel apparaat / Bord"
+
 msgid "Show notifications"
 msgstr "Meldingen weergeven"
 
+#. botón cuadrado
 msgid "Square button"
 msgstr "Vierkante knop"
 
@@ -187,6 +212,7 @@ msgstr "Ontkoppelen mislukt"
 msgid "Unmounting…"
 msgstr "Ontkoppelen…"
 
+#. ícono del panel
 msgid "Use panel icon size"
 msgstr "Panelgrootte gebruiken voor pictogram"
 

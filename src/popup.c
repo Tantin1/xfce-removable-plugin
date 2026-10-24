@@ -536,11 +536,15 @@ on_mount_done (gboolean ok, const gchar *mount_point,
         if (ok) {
             if (popup->show_notify)
                 notify_send (_("Device mounted"), mount_point, "drive-removable-media");
-            if (popup->open_thunar && mount_point)
+            if (popup->open_thunar && mount_point) {
+                /* igual que "Abrir carpeta": el popup no queda encima del gestor
+                   (popup_show reconstruye al volver a abrir) */
                 open_file_manager (mount_point);
-            /* si la señal de cambio todavía no reconstruyó la fila, forzarlo */
-            if (op->btn)
+                popup_hide (popup);
+            } else if (op->btn) {
+                /* si la señal de cambio todavía no reconstruyó la fila, forzarlo */
                 popup_rebuild (popup, op->conn);
+            }
         } else {
             if (popup->show_notify) {
                 gchar *msg = describe_error (error, _("Could not mount the device."));
@@ -865,6 +869,89 @@ build_partition_row (RemovablePopup *popup, GDBusConnection *conn, UdDevice *dev
     return row;
 }
 
+/* ---------- botón con ícono + texto fijo ----------
+ *
+ * Fila:  [flecha][ícono][ nombre ......... ][⏏ Expulsar]
+ * - El texto del botón NUNCA se recorta.
+ * - El nombre es el único elemento elástico: ancho mínimo chico
+ *   (NAME_MIN_CHARS), se recorta con "…" y muestra el nombre entero en el tooltip.
+ * - Si aun así la fila no entra en el ancho configurado del popup (popup muy
+ *   angosto o traducción larga), fit_labeled_button() deja el botón solo con el
+ *   ícono, con el texto en el tooltip, en vez de ensanchar el popup.
+ * Ojo: GTK reparte el sobrante por igual entre los hijos que no llegan a su
+ * ancho natural, así que dejar el texto del botón recortable lo recortaría
+ * junto con el nombre. Por eso la decisión es explícita.
+ */
+#define NAME_MIN_CHARS 6
+
+static GtkWidget *
+labeled_button_new (const gchar *icon_name, const gchar *text)
+{
+    GtkWidget *btn   = gtk_button_new ();
+    GtkWidget *box   = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 4);
+    GtkWidget *image = gtk_image_new_from_icon_name (icon_name, GTK_ICON_SIZE_BUTTON);
+    GtkWidget *label = gtk_label_new (text);
+
+    gtk_box_pack_start (GTK_BOX (box), image, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (box), label, FALSE, FALSE, 0);
+    gtk_container_add (GTK_CONTAINER (btn), box);
+    g_object_set_data (G_OBJECT (btn), "btn-label", label);
+
+    gtk_widget_set_tooltip_text (btn, text);
+    gtk_widget_set_valign (btn, GTK_ALIGN_CENTER);
+    gtk_widget_set_hexpand (btn, FALSE);
+    return btn;
+}
+
+/* ancho útil del contenido: popup configurado - borde - barra de desplazamiento */
+static gint
+popup_content_width (RemovablePopup *popup)
+{
+    gint avail = popup->popup_width
+               - 2 * (gint) gtk_container_get_border_width (GTK_CONTAINER (popup->window));
+    GtkWidget *vbar = gtk_scrolled_window_get_vscrollbar (GTK_SCROLLED_WINDOW (popup->scroll));
+    if (vbar && !gtk_scrolled_window_get_overlay_scrolling (GTK_SCROLLED_WINDOW (popup->scroll))) {
+        gint bar_min = 0;
+        gtk_widget_get_preferred_width (vbar, &bar_min, NULL);
+        avail -= bar_min;
+    }
+    return avail;
+}
+
+/* llamar con la fila ya empacada y mostrada (un widget oculto no mide) */
+static void
+fit_labeled_button (RemovablePopup *popup, GtkWidget *row, GtkWidget *btn)
+{
+    GtkWidget *label = btn ? g_object_get_data (G_OBJECT (btn), "btn-label") : NULL;
+    gint       row_min = 0;
+
+    if (!label)
+        return;
+    gtk_widget_get_preferred_width (row, &row_min, NULL);
+    if (row_min > popup_content_width (popup)) {
+        gtk_widget_set_no_show_all (label, TRUE);
+        gtk_widget_hide (label);
+    }
+}
+
+/* nombre en negrita, elástico, recortable, con el texto completo en el tooltip */
+static void
+setup_elastic_name (GtkWidget *label, const gchar *full_name)
+{
+    gtk_label_set_xalign (GTK_LABEL (label), 0.0);
+    gtk_label_set_ellipsize (GTK_LABEL (label), PANGO_ELLIPSIZE_END);
+    gtk_label_set_width_chars     (GTK_LABEL (label), NAME_MIN_CHARS);
+    gtk_label_set_max_width_chars (GTK_LABEL (label), -1);   /* natural = nombre entero */
+    gtk_widget_set_hexpand (label, TRUE);
+    if (full_name && *full_name)
+        gtk_widget_set_tooltip_text (label, full_name);
+
+    PangoAttrList *attrs = pango_attr_list_new ();
+    pango_attr_list_insert (attrs, pango_attr_weight_new (PANGO_WEIGHT_BOLD));
+    gtk_label_set_attributes (GTK_LABEL (label), attrs);
+    pango_attr_list_unref (attrs);
+}
+
 /* ---------- fila de encabezado de disco ---------- */
 
 /* nombre de respaldo si el Drive no tiene Vendor/Model:
@@ -922,16 +1009,8 @@ build_drive_header (RemovablePopup *popup, GDBusConnection *conn,
         drive_name = g_strdup (_("Removable disk"));
 
     GtkWidget *name_label = gtk_label_new (drive_name);
+    setup_elastic_name (name_label, drive_name);
     g_free (drive_name);
-    gtk_label_set_xalign (GTK_LABEL (name_label), 0.0);
-    gtk_label_set_ellipsize (GTK_LABEL (name_label), PANGO_ELLIPSIZE_END);
-    gtk_label_set_max_width_chars (GTK_LABEL (name_label), 26);
-    gtk_widget_set_hexpand (name_label, TRUE);
-
-    PangoAttrList *attrs = pango_attr_list_new ();
-    pango_attr_list_insert (attrs, pango_attr_weight_new (PANGO_WEIGHT_BOLD));
-    gtk_label_set_attributes (GTK_LABEL (name_label), attrs);
-    pango_attr_list_unref (attrs);
     gtk_box_pack_start (GTK_BOX (row), name_label, TRUE, TRUE, 0);
 
     /* botón Eject / Safely remove */
@@ -955,10 +1034,10 @@ build_drive_header (RemovablePopup *popup, GDBusConnection *conn,
         ejd->partitions = mounted_paths;
         ejd->power_off  = !ejectable;
 
-        GtkWidget *btn_eject = gtk_button_new_from_icon_name (
-            "media-eject-symbolic", GTK_ICON_SIZE_BUTTON);
-        gtk_widget_set_tooltip_text (btn_eject, ejectable ? _("Eject") : _("Safely remove"));
+        GtkWidget *btn_eject = labeled_button_new (
+            "media-eject-symbolic", ejectable ? _("Eject") : _("Safely remove"));
         g_object_set_data_full (G_OBJECT (btn_eject), "eject-data", ejd, eject_data_free);
+        g_object_set_data (G_OBJECT (row), "labeled-btn", btn_eject);
         g_signal_connect (btn_eject, "clicked", G_CALLBACK (on_eject_clicked), ejd);
         gtk_box_pack_start (GTK_BOX (row), btn_eject, FALSE, FALSE, 0);
     } else {
@@ -970,11 +1049,15 @@ build_drive_header (RemovablePopup *popup, GDBusConnection *conn,
 
 /* ---------- fila de dispositivo USB no-almacenamiento ---------- */
 
+/* sangría de "Other devices": sección secundaria, corrida a la derecha
+   respecto de discos y teléfonos (filas: OTHER_INDENT + 32, como particiones) */
+#define OTHER_INDENT 12
+
 static GtkWidget *
 build_usb_device_row (UdUsbDevice *dev)
 {
     GtkWidget *row = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
-    gtk_widget_set_margin_start  (row, 32);
+    gtk_widget_set_margin_start  (row, OTHER_INDENT + 32);
     gtk_widget_set_margin_end    (row, 12);
     gtk_widget_set_margin_top    (row, 4);
     gtk_widget_set_margin_bottom (row, 4);
@@ -1086,17 +1169,27 @@ on_phone_mount_done (GObject *source, GAsyncResult *res, gpointer data)
 
     if (!op->popup->destroyed) {
         if (ok) {
+            /* Con MTP, al terminar el montaje el GMount puede no estar registrado
+               todavía en el monitor de gvfs (llega después con mount-added).
+               Respaldo: la activation root del volumen, la misma mtp://… */
             GMount *mount = g_volume_get_mount (G_VOLUME (source));
-            GFile  *root  = mount ? g_mount_get_root (mount) : NULL;
+            GFile  *root  = mount ? g_mount_get_root (mount)
+                                  : g_volume_get_activation_root (G_VOLUME (source));
             gchar  *uri   = root ? g_file_get_uri (root) : NULL;
             gchar  *name  = g_volume_get_name (G_VOLUME (source));
 
+            if (!uri)
+                g_warning ("xfce-removable-plugin: teléfono montado sin URI para abrir");
+
             if (op->popup->show_notify)
                 notify_send (_("Phone ready"), name, "phone");
-            if (op->popup->open_thunar && uri)
+            if (op->popup->open_thunar && uri) {
                 open_file_manager (uri);
-            if (op->btn)   /* sin bus del sistema conn es NULL: popup_rebuild lo tolera */
+                popup_hide (op->popup);
+            } else if (op->btn) {
+                /* sin bus del sistema conn es NULL: popup_rebuild lo tolera */
                 popup_rebuild (op->popup, op->conn);
+            }
 
             g_free (name);
             g_free (uri);
@@ -1224,14 +1317,9 @@ build_phone_row (RemovablePopup *popup, GDBusConnection *conn, UdPhone *ph)
     gtk_widget_set_hexpand (info_box, TRUE);
     gtk_widget_set_valign (info_box, GTK_ALIGN_CENTER);
 
-    GtkWidget *name_label = gtk_label_new (ph->name && *ph->name ? ph->name : _("Phone"));
-    gtk_label_set_xalign (GTK_LABEL (name_label), 0.0);
-    gtk_label_set_ellipsize (GTK_LABEL (name_label), PANGO_ELLIPSIZE_END);
-    gtk_label_set_max_width_chars (GTK_LABEL (name_label), 26);
-    PangoAttrList *attrs = pango_attr_list_new ();
-    pango_attr_list_insert (attrs, pango_attr_weight_new (PANGO_WEIGHT_BOLD));
-    gtk_label_set_attributes (GTK_LABEL (name_label), attrs);
-    pango_attr_list_unref (attrs);
+    const gchar *ph_name   = (ph->name && *ph->name) ? ph->name : _("Phone");
+    GtkWidget   *name_label = gtk_label_new (ph_name);
+    setup_elastic_name (name_label, ph_name);
 
     gchar *detail = ph->mount
         ? g_strdup (phone_kind_label (ph->kind))
@@ -1257,11 +1345,10 @@ build_phone_row (RemovablePopup *popup, GDBusConnection *conn, UdPhone *ph)
         gtk_box_pack_start (GTK_BOX (row), btn_open, FALSE, FALSE, 0);
 
         if (g_mount_can_unmount (ph->mount) || g_mount_can_eject (ph->mount)) {
-            GtkWidget *btn_off = gtk_button_new_from_icon_name (
-                "media-eject-symbolic", GTK_ICON_SIZE_BUTTON);
-            gtk_widget_set_tooltip_text (btn_off, _("Safely remove"));
-            gtk_widget_set_valign (btn_off, GTK_ALIGN_CENTER);
+            GtkWidget *btn_off = labeled_button_new ("media-eject-symbolic",
+                                                     _("Safely remove"));
             g_signal_connect (btn_off, "clicked", G_CALLBACK (on_phone_unmount_clicked), pd);
+            g_object_set_data (G_OBJECT (row), "labeled-btn", btn_off);
             gtk_box_pack_start (GTK_BOX (row), btn_off, FALSE, FALSE, 0);
         }
     } else if (ph->volume && g_volume_can_mount (ph->volume)) {
@@ -1297,7 +1384,7 @@ add_other_devices_section (RemovablePopup *popup, GSList *usb_devs)
     }
     /* encabezado "Other devices" con flecha */
     GtkWidget *hdr = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
-    gtk_widget_set_margin_start  (hdr, 12);
+    gtk_widget_set_margin_start  (hdr, OTHER_INDENT + 12);
     gtk_widget_set_margin_end    (hdr, 12);
     gtk_widget_set_margin_top    (hdr, 8);
     gtk_widget_set_margin_bottom (hdr, 4);
@@ -1312,16 +1399,14 @@ add_other_devices_section (RemovablePopup *popup, GSList *usb_devs)
     ed_usb->arrow      = arrow;
     ed_usb->expanded   = g_hash_table_contains (popup->expanded, "__other__");
 
+    /* ícono chico y título atenuado sin negrita: se lee como accesorio */
     GtkWidget *hdr_icon = gtk_image_new_from_icon_name (
-        "emblem-system-symbolic", GTK_ICON_SIZE_LARGE_TOOLBAR);
+        "emblem-system-symbolic", GTK_ICON_SIZE_MENU);
     GtkWidget *hdr_label = gtk_label_new (_("Other devices"));
     gtk_label_set_xalign (GTK_LABEL (hdr_label), 0.0);
     gtk_widget_set_hexpand (hdr_label, TRUE);
-
-    PangoAttrList *attrs = pango_attr_list_new ();
-    pango_attr_list_insert (attrs, pango_attr_weight_new (PANGO_WEIGHT_BOLD));
-    gtk_label_set_attributes (GTK_LABEL (hdr_label), attrs);
-    pango_attr_list_unref (attrs);
+    gtk_style_context_add_class (gtk_widget_get_style_context (hdr_label), "dim-label");
+    gtk_style_context_add_class (gtk_widget_get_style_context (hdr_icon),  "dim-label");
 
     gtk_box_pack_start (GTK_BOX (hdr), arrow,     FALSE, FALSE, 0);
     gtk_box_pack_start (GTK_BOX (hdr), hdr_icon,  FALSE, FALSE, 0);
@@ -1387,6 +1472,8 @@ add_storage_section (RemovablePopup *popup, GDBusConnection *conn, GSList *devic
         g_signal_connect (event_box, "button-press-event", G_CALLBACK (on_expand_clicked), ed);
         gtk_box_pack_start (GTK_BOX (popup->content_box), event_box, FALSE, FALSE, 0);
         gtk_widget_show_all (event_box);
+        fit_labeled_button (popup, event_box,
+                            g_object_get_data (G_OBJECT (header), "labeled-btn"));
 
         /* filas de partición dentro de parts_box */
         for (GSList *p = parts; p; p = p->next) {
@@ -1435,6 +1522,7 @@ populate_content (RemovablePopup *popup, GDBusConnection *conn, const UdScan *sc
         GtkWidget *row = build_phone_row (popup, conn, l->data);
         gtk_box_pack_start (GTK_BOX (popup->content_box), row, FALSE, FALSE, 0);
         gtk_widget_show_all (row);
+        fit_labeled_button (popup, row, g_object_get_data (G_OBJECT (row), "labeled-btn"));
         need_sep = TRUE;
     }
 

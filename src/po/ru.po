@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"POT-Creation-Date: 2026-10-24 18:56+0000\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,14 @@ msgstr "Свободно %s из %s"
 msgid "Also hide when only other devices are present"
 msgstr "Скрывать также, если есть только другие устройства"
 
+#. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "Внешний вид"
 
 msgid "Audio device"
 msgstr "Аудиоустройство"
 
+#. ---- frame Comportamiento ----
 msgid "Behavior"
 msgstr "Поведение"
 
@@ -64,14 +66,24 @@ msgstr "Извлечение…"
 msgid "Gamepad / Joystick"
 msgstr "Геймпад / джойстик"
 
+msgid "Graphics tablet"
+msgstr "Графический планшет"
+
 msgid "Hide button when no removable devices"
 msgstr "Скрывать кнопку, если нет съёмных устройств"
 
+#. tamaño del ícono
 msgid "Icon size:"
 msgstr "Размер значка:"
 
+msgid "MIDI device"
+msgstr "MIDI-устройство"
+
 msgid "Mount"
 msgstr "Подключить"
+
+msgid "Mount and safely remove drives, phones and other USB devices"
+msgstr "Подключение и безопасное извлечение накопителей, телефонов и других USB-устройств"
 
 msgid "Mount failed"
 msgstr "Ошибка подключения"
@@ -118,12 +130,15 @@ msgstr "Телефон готов"
 msgid "Please wait, do not unplug."
 msgstr "Подождите, не отключайте устройство."
 
+#. tamaño del plugin
 msgid "Plugin size:"
 msgstr "Размер плагина:"
 
+#. alto del popup
 msgid "Popup height:"
 msgstr "Высота всплывающего окна:"
 
+#. ancho del popup
 msgid "Popup width:"
 msgstr "Ширина всплывающего окна:"
 
@@ -132,6 +147,9 @@ msgstr "Принтер"
 
 msgid "Properties — Removable Devices"
 msgstr "Свойства — Съёмные устройства"
+
+msgid "Removable Devices"
+msgstr "Съёмные устройства"
 
 msgid "Removable device connected"
 msgstr "Съёмное устройство подключено"
@@ -154,9 +172,16 @@ msgstr "Устройство можно отключить."
 msgid "Safely remove"
 msgstr "Безопасно извлечь"
 
+msgid "Security key / Smart card"
+msgstr "Ключ безопасности / смарт-карта"
+
+msgid "Serial device / Board"
+msgstr "Последовательное устройство / плата"
+
 msgid "Show notifications"
 msgstr "Показывать уведомления"
 
+#. botón cuadrado
 msgid "Square button"
 msgstr "Квадратная кнопка"
 
@@ -187,6 +212,7 @@ msgstr "Ошибка отключения"
 msgid "Unmounting…"
 msgstr "Отключение…"
 
+#. ícono del panel
 msgid "Use panel icon size"
 msgstr "Использовать размер панели для значка"
 

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"POT-Creation-Date: 2026-10-24 18:56+0000\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,14 @@ msgstr "%s متاح من %s"
 msgid "Also hide when only other devices are present"
 msgstr "إخفاء أيضاً عند وجود أجهزة أخرى فقط"
 
+#. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "المظهر"
 
 msgid "Audio device"
 msgstr "جهاز صوت"
 
+#. ---- frame Comportamiento ----
 msgid "Behavior"
 msgstr "السلوك"
 
@@ -64,14 +66,24 @@ msgstr "جارٍ الإخراج…"
 msgid "Gamepad / Joystick"
 msgstr "ذراع ألعاب / عصا تحكم"
 
+msgid "Graphics tablet"
+msgstr "لوح رسم"
+
 msgid "Hide button when no removable devices"
 msgstr "إخفاء الزر عند عدم وجود أجهزة قابلة للإزالة"
 
+#. tamaño del ícono
 msgid "Icon size:"
 msgstr "حجم الأيقونة:"
 
+msgid "MIDI device"
+msgstr "جهاز MIDI"
+
 msgid "Mount"
 msgstr "تحميل"
+
+msgid "Mount and safely remove drives, phones and other USB devices"
+msgstr "تحميل الأقراص والهواتف وأجهزة USB الأخرى وإزالتها بأمان"
 
 msgid "Mount failed"
 msgstr "فشل التحميل"
@@ -118,12 +130,15 @@ msgstr "الهاتف جاهز"
 msgid "Please wait, do not unplug."
 msgstr "يرجى الانتظار، لا تفصل الجهاز."
 
+#. tamaño del plugin
 msgid "Plugin size:"
 msgstr "حجم الإضافة:"
 
+#. alto del popup
 msgid "Popup height:"
 msgstr "ارتفاع النافذة المنبثقة:"
 
+#. ancho del popup
 msgid "Popup width:"
 msgstr "عرض النافذة المنبثقة:"
 
@@ -132,6 +147,9 @@ msgstr "طابعة"
 
 msgid "Properties — Removable Devices"
 msgstr "الخصائص — الأجهزة القابلة للإزالة"
+
+msgid "Removable Devices"
+msgstr "الأجهزة القابلة للإزالة"
 
 msgid "Removable device connected"
 msgstr "تم توصيل جهاز قابل للإزالة"
@@ -154,9 +172,16 @@ msgstr "يمكنك الآن فصل الجهاز."
 msgid "Safely remove"
 msgstr "إزالة آمنة"
 
+msgid "Security key / Smart card"
+msgstr "مفتاح أمان / بطاقة ذكية"
+
+msgid "Serial device / Board"
+msgstr "جهاز تسلسلي / لوحة"
+
 msgid "Show notifications"
 msgstr "إظهار الإشعارات"
 
+#. botón cuadrado
 msgid "Square button"
 msgstr "زر مربع"
 
@@ -187,6 +212,7 @@ msgstr "فشل إلغاء التحميل"
 msgid "Unmounting…"
 msgstr "جارٍ إلغاء التحميل…"
 
+#. ícono del panel
 msgid "Use panel icon size"
 msgstr "استخدام حجم اللوحة للأيقونة"
 

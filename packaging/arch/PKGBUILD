@@ -1,0 +1,30 @@
+# Maintainer: Juan Sebastian Perez <juanchiperez97@gmail.com>
+#
+# Antes de subirlo al AUR, con la etiqueta v$pkgver ya publicada en GitHub:
+#   updpkgsums                          # reemplaza SKIP por la suma real
+#   makepkg -si                         # probar que compila e instala
+#   makepkg --printsrcinfo > .SRCINFO   # el AUR exige este archivo
+
+pkgname=xfce-removable-plugin
+pkgver=1.0.0
+pkgrel=1
+pkgdesc='Xfce panel plugin for removable drives, phones and other USB devices'
+arch=('x86_64' 'aarch64')
+url='https://github.com/Tantin1/xfce-removable-plugin'
+license=('GPL-2.0-only')
+depends=('xfce4-panel' 'gtk3' 'glib2' 'libnotify' 'libgudev' 'udisks2')
+makedepends=('meson' 'gettext')
+optdepends=('gvfs-mtp: Android phones in file transfer mode'
+            'gvfs-gphoto2: cameras (PTP)'
+            'gvfs-afc: iPhone / iPad')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+  arch-meson "$pkgname-$pkgver/src" build
+  meson compile -C build
+}
+
+package() {
+  meson install -C build --destdir "$pkgdir"
+}

@@ -1,0 +1,6 @@
+#!/usr/bin/make -f
+# El proyecto meson está en src/. La carpeta del .so la decide meson.build
+# preguntándole a libxfce4panel (pkg-config), no hace falta pasarla acá.
+
+%:
+	dh $@ --buildsystem=meson --sourcedirectory=src

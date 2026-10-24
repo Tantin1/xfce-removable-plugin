@@ -445,13 +445,17 @@ const gchar *
 ud_usb_type_label (UdUsbType type)
 {
     switch (type) {
-    case UD_USB_PRINTER: return N_("Printer");
-    case UD_USB_AUDIO:   return N_("Audio device");
-    case UD_USB_CAMERA:  return N_("Camera / Webcam");
-    case UD_USB_GAMEPAD: return N_("Gamepad / Joystick");
-    case UD_USB_PHONE:   return N_("Phone / Camera");
+    case UD_USB_PRINTER:  return N_("Printer");
+    case UD_USB_AUDIO:    return N_("Audio device");
+    case UD_USB_CAMERA:   return N_("Camera / Webcam");
+    case UD_USB_GAMEPAD:  return N_("Gamepad / Joystick");
+    case UD_USB_PHONE:    return N_("Phone / Camera");
+    case UD_USB_TABLET:   return N_("Graphics tablet");
+    case UD_USB_SERIAL:   return N_("Serial device / Board");
+    case UD_USB_SECURITY: return N_("Security key / Smart card");
+    case UD_USB_MIDI:     return N_("MIDI device");
     case UD_USB_OTHER:
-    default:             return N_("USB device");
+    default:              return N_("USB device");
     }
 }
 
@@ -459,153 +463,291 @@ const gchar *
 ud_usb_type_icon (UdUsbType type)
 {
     switch (type) {
-    case UD_USB_PRINTER: return "printer";
-    case UD_USB_AUDIO:   return "audio-card";
-    case UD_USB_CAMERA:  return "camera-web";
-    case UD_USB_GAMEPAD: return "input-gaming";
-    case UD_USB_PHONE:   return "phone";
+    case UD_USB_PRINTER:  return "printer";
+    case UD_USB_AUDIO:    return "audio-card";
+    case UD_USB_CAMERA:   return "camera-web";
+    case UD_USB_GAMEPAD:  return "input-gaming";
+    case UD_USB_PHONE:    return "phone";
+    case UD_USB_TABLET:   return "input-tablet";
+    case UD_USB_SERIAL:   return "utilities-terminal";
+    case UD_USB_SECURITY: return "dialog-password";
+    case UD_USB_MIDI:     return "audio-x-generic";
     case UD_USB_OTHER:
-    default:             return "drive-removable-media";
+    default:              return "drive-removable-media";
     }
 }
 
-/* ---------- ud_get_usb_devices ---------- */
-
-/*
- * Estrategia: iterar subsistema "usb" buscando usb_device,
- * filtrar hubs (clase 09) y almacenamiento (usb-storage/uas),
- * deduplicar por ID_SERIAL, estimar tipo por clase de interfaz USB.
+/* ---------- ud_get_usb_devices ----------
+ *
+ * Por cada usb_device (no por interfaz):
+ *
+ * 1. Se descartan hubs (clase 09) y los puertos que el firmware declara
+ *    internos (atributo sysfs "removable" == "fixed": webcam, lector de
+ *    huellas o Bluetooth integrados de una notebook).
+ * 2. Se juntan dos fuentes:
+ *    - las interfaces USB (clase, subclase y driver de cada una, desde sysfs);
+ *    - lo que udev ya clasificó en los dispositivos "hijos": input
+ *      (ID_INPUT_JOYSTICK/TABLET/KEYBOARD/MOUSE/TOUCHPAD), hidraw
+ *      (ID_SECURITY_TOKEN, de las reglas fido_id), net, bluetooth y tty.
+ *      Las marcas de udev son más fiables que adivinar por clase de interfaz:
+ *      los mandos de Xbox no son HID, los de PlayStation traen audio, etc.
+ * 3. Se clasifica por prioridad (ver classify_usb()).
+ *
+ * No se deduplica: cada usb_device aparece una sola vez en la consulta, y
+ * deduplicar por ID_SERIAL juntaba dos aparatos iguales sin número de serie.
  */
+
+enum {
+    CH_JOYSTICK = 1 << 0,
+    CH_TABLET   = 1 << 1,
+    CH_KBMOUSE  = 1 << 2,
+    CH_SECURITY = 1 << 3,
+    CH_NET      = 1 << 4,
+    CH_BT       = 1 << 5,
+    CH_TTY      = 1 << 6,
+};
+
+static guint
+classify_input (GUdevDevice *d)
+{
+    if (g_udev_device_get_property_as_boolean (d, "ID_INPUT_JOYSTICK"))
+        return CH_JOYSTICK;
+    if (g_udev_device_get_property_as_boolean (d, "ID_INPUT_TABLET"))
+        return CH_TABLET;
+    if (g_udev_device_get_property_as_boolean (d, "ID_INPUT_KEYBOARD") ||
+        g_udev_device_get_property_as_boolean (d, "ID_INPUT_MOUSE")    ||
+        g_udev_device_get_property_as_boolean (d, "ID_INPUT_TOUCHPAD"))
+        return CH_KBMOUSE;
+    return 0;
+}
+
+static guint
+classify_hidraw (GUdevDevice *d)
+{
+    return g_udev_device_get_property_as_boolean (d, "ID_SECURITY_TOKEN") ? CH_SECURITY : 0;
+}
+
+static guint classify_net (GUdevDevice *d) { (void) d; return CH_NET; }
+static guint classify_bt  (GUdevDevice *d) { (void) d; return CH_BT;  }
+static guint classify_tty (GUdevDevice *d) { (void) d; return CH_TTY; }
+
+/* marca en `flags` (syspath del usb_device -> bits) lo que aportan los hijos
+   de un subsistema */
+static void
+mark_children (GUdevClient *client, const gchar *subsystem,
+               guint (*classify) (GUdevDevice *), GHashTable *flags)
+{
+    GList *devs = g_udev_client_query_by_subsystem (client, subsystem);
+    for (GList *l = devs; l; l = l->next) {
+        GUdevDevice *d    = l->data;
+        guint        bits = classify (d);
+        if (bits) {
+            GUdevDevice *usb = g_udev_device_get_parent_with_subsystem (d, "usb", "usb_device");
+            if (usb) {
+                const gchar *key = g_udev_device_get_sysfs_path (usb);
+                guint        old = GPOINTER_TO_UINT (g_hash_table_lookup (flags, key));
+                g_hash_table_replace (flags, g_strdup (key), GUINT_TO_POINTER (old | bits));
+                g_object_unref (usb);
+            }
+        }
+        g_object_unref (d);
+    }
+    g_list_free (devs);
+}
+
+/* lo que dicen las interfaces USB del aparato */
+typedef struct {
+    gboolean hid, vendor, storage, printer, video, image, bt, smartcard;
+    gboolean audio_stream;   /* 01/02: placa de audio, micrófono, auriculares */
+    gboolean midi;           /* 01/03: MIDIStreaming */
+    gboolean cdc_acm;        /* 02/02: módem / serie (Arduino) */
+    gboolean serial_driver;  /* cdc_acm, ftdi_sio, ch341, cp210x, pl2303… */
+    gboolean unknown_std;    /* alguna clase estándar sin categoría propia */
+} UsbIfaces;
+
+static gboolean
+is_serial_driver (const gchar *drv)
+{
+    static const gchar *serial[] = {
+        "cdc_acm", "ftdi_sio", "ch341", "cp210x", "pl2303", "usb_serial_simple",
+        "ti_usb_3410_5052", "io_ti", "mos7840", "oti6858", "spcp8x5", "ark3116",
+        "f81232", "xr_serial", NULL,
+    };
+    return drv && g_strv_contains (serial, drv);
+}
+
+static gchar *
+read_sysfs_line (const gchar *dir, const gchar *entry, const gchar *file)
+{
+    gchar *path = g_build_filename (dir, entry, file, NULL);
+    gchar *val  = NULL;
+    if (g_file_get_contents (path, &val, NULL, NULL))
+        g_strstrip (val);
+    g_free (path);
+    return val;
+}
+
+static void
+read_interfaces (const gchar *sysfs_path, UsbIfaces *f)
+{
+    GDir        *dir = g_dir_open (sysfs_path, 0, NULL);
+    const gchar *entry;
+
+    if (!dir)
+        return;
+    while ((entry = g_dir_read_name (dir))) {
+        gchar *cls = read_sysfs_line (sysfs_path, entry, "bInterfaceClass");
+        if (!cls)
+            continue;                       /* no es una interfaz */
+        gchar *sub  = read_sysfs_line (sysfs_path, entry, "bInterfaceSubClass");
+        gchar *link = g_build_filename (sysfs_path, entry, "driver", NULL);
+        gchar *tgt  = g_file_read_link (link, NULL);
+        gchar *drv  = tgt ? g_path_get_basename (tgt) : NULL;
+
+        if      (!g_strcmp0 (cls, "03")) f->hid       = TRUE;
+        else if (!g_strcmp0 (cls, "ff")) f->vendor    = TRUE;
+        else if (!g_strcmp0 (cls, "08")) f->storage   = TRUE;
+        else if (!g_strcmp0 (cls, "07")) f->printer   = TRUE;
+        else if (!g_strcmp0 (cls, "0e")) f->video     = TRUE;
+        else if (!g_strcmp0 (cls, "06")) f->image     = TRUE;
+        else if (!g_strcmp0 (cls, "e0")) f->bt        = TRUE;
+        else if (!g_strcmp0 (cls, "0b")) f->smartcard = TRUE;
+        else if (!g_strcmp0 (cls, "01")) {
+            if      (!g_strcmp0 (sub, "02")) f->audio_stream = TRUE;
+            else if (!g_strcmp0 (sub, "03")) f->midi         = TRUE;
+            /* 01/01 (AudioControl) solo acompaña a los otros dos */
+        }
+        else if (!g_strcmp0 (cls, "02")) {
+            if (!g_strcmp0 (sub, "02")) f->cdc_acm = TRUE;
+            /* 02/06, 02/0d… (Ethernet, NCM) los detecta CH_NET */
+        }
+        else if (!g_strcmp0 (cls, "0a")) { /* datos CDC: acompaña a la 02 */ }
+        else if (!g_strcmp0 (cls, "ef")) { /* misceláneo / IAD: contenedor */ }
+        else
+            f->unknown_std = TRUE;
+
+        if (is_serial_driver (drv))
+            f->serial_driver = TRUE;
+        /* almacenamiento: a veces la interfaz es ff con usb-storage/uas */
+        if (!g_strcmp0 (drv, "usb-storage") || !g_strcmp0 (drv, "uas"))
+            f->storage = TRUE;
+
+        g_free (drv);
+        g_free (tgt);
+        g_free (link);
+        g_free (sub);
+        g_free (cls);
+    }
+    g_dir_close (dir);
+}
+
+/* devuelve TRUE y el tipo si el aparato va en "Otros dispositivos".
+   El orden importa: cada regla solo mira lo que no resolvieron las anteriores. */
+static gboolean
+classify_usb (const UsbIfaces *f, guint ch, gboolean mtp, UdUsbType *type)
+{
+    /* lo que el usuario enchufa a propósito, de lo más específico a lo menos */
+    if (f->image || mtp)              { *type = UD_USB_PHONE;    return TRUE; }
+    if (ch & CH_JOYSTICK)             { *type = UD_USB_GAMEPAD;  return TRUE; }  /* antes que audio: DualSense */
+    if (ch & CH_TABLET)               { *type = UD_USB_TABLET;   return TRUE; }  /* antes que mouse: Wacom */
+    if ((ch & CH_SECURITY) || f->smartcard)
+                                      { *type = UD_USB_SECURITY; return TRUE; }
+    if (f->printer)                   { *type = UD_USB_PRINTER;  return TRUE; }
+    if (f->video)                     { *type = UD_USB_CAMERA;   return TRUE; }  /* antes que audio: micrófono de la webcam */
+    if (f->audio_stream)              { *type = UD_USB_AUDIO;    return TRUE; }
+    if (f->midi)                      { *type = UD_USB_MIDI;     return TRUE; }
+
+    /* van en otros plugins (red, Bluetooth) o en la sección principal */
+    if ((ch & (CH_NET | CH_BT)) || f->bt)
+        return FALSE;
+
+    /* antes que teclado/mouse: un Arduino Leonardo emula teclado y además es serie */
+    if ((ch & CH_TTY) || f->serial_driver || f->cdc_acm)
+                                      { *type = UD_USB_SERIAL;   return TRUE; }
+
+    if (ch & CH_KBMOUSE)              return FALSE;   /* teclados, mouses, receptores */
+    if (f->storage)                   return FALSE;   /* ya está en la sección principal */
+
+    /* sin categoría: solo si tiene alguna clase estándar reconocible. HID puro
+       (RGB, sensores, botoneras) y "de fabricante" puro (huelleros, controladores
+       varios) quedan afuera: casi siempre son internos o no le dicen nada al usuario */
+    if (f->unknown_std)               { *type = UD_USB_OTHER;    return TRUE; }
+    return FALSE;
+}
+
+static gchar *
+usb_display_name (GUdevDevice *dev)
+{
+    const gchar *vendor = g_udev_device_get_property (dev, "ID_VENDOR_FROM_DATABASE");
+    if (!vendor || !*vendor) vendor = g_udev_device_get_property (dev, "ID_VENDOR");
+    const gchar *model  = g_udev_device_get_property (dev, "ID_MODEL_FROM_DATABASE");
+    if (!model  || !*model)  model  = g_udev_device_get_property (dev, "ID_MODEL");
+
+    /* el nombre que el propio aparato reporta suele ser el más claro */
+    const gchar *product = g_udev_device_get_sysfs_attr (dev, "product");
+
+    gchar *name;
+    if (vendor && *vendor && model && *model)
+        name = g_strdup_printf ("%s %s", vendor, model);
+    else if (product && *product)
+        name = g_strdup (product);
+    else if (model && *model)
+        name = g_strdup (model);
+    else if (vendor && *vendor)
+        name = g_strdup (vendor);
+    else
+        name = g_strdup ("Unknown USB device");
+
+    for (gchar *c = name; *c; c++)
+        if (*c == '_') *c = ' ';
+    return name;
+}
+
 GSList *
 ud_get_usb_devices (void)
 {
     const gchar *subsystems[] = { "usb", NULL };
     GUdevClient *client = g_udev_client_new (subsystems);
     GSList      *result = NULL;
-    GHashTable  *seen   = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+    GHashTable  *flags  = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+
+    mark_children (client, "input",     classify_input,  flags);
+    mark_children (client, "hidraw",    classify_hidraw, flags);
+    mark_children (client, "net",       classify_net,    flags);
+    mark_children (client, "bluetooth", classify_bt,     flags);
+    mark_children (client, "tty",       classify_tty,    flags);
 
     GList *usb_devs = g_udev_client_query_by_subsystem (client, "usb");
     for (GList *l = usb_devs; l; l = l->next) {
-        GUdevDevice *dev = l->data;
-
-        /* solo usb_device */
-        const gchar *devtype = g_udev_device_get_devtype (dev);
-        if (g_strcmp0 (devtype, "usb_device") != 0) {
-            g_object_unref (dev);
-            continue;
-        }
-
-        /* filtrar hubs (clase 09) */
-        const gchar *bclass = g_udev_device_get_sysfs_attr (dev, "bDeviceClass");
-        if (g_strcmp0 (bclass, "09") == 0) {
-            g_object_unref (dev);
-            continue;
-        }
-
-        /* filtrar almacenamiento — ya aparece en la sección principal */
-        const gchar *driver = g_udev_device_get_driver (dev);
-        if (g_strcmp0 (driver, "usb-storage") == 0 ||
-            g_strcmp0 (driver, "uas") == 0) {
-            g_object_unref (dev);
-            continue;
-        }
-
-        /* deduplicar por ID_SERIAL */
-        const gchar *serial = g_udev_device_get_property (dev, "ID_SERIAL");
-        if (!serial || !*serial)
-            serial = g_udev_device_get_property (dev, "ID_PATH");
-        if (!serial || !*serial) { g_object_unref (dev); continue; }
-        if (g_hash_table_contains (seen, serial)) {
-            g_object_unref (dev);
-            continue;
-        }
-        g_hash_table_insert (seen, g_strdup (serial), GINT_TO_POINTER (1));
-
-        /* nombre */
-        const gchar *vendor = g_udev_device_get_property (dev, "ID_VENDOR_FROM_DATABASE");
-        if (!vendor || !*vendor) vendor = g_udev_device_get_property (dev, "ID_VENDOR");
-        const gchar *model  = g_udev_device_get_property (dev, "ID_MODEL_FROM_DATABASE");
-        if (!model  || !*model)  model  = g_udev_device_get_property (dev, "ID_MODEL");
-
-        gchar *name = NULL;
-        if (vendor && model && *vendor && *model)
-            name = g_strdup_printf ("%s %s", vendor, model);
-        else if (model && *model)
-            name = g_strdup (model);
-        else if (vendor && *vendor)
-            name = g_strdup (vendor);
-        else {
-            const gchar *prod = g_udev_device_get_sysfs_attr (dev, "product");
-            name = (prod && *prod) ? g_strdup (prod) : g_strdup ("Unknown USB device");
-        }
-        /* reemplazar guiones bajos por espacios */
-        for (gchar *c = name; *c; c++) if (*c == '_') *c = ' ';
-
-        /* leer interfaces del dispositivo desde sysfs */
+        GUdevDevice *dev        = l->data;
         const gchar *sysfs_path = g_udev_device_get_sysfs_path (dev);
-        GDir        *sysfs_dir  = g_dir_open (sysfs_path, 0, NULL);
-        gboolean has_hid = FALSE, has_vendor = FALSE, has_printer = FALSE;
-        gboolean has_audio = FALSE, has_video = FALSE, has_bt = FALSE;
-        gboolean has_image = FALSE;   /* 06: Still Image (PTP / MTP de Android) */
+        UsbIfaces    f          = { 0 };
+        UdUsbType    type;
 
-        if (sysfs_dir) {
-            const gchar *entry;
-            while ((entry = g_dir_read_name (sysfs_dir))) {
-                gchar *iface_path = g_strdup_printf ("%s/%s/bInterfaceClass", sysfs_path, entry);
-                gchar *iface_class = NULL;
-                if (g_file_get_contents (iface_path, &iface_class, NULL, NULL)) {
-                    g_strstrip (iface_class);
-                    if (g_strcmp0 (iface_class, "03") == 0) has_hid     = TRUE;
-                    if (g_strcmp0 (iface_class, "ff") == 0) has_vendor  = TRUE;
-                    if (g_strcmp0 (iface_class, "07") == 0) has_printer = TRUE;
-                    if (g_strcmp0 (iface_class, "01") == 0) has_audio   = TRUE;
-                    if (g_strcmp0 (iface_class, "0e") == 0) has_video   = TRUE;
-                    if (g_strcmp0 (iface_class, "e0") == 0) has_bt      = TRUE;
-                    if (g_strcmp0 (iface_class, "06") == 0) has_image   = TRUE;
-                    g_free (iface_class);
-                }
-                g_free (iface_path);
-            }
-            g_dir_close (sysfs_dir);
-        }
-
-        /* las reglas udev de libmtp marcan los teléfonos MTP (aunque usen clase ff) */
-        if (g_strcmp0 (g_udev_device_get_property (dev, "ID_MTP_DEVICE"), "1") == 0)
-            has_image = TRUE;
-
-        gboolean relevant = has_printer || has_audio || has_video || has_image;
-
-        /* filtrar: HID puro sin vendor = teclado/mouse/receptor → excluir */
-        /* filtrar: vendor puro sin HID = WiFi/otros → excluir */
-        /* filtrar: Bluetooth (clase e0) → excluir */
-        if ((has_hid && !has_vendor && !relevant) ||
-            (has_vendor && !has_hid && !relevant) ||
-            (has_bt && !has_hid && !relevant)) {
-            g_free (name);
+        if (g_strcmp0 (g_udev_device_get_devtype (dev), "usb_device") != 0 ||
+            g_strcmp0 (g_udev_device_get_sysfs_attr (dev, "bDeviceClass"), "09") == 0 ||
+            g_strcmp0 (g_udev_device_get_sysfs_attr (dev, "removable"), "fixed") == 0) {
             g_object_unref (dev);
             continue;
         }
 
-        UdUsbType type;
-        if (has_image)                  type = UD_USB_PHONE;
-        else if (has_printer)           type = UD_USB_PRINTER;
-        else if (has_audio)             type = UD_USB_AUDIO;
-        else if (has_video)             type = UD_USB_CAMERA;
-        else if (has_hid && has_vendor) type = UD_USB_GAMEPAD;
-        else                            type = UD_USB_OTHER;
+        read_interfaces (sysfs_path, &f);
+        guint    ch  = GPOINTER_TO_UINT (g_hash_table_lookup (flags, sysfs_path));
+        gboolean mtp = g_udev_device_get_property_as_boolean (dev, "ID_MTP_DEVICE");
 
-        UdUsbDevice *ud = g_new0 (UdUsbDevice, 1);
-        ud->name    = name;
-        ud->type    = type;
-        ud->syspath = g_strdup (sysfs_path);
-        ud->devfile = g_strdup (g_udev_device_get_device_file (dev));
-        result = g_slist_append (result, ud);
-
+        if (classify_usb (&f, ch, mtp, &type)) {
+            UdUsbDevice *ud = g_new0 (UdUsbDevice, 1);
+            ud->name    = usb_display_name (dev);
+            ud->type    = type;
+            ud->syspath = g_strdup (sysfs_path);
+            ud->devfile = g_strdup (g_udev_device_get_device_file (dev));
+            result = g_slist_append (result, ud);
+        }
         g_object_unref (dev);
     }
 
     g_list_free (usb_devs);
-    g_hash_table_destroy (seen);
+    g_hash_table_destroy (flags);
     g_object_unref (client);
     return result;
 }

@@ -58,6 +58,9 @@ typedef struct {
 
     /* CSS tamaño del botón */
     GtkCssProvider  *button_css;
+
+    /* ventana "Acerca de" abierta (una sola a la vez) */
+    GtkWidget       *about_dialog;
 } RemovablePlugin;
 
 /* ---------- apply_config ---------- */
@@ -376,6 +379,8 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
                 gchar   **parts = g_strsplit ((const gchar *) value, "|", 2);
                 UdUsbType type  = parts[1] ? (UdUsbType) g_ascii_strtoll (parts[1], NULL, 10)
                                            : UD_USB_OTHER;
+                /* sin categoría: se lista en el popup pero no se notifica */
+                if (type == UD_USB_OTHER) { g_strfreev (parts); continue; }
                 gchar    *body  = g_strdup_printf ("%s — %s",
                                                    (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
                                                    _(ud_usb_type_label (type)));
@@ -421,6 +426,7 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
                     gchar   **parts = g_strsplit ((const gchar *) value, "|", 2);
                     UdUsbType type  = parts[1] ? (UdUsbType) g_ascii_strtoll (parts[1], NULL, 10)
                                                : UD_USB_OTHER;
+                    if (type == UD_USB_OTHER) { g_strfreev (parts); continue; }
                     notify_simple (_("USB device disconnected"),
                                    (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
                                    ud_usb_type_icon (type));
@@ -715,6 +721,55 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     gtk_widget_show_all (dialog);
 }
 
+/* ---------- Acerca de ---------- */
+
+#ifndef PACKAGE_VERSION
+#define PACKAGE_VERSION "?"
+#endif
+
+static void
+on_about (XfcePanelPlugin *plugin, RemovablePlugin *rp)
+{
+    (void) plugin;
+
+    /* con el popup abierto él tiene el teclado (Wayland, wayland-notas §4.7) */
+    if (rp->popup_open)
+        popup_hide (rp->popup);
+
+    if (rp->about_dialog) {
+        gtk_window_present (GTK_WINDOW (rp->about_dialog));
+        return;
+    }
+
+    static const gchar *authors[] = {
+        "Juan Sebastian Perez <juanchiperez97@gmail.com>",
+        NULL,
+    };
+
+    GtkWidget *dlg = gtk_about_dialog_new ();
+    GtkAboutDialog *about = GTK_ABOUT_DIALOG (dlg);
+
+    gtk_about_dialog_set_program_name   (about, _("Removable Devices"));
+    gtk_about_dialog_set_version        (about, PACKAGE_VERSION);
+    gtk_about_dialog_set_comments       (about,
+        _("Mount and safely remove drives, phones and other USB devices"));
+    gtk_about_dialog_set_logo_icon_name (about, "drive-removable-media");
+    gtk_about_dialog_set_copyright      (about, "© 2025–2026 Juan Sebastian Perez");
+    gtk_about_dialog_set_license_type   (about, GTK_LICENSE_GPL_2_0_ONLY);
+    gtk_about_dialog_set_website        (about, "https://github.com/Tantin1/xfce-removable-plugin");
+    gtk_about_dialog_set_website_label  (about, "github.com/Tantin1/xfce-removable-plugin");
+    gtk_about_dialog_set_authors        (about, authors);
+
+    gtk_window_set_icon_name (GTK_WINDOW (dlg), "drive-removable-media");
+
+    rp->about_dialog = dlg;
+    g_object_add_weak_pointer (G_OBJECT (dlg), (gpointer *) &rp->about_dialog);
+    g_signal_connect (dlg, "response", G_CALLBACK (gtk_widget_destroy), NULL);
+
+    gtk_widget_show (dlg);
+    gtk_window_present (GTK_WINDOW (dlg));
+}
+
 /* ---------- callbacks del panel ---------- */
 
 static gboolean
@@ -738,6 +793,8 @@ static void
 removable_plugin_free (XfcePanelPlugin *plugin, RemovablePlugin *rp)
 {
     (void) plugin;
+    if (rp->about_dialog)
+        gtk_widget_destroy (rp->about_dialog);   /* el weak pointer lo deja en NULL */
     popup_destroy (rp->popup);
     if (rp->conn && rp->subscription)
         ud_unsubscribe (rp->conn, rp->subscription);
@@ -811,7 +868,9 @@ removable_plugin_construct (XfcePanelPlugin *plugin)
     }
 
     xfce_panel_plugin_menu_show_configure (plugin);
+    xfce_panel_plugin_menu_show_about (plugin);
     g_signal_connect (plugin, "configure-plugin", G_CALLBACK (on_configure_plugin), rp);
+    g_signal_connect (plugin, "about",            G_CALLBACK (on_about),            rp);
     g_signal_connect (plugin, "size-changed",     G_CALLBACK (on_size_changed),     rp);
     g_signal_connect (plugin, "mode-changed",     G_CALLBACK (on_mode_changed),     rp);
     g_signal_connect (plugin, "free-data",        G_CALLBACK (removable_plugin_free), rp);

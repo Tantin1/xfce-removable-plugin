@@ -64,6 +64,10 @@ typedef enum {
     UD_USB_CAMERA,
     UD_USB_GAMEPAD,
     UD_USB_PHONE,     /* MTP/PTP (clase 06 o ID_MTP_DEVICE) que gvfs no tomó */
+    UD_USB_TABLET,    /* tableta gráfica (ID_INPUT_TABLET) */
+    UD_USB_SERIAL,    /* placa / adaptador serie: Arduino, ESP32, FTDI, CH340… */
+    UD_USB_SECURITY,  /* llave de seguridad FIDO / lector de tarjetas inteligentes */
+    UD_USB_MIDI,      /* teclado / controlador MIDI */
 } UdUsbType;
 
 typedef struct {

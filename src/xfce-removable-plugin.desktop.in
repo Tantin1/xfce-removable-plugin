@@ -1,10 +1,9 @@
 [Xfce Panel]
 Type=X-XFCE-PanelPlugin
 Name=Removable Devices
-Comment=Manage removable storage devices
+Comment=Mount and safely remove drives, phones and other USB devices
 Icon=drive-removable-media
 X-XFCE-Module=xfce-removable-plugin
-X-XFCE-Module-Path=@PLUGIN_DIR@
 X-XFCE-Internal=false
 X-XFCE-Unique=false
 X-XFCE-API=2.0

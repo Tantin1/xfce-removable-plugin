@@ -1,12 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2025
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the xfce-removable-plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-01 00:00+0000\n"
+"POT-Creation-Date: 2026-10-24 18:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,255 +17,292 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: popup.c
+#: plugin.c:367 plugin.c:382 plugin.c:393 plugin.c:403 plugin.c:413
+#: plugin.c:428
+msgid "Unknown"
+msgstr ""
+
+#: plugin.c:369
+msgid "Removable device connected"
+msgstr ""
+
+#: plugin.c:384
+msgid "USB device connected"
+msgstr ""
+
+#: plugin.c:392
+msgid "Phone or camera connected"
+msgstr ""
+
+#: plugin.c:402
+msgid "Phone or camera disconnected"
+msgstr ""
+
+#: plugin.c:412
+msgid "Removable device disconnected"
+msgstr ""
+
+#: plugin.c:427
+msgid "USB device disconnected"
+msgstr ""
+
+#: plugin.c:583
+msgid "Properties — Removable Devices"
+msgstr ""
+
+#: plugin.c:586
+msgid "Close"
+msgstr ""
+
+#. ---- frame Apariencia ----
+#: plugin.c:594
+msgid "Appearance"
+msgstr ""
+
+#. botón cuadrado
+#: plugin.c:604
+msgid "Square button"
+msgstr ""
+
+#. tamaño del plugin
+#: plugin.c:610
+msgid "Plugin size:"
+msgstr ""
+
+#. ícono del panel
+#: plugin.c:621
+msgid "Use panel icon size"
+msgstr ""
+
+#. tamaño del ícono
+#: plugin.c:627
+msgid "Icon size:"
+msgstr ""
+
+#. ancho del popup
+#: plugin.c:638
+msgid "Popup width:"
+msgstr ""
+
+#. alto del popup
+#: plugin.c:647
+msgid "Popup height:"
+msgstr ""
+
+#. ---- frame Comportamiento ----
+#: plugin.c:660
+msgid "Behavior"
+msgstr ""
+
+#: plugin.c:669
+msgid "Show notifications"
+msgstr ""
+
+#: plugin.c:674
+msgid "Open file manager after mounting"
+msgstr ""
+
+#: plugin.c:679
+msgid "Hide button when no removable devices"
+msgstr ""
+
+#: plugin.c:686
+msgid "Also hide when only other devices are present"
+msgstr ""
+
+#: plugin.c:694
+msgid "Notify when devices are connected or disconnected"
+msgstr ""
+
+#: plugin.c:782
+msgid "Removable devices"
+msgstr ""
+
+#: popup.c:479
+msgid ""
+"The device is in use by another application. Close any open files or "
+"terminals on it and try again."
+msgstr ""
+
+#: popup.c:482
+msgid "Not authorized to perform this operation."
+msgstr ""
+
+#: popup.c:538
+msgid "Device mounted"
+msgstr ""
+
+#: popup.c:550
+msgid "Could not mount the device."
+msgstr ""
+
+#: popup.c:551 popup.c:1200
+msgid "Mount failed"
+msgstr ""
+
+#: popup.c:555 popup.c:862 popup.c:1245 popup.c:1355
+msgid "Mount"
+msgstr ""
+
+#: popup.c:575 popup.c:1222
+msgid "Safe to remove"
+msgstr ""
+
+#: popup.c:575 popup.c:1222
+msgid "You can now unplug the device."
+msgstr ""
+
+#: popup.c:581 popup.c:663
+msgid "Could not unmount the device."
+msgstr ""
+
+#: popup.c:582 popup.c:1226
+msgid "Unmount failed"
+msgstr ""
+
+#: popup.c:586 popup.c:859
+msgid "Unmount"
+msgstr ""
+
+#: popup.c:599 popup.c:1241
+msgid "Mounting…"
+msgstr ""
+
+#: popup.c:608
+msgid "Unmounting…"
+msgstr ""
+
+#: popup.c:664 popup.c:692
+msgid "Eject failed"
+msgstr ""
+
+#: popup.c:688
+msgid "Device ejected"
+msgstr ""
+
+#: popup.c:688
+msgid "Safe to unplug."
+msgstr ""
+
+#: popup.c:691
+msgid "The partitions were unmounted, but the drive could not be ejected."
+msgstr ""
+
+#: popup.c:727
+msgid "Ejecting…"
+msgstr ""
+
+#: popup.c:727
+msgid "Please wait, do not unplug."
+msgstr ""
+
+#: popup.c:769
 #, c-format
 msgid "%s free of %s"
 msgstr ""
 
-#: plugin.c
-msgid "Also hide when only other devices are present"
-msgstr ""
-
-#: plugin.c
-msgid "Appearance"
-msgstr ""
-
-#: ud-dbus.c
-msgid "Audio device"
-msgstr ""
-
-#: plugin.c
-msgid "Behavior"
-msgstr ""
-
-#: popup.c
-msgid "Camera (PTP)"
-msgstr ""
-
-#: ud-dbus.c
-msgid "Camera / Webcam"
-msgstr ""
-
-#: plugin.c
-msgid "Close"
-msgstr ""
-
-#: popup.c
-msgid "Could not close the connection to the device."
-msgstr ""
-
-#: popup.c
-msgid "Could not mount the device."
-msgstr ""
-
-#: popup.c
-msgid "Could not open the device. If it is a phone, unlock it and choose \"File transfer\" in its USB notification."
-msgstr ""
-
-#: popup.c
-msgid "Could not unmount the device."
-msgstr ""
-
-#: popup.c
-msgid "Device ejected"
-msgstr ""
-
-#: popup.c
-msgid "Device mounted"
-msgstr ""
-
-#: popup.c
-msgid "Eject"
-msgstr ""
-
-#: popup.c
-msgid "Eject failed"
-msgstr ""
-
-#: popup.c
-msgid "Ejecting…"
-msgstr ""
-
-#: ud-dbus.c
-msgid "Gamepad / Joystick"
-msgstr ""
-
-#: plugin.c
-msgid "Hide button when no removable devices"
-msgstr ""
-
-#: plugin.c
-msgid "Icon size:"
-msgstr ""
-
-#: popup.c
-msgid "Mount"
-msgstr ""
-
-#: popup.c
-msgid "Mount failed"
-msgstr ""
-
-#: popup.c
-msgid "Mounting…"
-msgstr ""
-
-#: popup.c
-msgid "No removable devices"
-msgstr ""
-
-#: popup.c
-msgid "Not authorized to perform this operation."
-msgstr ""
-
-#: plugin.c
-msgid "Notify when devices are connected or disconnected"
-msgstr ""
-
-#: plugin.c
-msgid "Open file manager after mounting"
-msgstr ""
-
-#: popup.c
+#: popup.c:851 popup.c:1342
 msgid "Open folder"
 msgstr ""
 
-#: popup.c
-msgid "Other devices"
-msgstr ""
-
-#: popup.c
-msgid "Phone"
-msgstr ""
-
-#: popup.c
-msgid "Phone (MTP)"
-msgstr ""
-
-#: ud-dbus.c
-msgid "Phone / Camera"
-msgstr ""
-
-#: plugin.c
-msgid "Phone or camera connected"
-msgstr ""
-
-#: plugin.c
-msgid "Phone or camera disconnected"
-msgstr ""
-
-#: popup.c
-msgid "Phone ready"
-msgstr ""
-
-#: popup.c
-msgid "Please wait, do not unplug."
-msgstr ""
-
-#: plugin.c
-msgid "Plugin size:"
-msgstr ""
-
-#: plugin.c
-msgid "Popup height:"
-msgstr ""
-
-#: plugin.c
-msgid "Popup width:"
-msgstr ""
-
-#: ud-dbus.c
-msgid "Printer"
-msgstr ""
-
-#: plugin.c
-msgid "Properties — Removable Devices"
-msgstr ""
-
-#: plugin.c
-msgid "Removable device connected"
-msgstr ""
-
-#: plugin.c
-msgid "Removable device disconnected"
-msgstr ""
-
-#: plugin.c
-msgid "Removable devices"
-msgstr ""
-
-#: popup.c
+#: popup.c:1009
 msgid "Removable disk"
 msgstr ""
 
-#: popup.c
-msgid "Safe to remove"
+#: popup.c:1038
+msgid "Eject"
 msgstr ""
 
-#: popup.c
-msgid "Safe to unplug."
-msgstr ""
-
-#: popup.c
+#: popup.c:1038 popup.c:1349
 msgid "Safely remove"
 msgstr ""
 
-#: plugin.c
-msgid "Show notifications"
+#: popup.c:1185
+msgid "Phone ready"
 msgstr ""
 
-#: plugin.c
-msgid "Square button"
+#: popup.c:1201
+msgid ""
+"Could not open the device. If it is a phone, unlock it and choose \"File "
+"transfer\" in its USB notification."
 msgstr ""
 
-#: popup.c
-msgid "The device is in use by another application. Close any open files or terminals on it and try again."
+#: popup.c:1227
+msgid "Could not close the connection to the device."
 msgstr ""
 
-#: popup.c
-msgid "The partitions were unmounted, but the drive could not be ejected."
+#: popup.c:1279
+msgid "Camera (PTP)"
 msgstr ""
 
-#: ud-dbus.c
-msgid "USB device"
-msgstr ""
-
-#: plugin.c
-msgid "USB device connected"
-msgstr ""
-
-#: plugin.c
-msgid "USB device disconnected"
-msgstr ""
-
-#: plugin.c
-msgid "Unknown"
-msgstr ""
-
-#: popup.c
-msgid "Unmount"
-msgstr ""
-
-#: popup.c
-msgid "Unmount failed"
-msgstr ""
-
-#: popup.c
-msgid "Unmounting…"
-msgstr ""
-
-#: plugin.c
-msgid "Use panel icon size"
-msgstr ""
-
-#: popup.c
-msgid "You can now unplug the device."
-msgstr ""
-
-#: popup.c
+#: popup.c:1280
 msgid "iPhone / iPad"
 msgstr ""
 
-#: popup.c
+#: popup.c:1282
+msgid "Phone (MTP)"
+msgstr ""
+
+#: popup.c:1320
+msgid "Phone"
+msgstr ""
+
+#: popup.c:1326
 msgid "not mounted"
+msgstr ""
+
+#: popup.c:1405
+msgid "Other devices"
+msgstr ""
+
+#: popup.c:1507
+msgid "No removable devices"
+msgstr ""
+
+#: ud-dbus.c:448
+msgid "Printer"
+msgstr ""
+
+#: ud-dbus.c:449
+msgid "Audio device"
+msgstr ""
+
+#: ud-dbus.c:450
+msgid "Camera / Webcam"
+msgstr ""
+
+#: ud-dbus.c:451
+msgid "Gamepad / Joystick"
+msgstr ""
+
+#: ud-dbus.c:452
+msgid "Phone / Camera"
+msgstr ""
+
+#: ud-dbus.c:453
+msgid "Graphics tablet"
+msgstr ""
+
+#: ud-dbus.c:454
+msgid "Serial device / Board"
+msgstr ""
+
+#: ud-dbus.c:455
+msgid "Security key / Smart card"
+msgstr ""
+
+#: ud-dbus.c:456
+msgid "MIDI device"
+msgstr ""
+
+#: ud-dbus.c:458
+msgid "USB device"
+msgstr ""
+
+#: xfce-removable-plugin.desktop.in:4
+msgid "Removable Devices"
+msgstr ""
+
+#: xfce-removable-plugin.desktop.in:5
+msgid "Mount and safely remove drives, phones and other USB devices"
 msgstr ""

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"POT-Creation-Date: 2026-10-24 18:56+0000\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,14 @@ msgstr "%s volno z %s"
 msgid "Also hide when only other devices are present"
 msgstr "Skrýt také, pokud jsou přítomna pouze ostatní zařízení"
 
+#. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "Vzhled"
 
 msgid "Audio device"
 msgstr "Zvukové zařízení"
 
+#. ---- frame Comportamiento ----
 msgid "Behavior"
 msgstr "Chování"
 
@@ -64,14 +66,24 @@ msgstr "Vysouvání…"
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
+msgid "Graphics tablet"
+msgstr "Grafický tablet"
+
 msgid "Hide button when no removable devices"
 msgstr "Skrýt tlačítko, pokud nejsou připojena žádná vyměnitelná zařízení"
 
+#. tamaño del ícono
 msgid "Icon size:"
 msgstr "Velikost ikony:"
 
+msgid "MIDI device"
+msgstr "Zařízení MIDI"
+
 msgid "Mount"
 msgstr "Připojit"
+
+msgid "Mount and safely remove drives, phones and other USB devices"
+msgstr "Připojení a bezpečné odebrání jednotek, telefonů a dalších zařízení USB"
 
 msgid "Mount failed"
 msgstr "Připojení se nezdařilo"
@@ -118,12 +130,15 @@ msgstr "Telefon připraven"
 msgid "Please wait, do not unplug."
 msgstr "Počkejte prosím, neodpojujte."
 
+#. tamaño del plugin
 msgid "Plugin size:"
 msgstr "Velikost pluginu:"
 
+#. alto del popup
 msgid "Popup height:"
 msgstr "Výška vyskakovacího okna:"
 
+#. ancho del popup
 msgid "Popup width:"
 msgstr "Šířka vyskakovacího okna:"
 
@@ -132,6 +147,9 @@ msgstr "Tiskárna"
 
 msgid "Properties — Removable Devices"
 msgstr "Vlastnosti — Vyměnitelná zařízení"
+
+msgid "Removable Devices"
+msgstr "Vyměnitelná zařízení"
 
 msgid "Removable device connected"
 msgstr "Vyměnitelné zařízení připojeno"
@@ -154,9 +172,16 @@ msgstr "Zařízení lze odpojit."
 msgid "Safely remove"
 msgstr "Bezpečně odebrat"
 
+msgid "Security key / Smart card"
+msgstr "Bezpečnostní klíč / Čipová karta"
+
+msgid "Serial device / Board"
+msgstr "Sériové zařízení / Deska"
+
 msgid "Show notifications"
 msgstr "Zobrazovat oznámení"
 
+#. botón cuadrado
 msgid "Square button"
 msgstr "Čtvercové tlačítko"
 
@@ -187,6 +212,7 @@ msgstr "Odpojení se nezdařilo"
 msgid "Unmounting…"
 msgstr "Odpojování…"
 
+#. ícono del panel
 msgid "Use panel icon size"
 msgstr "Použít velikost panelu pro ikonu"
 

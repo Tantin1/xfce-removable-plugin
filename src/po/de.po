@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-23 16:25+0000\n"
+"POT-Creation-Date: 2026-10-24 18:56+0000\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,14 @@ msgstr "%s frei von %s"
 msgid "Also hide when only other devices are present"
 msgstr "Auch ausblenden, wenn nur andere Geräte vorhanden sind"
 
+#. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "Erscheinungsbild"
 
 msgid "Audio device"
 msgstr "Audiogerät"
 
+#. ---- frame Comportamiento ----
 msgid "Behavior"
 msgstr "Verhalten"
 
@@ -64,14 +66,24 @@ msgstr "Wird ausgeworfen…"
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
+msgid "Graphics tablet"
+msgstr "Grafiktablett"
+
 msgid "Hide button when no removable devices"
 msgstr "Schaltfläche ausblenden, wenn keine Wechseldatenträger vorhanden sind"
 
+#. tamaño del ícono
 msgid "Icon size:"
 msgstr "Symbolgröße:"
 
+msgid "MIDI device"
+msgstr "MIDI-Gerät"
+
 msgid "Mount"
 msgstr "Einhängen"
+
+msgid "Mount and safely remove drives, phones and other USB devices"
+msgstr "Laufwerke, Telefone und andere USB-Geräte einhängen und sicher entfernen"
 
 msgid "Mount failed"
 msgstr "Einhängen fehlgeschlagen"
@@ -118,12 +130,15 @@ msgstr "Telefon bereit"
 msgid "Please wait, do not unplug."
 msgstr "Bitte warten, nicht trennen."
 
+#. tamaño del plugin
 msgid "Plugin size:"
 msgstr "Plugin-Größe:"
 
+#. alto del popup
 msgid "Popup height:"
 msgstr "Popup-Höhe:"
 
+#. ancho del popup
 msgid "Popup width:"
 msgstr "Popup-Breite:"
 
@@ -132,6 +147,9 @@ msgstr "Drucker"
 
 msgid "Properties — Removable Devices"
 msgstr "Eigenschaften — Wechseldatenträger"
+
+msgid "Removable Devices"
+msgstr "Wechseldatenträger"
 
 msgid "Removable device connected"
 msgstr "Wechseldatenträger angeschlossen"
@@ -154,9 +172,16 @@ msgstr "Das Gerät kann jetzt getrennt werden."
 msgid "Safely remove"
 msgstr "Sicher entfernen"
 
+msgid "Security key / Smart card"
+msgstr "Sicherheitsschlüssel / Smartcard"
+
+msgid "Serial device / Board"
+msgstr "Serielles Gerät / Board"
+
 msgid "Show notifications"
 msgstr "Benachrichtigungen anzeigen"
 
+#. botón cuadrado
 msgid "Square button"
 msgstr "Quadratische Schaltfläche"
 
@@ -187,6 +212,7 @@ msgstr "Aushängen fehlgeschlagen"
 msgid "Unmounting…"
 msgstr "Wird ausgehängt…"
 
+#. ícono del panel
 msgid "Use panel icon size"
 msgstr "Panelgröße für Symbol verwenden"
 
