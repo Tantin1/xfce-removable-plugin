@@ -18,7 +18,7 @@ optdepends=('gvfs-mtp: Android phones in file transfer mode'
             'gvfs-gphoto2: cameras (PTP)'
             'gvfs-afc: iPhone / iPad')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('98c4f6fcd999bdb6bf1813a75c40a83421094f2b1c51582dacf343c54216227f')
 
 build() {
   arch-meson "$pkgname-$pkgver/src" build
