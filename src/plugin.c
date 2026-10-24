@@ -20,9 +20,11 @@
 #define DEFAULT_USE_PANEL_ICON       FALSE
 #define DEFAULT_ICON_SIZE            16
 #define DEFAULT_POPUP_WIDTH          400
+/* con Montar/Desmontar + Expulsar en una fila, menos de esto no entra en todos
+   los idiomas sin ensanchar el popup (medido con ruso, el más largo) */
+#define MIN_POPUP_WIDTH              320
 #define DEFAULT_POPUP_HEIGHT         300
 #define DEFAULT_SHOW_NOTIFY          TRUE
-#define DEFAULT_OPEN_THUNAR          FALSE
 #define DEFAULT_HIDE_IF_EMPTY        TRUE
 #define DEFAULT_HIDE_IF_ONLY_OTHER   FALSE
 #define DEFAULT_NOTIFY_NEW_DEVICE    TRUE
@@ -46,7 +48,6 @@ typedef struct {
     gint             popup_width;
     gint             popup_height;
     gboolean         show_notify;
-    gboolean         open_thunar;
     gboolean         hide_if_empty;
     gboolean         hide_if_only_other;
     gboolean         notify_new_device;
@@ -156,7 +157,6 @@ load_config (RemovablePlugin *rp)
     rp->popup_width         = DEFAULT_POPUP_WIDTH;
     rp->popup_height        = DEFAULT_POPUP_HEIGHT;
     rp->show_notify         = DEFAULT_SHOW_NOTIFY;
-    rp->open_thunar         = DEFAULT_OPEN_THUNAR;
     rp->hide_if_empty       = DEFAULT_HIDE_IF_EMPTY;
     rp->hide_if_only_other  = DEFAULT_HIDE_IF_ONLY_OTHER;
     rp->notify_new_device   = DEFAULT_NOTIFY_NEW_DEVICE;
@@ -170,10 +170,10 @@ load_config (RemovablePlugin *rp)
     rp->plugin_size        = kf_get_int  (kf, "appearance", "plugin_size",        DEFAULT_PLUGIN_SIZE);
     rp->use_panel_icon     = kf_get_bool (kf, "appearance", "use_panel_icon",     DEFAULT_USE_PANEL_ICON);
     rp->icon_size          = kf_get_int  (kf, "appearance", "icon_size",          DEFAULT_ICON_SIZE);
-    rp->popup_width        = kf_get_int  (kf, "appearance", "popup_width",        DEFAULT_POPUP_WIDTH);
+    rp->popup_width        = MAX (MIN_POPUP_WIDTH,
+                                  kf_get_int (kf, "appearance", "popup_width", DEFAULT_POPUP_WIDTH));
     rp->popup_height       = kf_get_int  (kf, "appearance", "popup_height",       DEFAULT_POPUP_HEIGHT);
     rp->show_notify        = kf_get_bool (kf, "behavior",   "show_notify",        DEFAULT_SHOW_NOTIFY);
-    rp->open_thunar        = kf_get_bool (kf, "behavior",   "open_thunar",        DEFAULT_OPEN_THUNAR);
     rp->hide_if_empty      = kf_get_bool (kf, "behavior",   "hide_if_empty",      DEFAULT_HIDE_IF_EMPTY);
     rp->hide_if_only_other = kf_get_bool (kf, "behavior",   "hide_if_only_other", DEFAULT_HIDE_IF_ONLY_OTHER);
     rp->notify_new_device  = kf_get_bool (kf, "behavior",   "notify_new_device",  DEFAULT_NOTIFY_NEW_DEVICE);
@@ -203,7 +203,6 @@ save_config (RemovablePlugin *rp)
     g_key_file_set_integer  (kf, "appearance", "popup_width",        rp->popup_width);
     g_key_file_set_integer  (kf, "appearance", "popup_height",       rp->popup_height);
     g_key_file_set_boolean  (kf, "behavior",   "show_notify",        rp->show_notify);
-    g_key_file_set_boolean  (kf, "behavior",   "open_thunar",        rp->open_thunar);
     g_key_file_set_boolean  (kf, "behavior",   "hide_if_empty",      rp->hide_if_empty);
     g_key_file_set_boolean  (kf, "behavior",   "hide_if_only_other", rp->hide_if_only_other);
     g_key_file_set_boolean  (kf, "behavior",   "notify_new_device",  rp->notify_new_device);
@@ -471,7 +470,6 @@ typedef struct {
     GtkWidget       *popup_width_spin;
     GtkWidget       *popup_height_spin;
     GtkWidget       *notify_check;
-    GtkWidget       *thunar_check;
     GtkWidget       *hide_check;
     GtkWidget       *hide_other_check;
     GtkWidget       *notify_new_check;
@@ -531,14 +529,6 @@ on_notify_toggled (GtkToggleButton *btn, PropsDialog *pd)
     pd->rp->show_notify = gtk_toggle_button_get_active (btn);
     save_config (pd->rp);
     popup_set_notify (pd->rp->popup, pd->rp->show_notify);
-}
-
-static void
-on_thunar_toggled (GtkToggleButton *btn, PropsDialog *pd)
-{
-    pd->rp->open_thunar = gtk_toggle_button_get_active (btn);
-    save_config (pd->rp);
-    popup_set_open_thunar (pd->rp->popup, pd->rp->open_thunar);
 }
 
 static void
@@ -640,7 +630,7 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     /* ancho del popup */
     GtkWidget *popup_width_label = gtk_label_new (_("Popup width:"));
     gtk_label_set_xalign (GTK_LABEL (popup_width_label), 0.0);
-    pd->popup_width_spin = gtk_spin_button_new_with_range (200, 800, 10);
+    pd->popup_width_spin = gtk_spin_button_new_with_range (MIN_POPUP_WIDTH, 800, 10);
     gtk_spin_button_set_value (GTK_SPIN_BUTTON (pd->popup_width_spin), rp->popup_width);
     gtk_grid_attach (GTK_GRID (grid_ap), popup_width_label,   0, row, 1, 1);
     gtk_grid_attach (GTK_GRID (grid_ap), pd->popup_width_spin, 1, row, 1, 1);
@@ -674,11 +664,6 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     gtk_grid_attach (GTK_GRID (grid_bh), pd->notify_check, 0, row, 2, 1);
     row++;
 
-    pd->thunar_check = gtk_check_button_new_with_label (_("Open file manager after mounting"));
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->thunar_check), rp->open_thunar);
-    gtk_grid_attach (GTK_GRID (grid_bh), pd->thunar_check, 0, row, 2, 1);
-    row++;
-
     pd->hide_check = gtk_check_button_new_with_label (_("Hide button when no removable devices"));
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->hide_check), rp->hide_if_empty);
     gtk_grid_attach (GTK_GRID (grid_bh), pd->hide_check, 0, row, 2, 1);
@@ -708,7 +693,6 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     g_signal_connect (pd->popup_width_spin,  "value-changed", G_CALLBACK (on_popup_width_changed),  pd);
     g_signal_connect (pd->popup_height_spin, "value-changed", G_CALLBACK (on_popup_height_changed), pd);
     g_signal_connect (pd->notify_check,      "toggled",       G_CALLBACK (on_notify_toggled),       pd);
-    g_signal_connect (pd->thunar_check,      "toggled",       G_CALLBACK (on_thunar_toggled),       pd);
     g_signal_connect (pd->hide_check,        "toggled",       G_CALLBACK (on_hide_toggled),         pd);
     g_signal_connect (pd->hide_other_check,  "toggled",       G_CALLBACK (on_hide_other_toggled),   pd);
     g_signal_connect (pd->notify_new_check,  "toggled",       G_CALLBACK (on_notify_new_toggled),   pd);
@@ -847,7 +831,6 @@ removable_plugin_construct (XfcePanelPlugin *plugin)
 
     rp->popup = popup_create (plugin, rp->button);
     popup_set_notify      (rp->popup, rp->show_notify);
-    popup_set_open_thunar (rp->popup, rp->open_thunar);
 
     g_object_set_data (G_OBJECT (rp->popup->window), "closed-cb",   (gpointer) on_popup_closed);
     g_object_set_data (G_OBJECT (rp->popup->window), "closed-data",  rp);

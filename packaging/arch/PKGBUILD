@@ -6,7 +6,7 @@
 #   makepkg --printsrcinfo > .SRCINFO   # el AUR exige este archivo
 
 pkgname=xfce-removable-plugin
-pkgver=1.0.0
+pkgver=1.0.1
 pkgrel=1
 pkgdesc='Xfce panel plugin for removable drives, phones and other USB devices'
 arch=('x86_64' 'aarch64')

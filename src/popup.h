@@ -15,8 +15,8 @@ typedef struct {
     gint             popup_width;
     gint             popup_height;
     gboolean         show_notify;
-    gboolean         open_thunar;
-    GHashTable      *expanded;    /* drive_path expandidos entre refrescos */
+    GHashTable      *expanded;    /* claves (drive_path, "__other__") que el usuario
+                                     cambió respecto de su estado por defecto */
     gint             pending_ops; /* mount/unmount/eject asíncronos en vuelo */
     gboolean         destroyed;   /* popup_destroy llamado con ops pendientes */
     gboolean         hiding;      /* dentro de popup_hide: cortar re-entradas */
@@ -31,7 +31,6 @@ void            popup_hide    (RemovablePopup *popup);
 void            popup_refresh        (RemovablePopup *popup, GDBusConnection *conn,
                                       const UdScan *scan);
 void            popup_set_notify     (RemovablePopup *popup, gboolean enabled);
-void            popup_set_open_thunar(RemovablePopup *popup, gboolean enabled);
 void            popup_destroy        (RemovablePopup *popup);
 
 #endif /* POPUP_H */

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 18:56+0000\n"
+"POT-Creation-Date: 2026-10-24 21:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,245 +17,249 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: plugin.c:367 plugin.c:382 plugin.c:393 plugin.c:403 plugin.c:413
-#: plugin.c:428
+#: plugin.c:369 plugin.c:384 plugin.c:395 plugin.c:405 plugin.c:415
+#: plugin.c:430
 msgid "Unknown"
 msgstr ""
 
-#: plugin.c:369
+#: plugin.c:371
 msgid "Removable device connected"
 msgstr ""
 
-#: plugin.c:384
+#: plugin.c:386
 msgid "USB device connected"
 msgstr ""
 
-#: plugin.c:392
+#: plugin.c:394
 msgid "Phone or camera connected"
 msgstr ""
 
-#: plugin.c:402
+#: plugin.c:404
 msgid "Phone or camera disconnected"
 msgstr ""
 
-#: plugin.c:412
+#: plugin.c:414
 msgid "Removable device disconnected"
 msgstr ""
 
-#: plugin.c:427
+#: plugin.c:429
 msgid "USB device disconnected"
 msgstr ""
 
-#: plugin.c:583
+#: plugin.c:576
 msgid "Properties — Removable Devices"
 msgstr ""
 
-#: plugin.c:586
+#: plugin.c:579
 msgid "Close"
 msgstr ""
 
 #. ---- frame Apariencia ----
-#: plugin.c:594
+#: plugin.c:587
 msgid "Appearance"
 msgstr ""
 
 #. botón cuadrado
-#: plugin.c:604
+#: plugin.c:597
 msgid "Square button"
 msgstr ""
 
 #. tamaño del plugin
-#: plugin.c:610
+#: plugin.c:603
 msgid "Plugin size:"
 msgstr ""
 
 #. ícono del panel
-#: plugin.c:621
+#: plugin.c:614
 msgid "Use panel icon size"
 msgstr ""
 
 #. tamaño del ícono
-#: plugin.c:627
+#: plugin.c:620
 msgid "Icon size:"
 msgstr ""
 
 #. ancho del popup
-#: plugin.c:638
+#: plugin.c:631
 msgid "Popup width:"
 msgstr ""
 
 #. alto del popup
-#: plugin.c:647
+#: plugin.c:640
 msgid "Popup height:"
 msgstr ""
 
 #. ---- frame Comportamiento ----
-#: plugin.c:660
+#: plugin.c:653
 msgid "Behavior"
 msgstr ""
 
-#: plugin.c:669
+#: plugin.c:662
 msgid "Show notifications"
 msgstr ""
 
-#: plugin.c:674
-msgid "Open file manager after mounting"
-msgstr ""
-
-#: plugin.c:679
+#: plugin.c:667
 msgid "Hide button when no removable devices"
 msgstr ""
 
-#: plugin.c:686
+#: plugin.c:674
 msgid "Also hide when only other devices are present"
 msgstr ""
 
-#: plugin.c:694
+#: plugin.c:682
 msgid "Notify when devices are connected or disconnected"
 msgstr ""
 
-#: plugin.c:782
+#: plugin.c:736 xfce-removable-plugin.desktop.in:4
+msgid "Removable Devices"
+msgstr ""
+
+#: plugin.c:739 xfce-removable-plugin.desktop.in:5
+msgid "Mount and safely remove drives, phones and other USB devices"
+msgstr ""
+
+#: plugin.c:820
 msgid "Removable devices"
 msgstr ""
 
-#: popup.c:479
+#: popup.c:488
 msgid ""
 "The device is in use by another application. Close any open files or "
 "terminals on it and try again."
 msgstr ""
 
-#: popup.c:482
+#: popup.c:491
 msgid "Not authorized to perform this operation."
 msgstr ""
 
-#: popup.c:538
+#: popup.c:547
 msgid "Device mounted"
 msgstr ""
 
-#: popup.c:550
+#: popup.c:560
 msgid "Could not mount the device."
 msgstr ""
 
-#: popup.c:551 popup.c:1200
+#: popup.c:561 popup.c:1373
 msgid "Mount failed"
 msgstr ""
 
-#: popup.c:555 popup.c:862 popup.c:1245 popup.c:1355
+#: popup.c:565 popup.c:872 popup.c:1207 popup.c:1418 popup.c:1530
 msgid "Mount"
 msgstr ""
 
-#: popup.c:575 popup.c:1222
+#: popup.c:585 popup.c:1395
 msgid "Safe to remove"
 msgstr ""
 
-#: popup.c:575 popup.c:1222
+#: popup.c:585 popup.c:1395
 msgid "You can now unplug the device."
 msgstr ""
 
-#: popup.c:581 popup.c:663
+#: popup.c:591 popup.c:673
 msgid "Could not unmount the device."
 msgstr ""
 
-#: popup.c:582 popup.c:1226
+#: popup.c:592 popup.c:1399
 msgid "Unmount failed"
 msgstr ""
 
-#: popup.c:586 popup.c:859
+#: popup.c:596 popup.c:869 popup.c:1204
 msgid "Unmount"
 msgstr ""
 
-#: popup.c:599 popup.c:1241
+#: popup.c:609 popup.c:1414
 msgid "Mounting…"
 msgstr ""
 
-#: popup.c:608
+#: popup.c:618
 msgid "Unmounting…"
 msgstr ""
 
-#: popup.c:664 popup.c:692
+#: popup.c:674 popup.c:702
 msgid "Eject failed"
 msgstr ""
 
-#: popup.c:688
+#: popup.c:698
 msgid "Device ejected"
 msgstr ""
 
-#: popup.c:688
+#: popup.c:698
 msgid "Safe to unplug."
 msgstr ""
 
-#: popup.c:691
+#: popup.c:701
 msgid "The partitions were unmounted, but the drive could not be ejected."
 msgstr ""
 
-#: popup.c:727
+#: popup.c:737
 msgid "Ejecting…"
 msgstr ""
 
-#: popup.c:727
+#: popup.c:737
 msgid "Please wait, do not unplug."
 msgstr ""
 
-#: popup.c:769
+#: popup.c:779
 #, c-format
 msgid "%s free of %s"
 msgstr ""
 
-#: popup.c:851 popup.c:1342
+#: popup.c:861 popup.c:1195 popup.c:1516
 msgid "Open folder"
 msgstr ""
 
-#: popup.c:1009
+#: popup.c:1023
 msgid "Removable disk"
 msgstr ""
 
-#: popup.c:1038
+#: popup.c:1095
 msgid "Eject"
 msgstr ""
 
-#: popup.c:1038 popup.c:1349
+#: popup.c:1095 popup.c:1524
 msgid "Safely remove"
 msgstr ""
 
-#: popup.c:1185
+#: popup.c:1358
 msgid "Phone ready"
 msgstr ""
 
-#: popup.c:1201
+#: popup.c:1374
 msgid ""
 "Could not open the device. If it is a phone, unlock it and choose \"File "
 "transfer\" in its USB notification."
 msgstr ""
 
-#: popup.c:1227
+#: popup.c:1400
 msgid "Could not close the connection to the device."
 msgstr ""
 
-#: popup.c:1279
+#: popup.c:1452
 msgid "Camera (PTP)"
 msgstr ""
 
-#: popup.c:1280
+#: popup.c:1453
 msgid "iPhone / iPad"
 msgstr ""
 
-#: popup.c:1282
+#: popup.c:1455
 msgid "Phone (MTP)"
 msgstr ""
 
-#: popup.c:1320
+#: popup.c:1493
 msgid "Phone"
 msgstr ""
 
-#: popup.c:1326
+#: popup.c:1500
 msgid "not mounted"
 msgstr ""
 
-#: popup.c:1405
+#: popup.c:1581
 msgid "Other devices"
 msgstr ""
 
-#: popup.c:1507
+#: popup.c:1694
 msgid "No removable devices"
 msgstr ""
 
@@ -297,12 +301,4 @@ msgstr ""
 
 #: ud-dbus.c:458
 msgid "USB device"
-msgstr ""
-
-#: xfce-removable-plugin.desktop.in:4
-msgid "Removable Devices"
-msgstr ""
-
-#: xfce-removable-plugin.desktop.in:5
-msgid "Mount and safely remove drives, phones and other USB devices"
 msgstr ""

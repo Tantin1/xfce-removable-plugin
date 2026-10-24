@@ -1,3 +1,12 @@
+xfce-removable-plugin (1.0.1-1) unstable; urgency=medium
+
+  * Discos con una sola partición: una fila con Montar y Expulsar a la vista.
+  * Discos con varias particiones: desplegados por defecto.
+  * Montar siempre abre el gestor de archivos (se quita la opción).
+  * Ancho mínimo del popup: 320 px.
+
+ -- Juan Sebastian Perez <juanchiperez97@gmail.com>  Sat, 24 Oct 2026 19:00:00 -0300
+
 xfce-removable-plugin (1.0.0-1) unstable; urgency=medium
 
   * Primera versión publicada.

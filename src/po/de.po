@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 18:56+0000\n"
+"POT-Creation-Date: 2026-10-24 21:24+0000\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -99,9 +99,6 @@ msgstr "Keine Berechtigung für diesen Vorgang."
 
 msgid "Notify when devices are connected or disconnected"
 msgstr "Benachrichtigen, wenn Geräte angeschlossen oder getrennt werden"
-
-msgid "Open file manager after mounting"
-msgstr "Dateimanager nach dem Einhängen öffnen"
 
 msgid "Open folder"
 msgstr "Ordner öffnen"

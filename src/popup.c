@@ -342,7 +342,16 @@ typedef struct {
     GtkWidget      *parts_box;
     GtkWidget      *arrow;
     gboolean        expanded;
+    gboolean        default_expanded;  /* discos: TRUE · "Other devices": FALSE */
 } ExpandData;
+
+/* popup->expanded guarda las claves que el usuario cambió respecto de su
+   estado por defecto, para que un refresco respete lo que eligió */
+static gboolean
+expand_initial_state (RemovablePopup *popup, const gchar *key, gboolean default_expanded)
+{
+    return default_expanded != g_hash_table_contains (popup->expanded, key);
+}
 
 static void
 expand_data_free (gpointer data)
@@ -379,9 +388,9 @@ on_expand_clicked (GtkWidget *btn, GdkEventButton *event, ExpandData *ed)
     (void) btn; (void) event;
     ed->expanded = !ed->expanded;
 
-    /* recordar el estado para que un refresco no lo colapse */
+    /* recordar la elección para que un refresco no la deshaga */
     if (ed->popup && ed->key) {
-        if (ed->expanded)
+        if (ed->expanded != ed->default_expanded)
             g_hash_table_add (ed->popup->expanded, g_strdup (ed->key));
         else
             g_hash_table_remove (ed->popup->expanded, ed->key);
@@ -536,8 +545,9 @@ on_mount_done (gboolean ok, const gchar *mount_point,
         if (ok) {
             if (popup->show_notify)
                 notify_send (_("Device mounted"), mount_point, "drive-removable-media");
-            if (popup->open_thunar && mount_point) {
-                /* igual que "Abrir carpeta": el popup no queda encima del gestor
+            if (mount_point) {
+                /* "Montar" siempre abre el contenido en el gestor de archivos.
+                   Igual que "Abrir carpeta": el popup no queda encima del gestor
                    (popup_show reconstruye al volver a abrir) */
                 open_file_manager (mount_point);
                 popup_hide (popup);
@@ -876,7 +886,7 @@ build_partition_row (RemovablePopup *popup, GDBusConnection *conn, UdDevice *dev
  * - El nombre es el único elemento elástico: ancho mínimo chico
  *   (NAME_MIN_CHARS), se recorta con "…" y muestra el nombre entero en el tooltip.
  * - Si aun así la fila no entra en el ancho configurado del popup (popup muy
- *   angosto o traducción larga), fit_labeled_button() deja el botón solo con el
+ *   angosto o traducción larga), fit_row() deja el botón solo con el
  *   ícono, con el texto en el tooltip, en vez de ensanchar el popup.
  * Ojo: GTK reparte el sobrante por igual entre los hijos que no llegan a su
  * ancho natural, así que dejar el texto del botón recortable lo recortaría
@@ -918,19 +928,45 @@ popup_content_width (RemovablePopup *popup)
     return avail;
 }
 
-/* llamar con la fila ya empacada y mostrada (un widget oculto no mide) */
-static void
-fit_labeled_button (RemovablePopup *popup, GtkWidget *row, GtkWidget *btn)
-{
-    GtkWidget *label = btn ? g_object_get_data (G_OBJECT (btn), "btn-label") : NULL;
-    gint       row_min = 0;
+/* nombre con al menos estos caracteres visibles antes de recortar botones */
+#define NAME_COMFORT_CHARS 14
 
-    if (!label)
-        return;
-    gtk_widget_get_preferred_width (row, &row_min, NULL);
-    if (row_min > popup_content_width (popup)) {
-        gtk_widget_set_no_show_all (label, TRUE);
-        gtk_widget_hide (label);
+static gint
+row_min_width (GtkWidget *row)
+{
+    gint w = 0;
+    gtk_widget_get_preferred_width (row, &w, NULL);
+    return w;
+}
+
+/* Ajusta una fila al ancho del popup, en este orden:
+ *   1. si el nombre no llegaría a mostrar NAME_COMFORT_CHARS, el botón
+ *      Expulsar / Quitar con seguridad queda solo con el ícono;
+ *   2. si la fila igual no entra, se oculta "Abrir carpeta" (al montar la
+ *      carpeta ya se abre sola, es el botón que menos se pierde).
+ * `row` es lo que se mide (ya empacado y mostrado: un widget oculto no mide);
+ * `data_row` es la fila que guarda "elastic-name", "labeled-btn" y "open-btn". */
+static void
+fit_row (RemovablePopup *popup, GtkWidget *row, GtkWidget *data_row)
+{
+    GtkWidget *name  = g_object_get_data (G_OBJECT (data_row), "elastic-name");
+    GtkWidget *btn   = g_object_get_data (G_OBJECT (data_row), "labeled-btn");
+    GtkWidget *open  = g_object_get_data (G_OBJECT (data_row), "open-btn");
+    GtkWidget *label = btn ? g_object_get_data (G_OBJECT (btn), "btn-label") : NULL;
+    gint       avail = popup_content_width (popup);
+
+    if (label && name) {
+        gtk_label_set_width_chars (GTK_LABEL (name), NAME_COMFORT_CHARS);
+        gboolean tight = row_min_width (row) > avail;
+        gtk_label_set_width_chars (GTK_LABEL (name), NAME_MIN_CHARS);
+        if (tight) {
+            gtk_widget_set_no_show_all (label, TRUE);
+            gtk_widget_hide (label);
+        }
+    }
+    if (open && row_min_width (row) > avail) {
+        gtk_widget_set_no_show_all (open, TRUE);
+        gtk_widget_hide (open);
     }
 }
 
@@ -974,6 +1010,22 @@ fallback_drive_name (const UdDevice *dev)
     return d;
 }
 
+/* nombre del disco: Vendor + Model (ya viene en el UdDevice, sin llamadas DBus) */
+static gchar *
+drive_title (GSList *partitions)
+{
+    UdDevice *first = partitions ? partitions->data : NULL;
+    gchar    *name  = NULL;
+    if (first && first->drive_name && *first->drive_name)
+        name = g_strdup (first->drive_name);
+    else if (first)
+        name = fallback_drive_name (first);
+    return name ? name : g_strdup (_("Removable disk"));
+}
+
+static GtkWidget *build_eject_button (RemovablePopup *popup, GDBusConnection *conn,
+                                      const gchar *drive_path, GSList *partitions);
+
 static GtkWidget *
 build_drive_header (RemovablePopup *popup, GDBusConnection *conn,
                     const gchar *drive_path, GSList *partitions,
@@ -998,22 +1050,29 @@ build_drive_header (RemovablePopup *popup, GDBusConnection *conn,
         "drive-removable-media-symbolic", GTK_ICON_SIZE_LARGE_TOOLBAR);
     gtk_box_pack_start (GTK_BOX (row), icon, FALSE, FALSE, 0);
 
-    /* nombre del disco: Vendor + Model (ya viene en el UdDevice, sin llamadas DBus) */
-    UdDevice *first      = partitions ? partitions->data : NULL;
-    gchar    *drive_name = NULL;
-    if (first && first->drive_name && *first->drive_name)
-        drive_name = g_strdup (first->drive_name);
-    else if (first)
-        drive_name = fallback_drive_name (first);
-    if (!drive_name)
-        drive_name = g_strdup (_("Removable disk"));
-
+    gchar     *drive_name = drive_title (partitions);
     GtkWidget *name_label = gtk_label_new (drive_name);
     setup_elastic_name (name_label, drive_name);
+    g_object_set_data (G_OBJECT (row), "elastic-name", name_label);
     g_free (drive_name);
     gtk_box_pack_start (GTK_BOX (row), name_label, TRUE, TRUE, 0);
 
-    /* botón Eject / Safely remove */
+    GtkWidget *btn_eject = build_eject_button (popup, conn, drive_path, partitions);
+    if (btn_eject) {
+        g_object_set_data (G_OBJECT (row), "labeled-btn", btn_eject);
+        gtk_box_pack_start (GTK_BOX (row), btn_eject, FALSE, FALSE, 0);
+    }
+
+    return row;
+}
+
+/* Botón Expulsar / Quitar con seguridad del disco, o NULL si no se puede.
+   Eject saca el medio (lector SD, óptico); PowerOff apaga el disco entero
+   (HDD/SSD USB, que suelen reportar Ejectable=false) */
+static GtkWidget *
+build_eject_button (RemovablePopup *popup, GDBusConnection *conn,
+                    const gchar *drive_path, GSList *partitions)
+{
     gboolean ejectable = FALSE, can_power_off = FALSE;
     GSList  *mounted_paths = NULL;
     for (GSList *l = partitions; l; l = l->next) {
@@ -1024,8 +1083,6 @@ build_drive_header (RemovablePopup *popup, GDBusConnection *conn,
             mounted_paths = g_slist_append (mounted_paths, g_strdup (dev->object_path));
     }
 
-    /* Eject saca el medio (lector SD, óptico); PowerOff apaga el disco entero
-       (HDD/SSD USB, que suelen reportar Ejectable=false) */
     if (ejectable || can_power_off) {
         EjectData *ejd  = g_new0 (EjectData, 1);
         ejd->popup      = popup;
@@ -1037,11 +1094,127 @@ build_drive_header (RemovablePopup *popup, GDBusConnection *conn,
         GtkWidget *btn_eject = labeled_button_new (
             "media-eject-symbolic", ejectable ? _("Eject") : _("Safely remove"));
         g_object_set_data_full (G_OBJECT (btn_eject), "eject-data", ejd, eject_data_free);
-        g_object_set_data (G_OBJECT (row), "labeled-btn", btn_eject);
         g_signal_connect (btn_eject, "clicked", G_CALLBACK (on_eject_clicked), ejd);
-        gtk_box_pack_start (GTK_BOX (row), btn_eject, FALSE, FALSE, 0);
+        return btn_eject;
+    }
+
+    g_slist_free_full (mounted_paths, g_free);
+    return NULL;
+}
+
+/* ---------- disco con una sola partición: una sola fila ----------
+ *
+ *   [ ][ícono]  Kingston DataTraveler           [📂][Montar][⏏ Expulsar]
+ *               DATOS · 32,0 GB · vfat
+ *               [barra de uso, si está montada]
+ *
+ * Sin flecha ni nada que desplegar: es la mayoría de los pendrives y tarjetas.
+ * Mismos callbacks y RowData que la fila de partición. Si no entra a lo ancho,
+ * fit_row() deja "Expulsar" solo con el ícono (y si hace falta oculta
+ * "Abrir carpeta"); "Montar" conserva
+ * su texto porque es la acción principal.
+ */
+static GtkWidget *
+build_single_drive_row (RemovablePopup *popup, GDBusConnection *conn,
+                        const gchar *drive_path, GSList *partitions)
+{
+    UdDevice *dev = partitions->data;
+
+    RowData *rd     = g_new0 (RowData, 1);
+    rd->popup       = popup;
+    rd->conn        = conn;
+    rd->object_path = g_strdup (dev->object_path);
+    rd->drive_path  = g_strdup (dev->drive_path);
+    rd->mount_point = g_strdup (dev->mount_point);
+    rd->mounted     = dev->mounted;
+
+    GtkWidget *row = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
+    gtk_widget_set_margin_start  (row, 12);
+    gtk_widget_set_margin_end    (row, 12);
+    gtk_widget_set_margin_top    (row, 8);
+    gtk_widget_set_margin_bottom (row, 8);
+    g_object_set_data_full (G_OBJECT (row), "row-data", rd, row_data_free);
+
+    /* hueco del ancho de la flecha, para alinear con los discos de varias particiones */
+    GtkWidget *spacer = gtk_image_new_from_icon_name ("pan-end-symbolic", GTK_ICON_SIZE_MENU);
+    gtk_widget_set_opacity (spacer, 0.0);
+    gtk_box_pack_start (GTK_BOX (row), spacer, FALSE, FALSE, 0);
+
+    GtkWidget *icon = gtk_image_new_from_icon_name (
+        "drive-removable-media-symbolic", GTK_ICON_SIZE_LARGE_TOOLBAR);
+    gtk_widget_set_valign (icon, GTK_ALIGN_CENTER);
+    gtk_box_pack_start (GTK_BOX (row), icon, FALSE, FALSE, 0);
+
+    GtkWidget *info_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+    gtk_widget_set_hexpand (info_box, TRUE);
+    gtk_widget_set_valign (info_box, GTK_ALIGN_CENTER);
+
+    gchar     *drive_name = drive_title (partitions);
+    GtkWidget *name_label = gtk_label_new (drive_name);
+    setup_elastic_name (name_label, drive_name);
+    g_object_set_data (G_OBJECT (row), "elastic-name", name_label);
+
+    /* detalle: "ETIQUETA · tamaño · tipo" (la etiqueta solo si dice algo distinto) */
+    gdouble  fraction;
+    gchar   *part_detail = partition_detail (dev, &fraction);
+    gchar   *detail = (dev->label && *dev->label && g_strcmp0 (dev->label, drive_name) != 0)
+                      ? g_strdup_printf ("%s · %s", dev->label, part_detail)
+                      : g_strdup (part_detail);
+    g_free (part_detail);
+    g_free (drive_name);
+
+    GtkWidget *detail_label = gtk_label_new (detail);
+    g_free (detail);
+    gtk_label_set_xalign (GTK_LABEL (detail_label), 0.0);
+    gtk_label_set_ellipsize (GTK_LABEL (detail_label), PANGO_ELLIPSIZE_END);
+    gtk_label_set_width_chars (GTK_LABEL (detail_label), NAME_MIN_CHARS);
+    gtk_style_context_add_class (gtk_widget_get_style_context (detail_label), "dim-label");
+
+    gtk_box_pack_start (GTK_BOX (info_box), name_label,   FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (info_box), detail_label, FALSE, FALSE, 0);
+
+    if (fraction >= 0.0) {
+        GtkLevelBar *bar = GTK_LEVEL_BAR (gtk_level_bar_new_for_interval (0.0, 1.0));
+        gtk_level_bar_remove_offset_value (bar, GTK_LEVEL_BAR_OFFSET_LOW);
+        gtk_level_bar_remove_offset_value (bar, GTK_LEVEL_BAR_OFFSET_HIGH);
+        gtk_level_bar_remove_offset_value (bar, GTK_LEVEL_BAR_OFFSET_FULL);
+        gtk_level_bar_add_offset_value (bar, GTK_LEVEL_BAR_OFFSET_HIGH, 0.90);
+        gtk_level_bar_add_offset_value (bar, GTK_LEVEL_BAR_OFFSET_LOW,  1.00);
+        gtk_level_bar_set_value (bar, CLAMP (fraction, 0.0, 1.0));
+        gtk_widget_set_margin_top (GTK_WIDGET (bar), 2);
+        gtk_box_pack_start (GTK_BOX (info_box), GTK_WIDGET (bar), FALSE, FALSE, 0);
+    }
+    if (dev->mounted && dev->mount_point)
+        gtk_widget_set_tooltip_text (detail_label, dev->mount_point);
+
+    gtk_box_pack_start (GTK_BOX (row), info_box, TRUE, TRUE, 0);
+
+    if (dev->mounted && dev->mount_point) {
+        GtkWidget *btn_open = gtk_button_new_from_icon_name (
+            "folder-open-symbolic", GTK_ICON_SIZE_BUTTON);
+        gtk_widget_set_tooltip_text (btn_open, _("Open folder"));
+        gtk_widget_set_valign (btn_open, GTK_ALIGN_CENTER);
+        g_signal_connect (btn_open, "clicked", G_CALLBACK (on_open_folder_clicked), rd);
+        g_object_set_data (G_OBJECT (row), "open-btn", btn_open);
+        gtk_box_pack_start (GTK_BOX (row), btn_open, FALSE, FALSE, 0);
+    }
+
+    GtkWidget *btn_action;
+    if (dev->mounted) {
+        btn_action = gtk_button_new_with_label (_("Unmount"));
+        g_signal_connect (btn_action, "clicked", G_CALLBACK (on_unmount_clicked), rd);
     } else {
-        g_slist_free_full (mounted_paths, g_free);
+        btn_action = gtk_button_new_with_label (_("Mount"));
+        g_signal_connect (btn_action, "clicked", G_CALLBACK (on_mount_clicked), rd);
+    }
+    gtk_widget_set_valign (btn_action, GTK_ALIGN_CENTER);
+    rd->btn_action = btn_action;
+    gtk_box_pack_start (GTK_BOX (row), btn_action, FALSE, FALSE, 0);
+
+    GtkWidget *btn_eject = build_eject_button (popup, conn, drive_path, partitions);
+    if (btn_eject) {
+        g_object_set_data (G_OBJECT (row), "labeled-btn", btn_eject);
+        gtk_box_pack_start (GTK_BOX (row), btn_eject, FALSE, FALSE, 0);
     }
 
     return row;
@@ -1183,7 +1356,7 @@ on_phone_mount_done (GObject *source, GAsyncResult *res, gpointer data)
 
             if (op->popup->show_notify)
                 notify_send (_("Phone ready"), name, "phone");
-            if (op->popup->open_thunar && uri) {
+            if (uri) {   /* "Montar" siempre abre el gestor de archivos */
                 open_file_manager (uri);
                 popup_hide (op->popup);
             } else if (op->btn) {
@@ -1320,6 +1493,7 @@ build_phone_row (RemovablePopup *popup, GDBusConnection *conn, UdPhone *ph)
     const gchar *ph_name   = (ph->name && *ph->name) ? ph->name : _("Phone");
     GtkWidget   *name_label = gtk_label_new (ph_name);
     setup_elastic_name (name_label, ph_name);
+    g_object_set_data (G_OBJECT (row), "elastic-name", name_label);
 
     gchar *detail = ph->mount
         ? g_strdup (phone_kind_label (ph->kind))
@@ -1342,6 +1516,7 @@ build_phone_row (RemovablePopup *popup, GDBusConnection *conn, UdPhone *ph)
         gtk_widget_set_tooltip_text (btn_open, _("Open folder"));
         gtk_widget_set_valign (btn_open, GTK_ALIGN_CENTER);
         g_signal_connect (btn_open, "clicked", G_CALLBACK (on_phone_open_clicked), pd);
+        g_object_set_data (G_OBJECT (row), "open-btn", btn_open);
         gtk_box_pack_start (GTK_BOX (row), btn_open, FALSE, FALSE, 0);
 
         if (g_mount_can_unmount (ph->mount) || g_mount_can_eject (ph->mount)) {
@@ -1397,7 +1572,8 @@ add_other_devices_section (RemovablePopup *popup, GSList *usb_devs)
     ed_usb->key        = g_strdup ("__other__");
     ed_usb->parts_box  = usb_box;
     ed_usb->arrow      = arrow;
-    ed_usb->expanded   = g_hash_table_contains (popup->expanded, "__other__");
+    ed_usb->default_expanded = FALSE;   /* sección secundaria: contraída */
+    ed_usb->expanded   = expand_initial_state (popup, "__other__", FALSE);
 
     /* ícono chico y título atenuado sin negrita: se lee como accesorio */
     GtkWidget *hdr_icon = gtk_image_new_from_icon_name (
@@ -1452,7 +1628,18 @@ add_storage_section (RemovablePopup *popup, GDBusConnection *conn, GSList *devic
             add_separator (popup);
         first_drive = FALSE;
 
-        /* parts_box: contenedor de particiones, oculto por defecto */
+        /* una sola partición: una fila con todo, sin desplegar */
+        if (parts && !parts->next) {
+            GtkWidget *row = build_single_drive_row (popup, conn, drive_path, parts);
+            gtk_box_pack_start (GTK_BOX (popup->content_box), row, FALSE, FALSE, 0);
+            gtk_widget_show_all (row);
+            fit_row (popup, row, row);
+            g_slist_free (parts);
+            continue;
+        }
+
+        /* varias particiones: encabezado + parts_box, desplegado por defecto
+           (el patrón no_show_all de CONTEXT.md se mantiene; expander_apply lo muestra) */
         GtkWidget *parts_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
         /* NO se llama show() sobre parts_box aquí */
 
@@ -1464,7 +1651,8 @@ add_storage_section (RemovablePopup *popup, GDBusConnection *conn, GSList *devic
         ed->key        = g_strdup (drive_path);
         ed->parts_box  = parts_box;
         ed->arrow      = g_object_get_data (G_OBJECT (header), "arrow");
-        ed->expanded   = g_hash_table_contains (popup->expanded, drive_path);
+        ed->default_expanded = TRUE;    /* se ven los "Montar" sin hacer clic */
+        ed->expanded   = expand_initial_state (popup, drive_path, TRUE);
 
         GtkWidget *event_box = gtk_event_box_new ();
         gtk_container_add (GTK_CONTAINER (event_box), header);
@@ -1472,8 +1660,7 @@ add_storage_section (RemovablePopup *popup, GDBusConnection *conn, GSList *devic
         g_signal_connect (event_box, "button-press-event", G_CALLBACK (on_expand_clicked), ed);
         gtk_box_pack_start (GTK_BOX (popup->content_box), event_box, FALSE, FALSE, 0);
         gtk_widget_show_all (event_box);
-        fit_labeled_button (popup, event_box,
-                            g_object_get_data (G_OBJECT (header), "labeled-btn"));
+        fit_row (popup, event_box, header);
 
         /* filas de partición dentro de parts_box */
         for (GSList *p = parts; p; p = p->next) {
@@ -1522,7 +1709,7 @@ populate_content (RemovablePopup *popup, GDBusConnection *conn, const UdScan *sc
         GtkWidget *row = build_phone_row (popup, conn, l->data);
         gtk_box_pack_start (GTK_BOX (popup->content_box), row, FALSE, FALSE, 0);
         gtk_widget_show_all (row);
-        fit_labeled_button (popup, row, g_object_get_data (G_OBJECT (row), "labeled-btn"));
+        fit_row (popup, row, row);
         need_sep = TRUE;
     }
 
@@ -1574,7 +1761,6 @@ popup_create (XfcePanelPlugin *plugin, GtkWidget *button)
     popup->scroll       = scroll;
     popup->button       = button;
     popup->show_notify  = TRUE;
-    popup->open_thunar  = FALSE;
     popup->popup_width  = POPUP_WIDTH;
     popup->popup_height = POPUP_HEIGHT;
     popup->expanded     = g_hash_table_new_full (g_str_hash, g_str_equal,
@@ -1742,12 +1928,6 @@ void
 popup_set_notify (RemovablePopup *popup, gboolean enabled)
 {
     popup->show_notify = enabled;
-}
-
-void
-popup_set_open_thunar (RemovablePopup *popup, gboolean enabled)
-{
-    popup->open_thunar = enabled;
 }
 
 void

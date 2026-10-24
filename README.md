@@ -9,13 +9,13 @@ Inspired by KDE Plasma's Device Notifier, built natively for Xfce using UDisks2,
 ## Features
 
 - Lists removable storage devices (USB drives, SD cards, external disks) via UDisks2
-- Groups partitions under their parent disk with expand/collapse
+- Drives with a single partition take one row; drives with several partitions show them under the disk header, expanded by default
 - Mount / Unmount buttons per partition with intermediate state feedback ("Mounting…" / "Unmounting…")
 - **Eject** / **Safely remove** button on the disk header — unmounts all partitions first and only reports success when the drive is really safe to unplug
 - **Phones and cameras**: Android phones in file-transfer mode (MTP), cameras (PTP) and iPhones (afc), via gvfs — mount, open in the file manager, safely remove
 - **Other devices** section: gamepads, graphics tablets, security keys, serial boards (Arduino, ESP32), printers, audio and MIDI devices, webcams — classified with udev; built-in devices are left out
 - Desktop notifications on mount, unmount, eject, connect and disconnect (libnotify), configurable
-- Opens the file manager after mounting, configurable
+- **Mount** always opens the drive in the file manager
 - Hides the panel button when no devices are present, configurable
 - Scrollable popup with configurable width and height
 - Configurable button size (square or fixed width) and icon size
@@ -93,11 +93,10 @@ Right-click the panel button → **Properties**. Settings are stored per plugin 
 - Square button / fixed width
 - Plugin size (px)
 - Use panel icon size / custom icon size (px)
-- Popup width and height (px)
+- Popup width (320–800 px) and height (px)
 
 **Behavior**
 - Show notifications
-- Open file manager after mounting
 - Hide button when no removable devices
   - Sub-option: also hide when only other devices are present
 - Notify when devices are connected or disconnected
