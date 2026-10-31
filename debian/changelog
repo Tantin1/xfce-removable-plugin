@@ -1,3 +1,13 @@
+xfce-removable-plugin (1.0.2-1) unstable; urgency=medium
+
+  * Al agregarlo por primera vez el botón se ve aunque no haya dispositivos,
+    con una explicación en el popup y una notificación.
+  * Ya no se lee el .ini compartido de las versiones de desarrollo.
+  * Paquetes armados por GitHub Actions: Debian 12, Debian 13,
+    Ubuntu 24.04 y Arch Linux.
+
+ -- Juan Sebastian Perez <juanchiperez97@gmail.com>  Sat, 31 Oct 2026 19:00:00 -0300
+
 xfce-removable-plugin (1.0.1-1) unstable; urgency=medium
 
   * Discos con una sola partición: una fila con Montar y Expulsar a la vista.

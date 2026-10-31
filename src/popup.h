@@ -15,6 +15,7 @@ typedef struct {
     gint             popup_width;
     gint             popup_height;
     gboolean         show_notify;
+    gboolean         first_run_hint; /* explicar que el botón se oculta (modo primera vez) */
     GHashTable      *expanded;    /* claves (drive_path, "__other__") que el usuario
                                      cambió respecto de su estado por defecto */
     gint             pending_ops; /* mount/unmount/eject asíncronos en vuelo */
@@ -31,6 +32,7 @@ void            popup_hide    (RemovablePopup *popup);
 void            popup_refresh        (RemovablePopup *popup, GDBusConnection *conn,
                                       const UdScan *scan);
 void            popup_set_notify     (RemovablePopup *popup, gboolean enabled);
+void            popup_set_first_run_hint (RemovablePopup *popup, gboolean enabled);
 void            popup_destroy        (RemovablePopup *popup);
 
 #endif /* POPUP_H */

@@ -60,6 +60,10 @@ typedef struct {
     /* CSS tamaño del botón */
     GtkCssProvider  *button_css;
 
+    /* "modo primera vez": la instancia se acaba de agregar al panel (no tiene
+       configuración guardada). Dura hasta que se reinicie el panel. */
+    gboolean         first_run;
+
     /* ventana "Acerca de" abierta (una sola a la vez) */
     GtkWidget       *about_dialog;
 } RemovablePlugin;
@@ -116,9 +120,9 @@ apply_config (RemovablePlugin *rp)
 
 /* Un archivo por instancia del plugin (lo administra el panel:
    ~/.config/xfce4/panel/xfce-removable-plugin-<id>.rc), así dos instancias
-   no se pisan. Si la instancia todavía no tiene el suyo, se lee el .ini
-   compartido de versiones anteriores para no perder la configuración. */
-#define LEGACY_CONFIG_PATH "xfce4/panel/xfce-removable-plugin.ini"
+   no se pisan. Si la instancia no tiene el suyo, se acaba de agregar al panel.
+   (El .ini compartido de las versiones de desarrollo ya no se lee: ninguna
+   versión publicada lo escribió, y leerlo escondía el "modo primera vez".) */
 
 /* lee una clave booleana respetando el default si la clave no existe */
 static gboolean
@@ -147,8 +151,8 @@ load_config (RemovablePlugin *rp)
     gchar    *path = xfce_panel_plugin_lookup_rc_file (rp->plugin);
     GError   *err  = NULL;
 
-    if (!path)
-        path = g_build_filename (g_get_user_config_dir (), LEGACY_CONFIG_PATH, NULL);
+    /* sin archivo propio: instancia recién agregada */
+    rp->first_run = (path == NULL);
 
     rp->square_button       = DEFAULT_SQUARE_BUTTON;
     rp->plugin_size         = DEFAULT_PLUGIN_SIZE;
@@ -161,7 +165,7 @@ load_config (RemovablePlugin *rp)
     rp->hide_if_only_other  = DEFAULT_HIDE_IF_ONLY_OTHER;
     rp->notify_new_device   = DEFAULT_NOTIFY_NEW_DEVICE;
 
-    if (!g_key_file_load_from_file (kf, path, G_KEY_FILE_NONE, &err)) {
+    if (!path || !g_key_file_load_from_file (kf, path, G_KEY_FILE_NONE, &err)) {
         g_clear_error (&err);
         goto out;
     }
@@ -222,7 +226,8 @@ static void
 apply_button_visibility (RemovablePlugin *rp, const UdScan *scan)
 {
     /* los teléfonos cuentan como dispositivos "principales", no como "otros" */
-    gboolean show = !rp->hide_if_empty ||
+    gboolean show = rp->first_run ||        /* recién agregado: que se vea y se pueda ubicar */
+                    !rp->hide_if_empty ||
                     scan->storage != NULL ||
                     scan->phones  != NULL ||
                     (!rp->hide_if_only_other && scan->usb != NULL);
@@ -537,6 +542,7 @@ on_hide_toggled (GtkToggleButton *btn, PropsDialog *pd)
     pd->rp->hide_if_empty = gtk_toggle_button_get_active (btn);
     gtk_widget_set_sensitive (pd->hide_other_check, pd->rp->hide_if_empty);
     save_config (pd->rp);
+    popup_set_first_run_hint (pd->rp->popup, pd->rp->first_run && pd->rp->hide_if_empty);
     plugin_update_button_visibility (pd->rp);
 }
 
@@ -831,6 +837,7 @@ removable_plugin_construct (XfcePanelPlugin *plugin)
 
     rp->popup = popup_create (plugin, rp->button);
     popup_set_notify      (rp->popup, rp->show_notify);
+    popup_set_first_run_hint (rp->popup, rp->first_run && rp->hide_if_empty);
 
     g_object_set_data (G_OBJECT (rp->popup->window), "closed-cb",   (gpointer) on_popup_closed);
     g_object_set_data (G_OBJECT (rp->popup->window), "closed-data",  rp);
@@ -847,6 +854,21 @@ removable_plugin_construct (XfcePanelPlugin *plugin)
         UdScan *scan = ud_scan (rp->conn);
         update_snapshots (rp, scan, TRUE);
         apply_button_visibility (rp, scan);
+
+        if (rp->first_run) {
+            /* guardar ya la configuración: desde el próximo inicio no es "primera vez" */
+            save_config (rp);
+
+            /* por las dudas no abra el popup: avisar una sola vez, solo si en
+               condiciones normales el botón estaría oculto */
+            gboolean would_hide = rp->hide_if_empty && !scan->storage && !scan->phones &&
+                                  (rp->hide_if_only_other || !scan->usb);
+            if (would_hide && rp->show_notify)
+                notify_simple (_("Removable Devices added"),
+                               _("This button hides when nothing is connected and "
+                                 "reappears when you connect a device."),
+                               "drive-removable-media");
+        }
         ud_scan_free (scan);
     }
 

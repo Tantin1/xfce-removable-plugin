@@ -1691,13 +1691,41 @@ populate_content (RemovablePopup *popup, GDBusConnection *conn, const UdScan *sc
     g_list_free (kids);
 
     if (ud_scan_is_empty (scan)) {
+        GtkWidget *box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
+        gtk_widget_set_margin_top    (box, 16);
+        gtk_widget_set_margin_bottom (box, 16);
+        gtk_widget_set_margin_start  (box, 16);
+        gtk_widget_set_margin_end    (box, 16);
+        gtk_widget_set_valign (box, GTK_ALIGN_CENTER);
+
         GtkWidget *label = gtk_label_new (_("No removable devices"));
-        gtk_widget_set_margin_top    (label, 16);
-        gtk_widget_set_margin_bottom (label, 16);
-        gtk_widget_set_margin_start  (label, 16);
-        gtk_widget_set_margin_end    (label, 16);
-        gtk_box_pack_start (GTK_BOX (popup->content_box), label, TRUE, TRUE, 0);
-        gtk_widget_show (label);
+        gtk_box_pack_start (GTK_BOX (box), label, FALSE, FALSE, 0);
+
+        /* modo primera vez: el botón se ve aunque no haya nada; explicar por
+           qué después va a desaparecer y cómo ubicarlo */
+        if (popup->first_run_hint) {
+            PangoAttrList *attrs = pango_attr_list_new ();
+            pango_attr_list_insert (attrs, pango_attr_weight_new (PANGO_WEIGHT_BOLD));
+            gtk_label_set_attributes (GTK_LABEL (label), attrs);
+            pango_attr_list_unref (attrs);
+
+            const gchar *lines[] = {
+                _("This button hides when nothing is connected and "
+                  "reappears when you connect a device."),
+                _("You can now place it wherever you like: right-click → Move."),
+            };
+            for (gsize i = 0; i < G_N_ELEMENTS (lines); i++) {
+                GtkWidget *hint = gtk_label_new (lines[i]);
+                gtk_label_set_line_wrap (GTK_LABEL (hint), TRUE);
+                gtk_label_set_justify (GTK_LABEL (hint), GTK_JUSTIFY_CENTER);
+                gtk_label_set_max_width_chars (GTK_LABEL (hint), 34);
+                gtk_style_context_add_class (gtk_widget_get_style_context (hint), "dim-label");
+                gtk_box_pack_start (GTK_BOX (box), hint, FALSE, FALSE, 0);
+            }
+        }
+
+        gtk_box_pack_start (GTK_BOX (popup->content_box), box, TRUE, TRUE, 0);
+        gtk_widget_show_all (box);
         return;
     }
 
@@ -1928,6 +1956,12 @@ void
 popup_set_notify (RemovablePopup *popup, gboolean enabled)
 {
     popup->show_notify = enabled;
+}
+
+void
+popup_set_first_run_hint (RemovablePopup *popup, gboolean enabled)
+{
+    popup->first_run_hint = enabled;
 }
 
 void

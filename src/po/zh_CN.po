@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 21:24+0000\n"
+"POT-Creation-Date: 2026-10-24 22:26+0000\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -148,6 +148,9 @@ msgstr "属性 — 可移动设备"
 msgid "Removable Devices"
 msgstr "可移动设备"
 
+msgid "Removable Devices added"
+msgstr "已添加可移动设备"
+
 msgid "Removable device connected"
 msgstr "已连接可移动设备"
 
@@ -188,6 +191,9 @@ msgstr "设备正被其他应用程序使用。请关闭其上打开的文件或
 msgid "The partitions were unmounted, but the drive could not be ejected."
 msgstr "分区已卸载，但无法弹出驱动器。"
 
+msgid "This button hides when nothing is connected and reappears when you connect a device."
+msgstr "未连接任何设备时此按钮会隐藏，连接设备后会重新出现。"
+
 msgid "USB device"
 msgstr "USB 设备"
 
@@ -212,6 +218,9 @@ msgstr "正在卸载…"
 #. ícono del panel
 msgid "Use panel icon size"
 msgstr "使用面板大小作为图标大小"
+
+msgid "You can now place it wherever you like: right-click → Move."
+msgstr "现在可以把它放到任意位置：右键 → 移动。"
 
 msgid "You can now unplug the device."
 msgstr "现在可以拔出设备。"

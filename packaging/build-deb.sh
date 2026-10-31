@@ -18,6 +18,7 @@ fi
 chmod +x debian/rules
 dpkg-buildpackage -us -uc -b
 
+# shellcheck source=/dev/null
 . /etc/os-release
 ver=$(dpkg-parsechangelog -S Version)
 arch=$(dpkg --print-architecture)

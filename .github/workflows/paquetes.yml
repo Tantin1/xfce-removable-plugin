@@ -1,0 +1,146 @@
+# Compila y empaqueta el plugin en cada push, pull request o a mano
+# (Actions → Paquetes → Run workflow). Los paquetes quedan como "artifacts"
+# de la ejecución, para descargarlos y probarlos.
+#
+# Al subir una etiqueta v<versión> (git push origin v1.0.2), además crea un
+# BORRADOR de release con los paquetes adjuntos: revisar la nota y publicarlo
+# a mano desde la página de Releases.
+
+name: Paquetes
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  versiones:
+    name: Versiones coinciden
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: meson.build, debian/changelog, PKGBUILD (y la etiqueta)
+        run: sh packaging/check-version.sh "${{ github.ref_type == 'tag' && github.ref_name || '' }}"
+
+  deb:
+    name: .deb ${{ matrix.name }}
+    needs: versiones
+    runs-on: ubuntu-latest
+    container: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: debian12,    image: 'debian:12' }      # Xfce 4.18
+          - { name: debian13,    image: 'debian:13' }      # Xfce 4.20
+          - { name: ubuntu24.04, image: 'ubuntu:24.04' }   # Xubuntu 24.04, Linux Mint 22 Xfce
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - name: Dependencias de compilación
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential debhelper meson pkgconf gettext \
+            libgtk-3-dev libxfce4panel-2.0-dev libnotify-dev libgudev-1.0-dev
+
+      - uses: actions/checkout@v4
+
+      - name: Armar el .deb
+        run: |
+          sh packaging/build-deb.sh
+          mkdir -p dist
+          mv ../xfce-removable-plugin_*.deb dist/
+          ls -l dist
+
+      - name: Probar que se instala donde lo busca el panel
+        run: |
+          apt-get install -y --no-install-recommends ./dist/*.deb
+          dir="$(pkg-config --variable=libdir libxfce4panel-2.0)/xfce4/panel/plugins"
+          test -f "$dir/libxfce-removable-plugin.so"
+          test -f /usr/share/xfce4/panel/plugins/xfce-removable-plugin.desktop
+          echo "OK: $dir/libxfce-removable-plugin.so"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deb-${{ matrix.name }}
+          path: dist/*.deb
+          if-no-files-found: error
+
+  arch:
+    name: .pkg.tar.zst Arch Linux
+    needs: versiones
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+    steps:
+      - name: Dependencias
+        run: |
+          pacman -Syu --noconfirm --needed git meson gettext pacman-contrib \
+            xfce4-panel gtk3 glib2 libnotify libgudev udisks2
+
+      - uses: actions/checkout@v4
+
+      # El PKGBUILD del repo descarga el código de la etiqueta publicada en
+      # GitHub. Acá se arma desde ESTE commit: se empaqueta el código con
+      # git archive y se apunta el PKGBUILD a ese archivo.
+      - name: Armar el paquete desde este commit
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          ver=$(sed -n 's/^pkgver=//p' packaging/arch/PKGBUILD)
+          work=/tmp/arch
+          mkdir -p "$work"
+          git archive --format=tar.gz --prefix="xfce-removable-plugin-$ver/" \
+              -o "$work/xfce-removable-plugin-$ver.tar.gz" HEAD
+          # $pkgname y $pkgver van literales: los expande makepkg, no este shell
+          # shellcheck disable=SC2016
+          sed -e 's|^source=.*|source=("$pkgname-$pkgver.tar.gz")|' \
+              packaging/arch/PKGBUILD > "$work/PKGBUILD"
+          useradd -m builder          # makepkg no corre como root
+          chown -R builder "$work"
+          su builder -c "cd $work && updpkgsums && makepkg -f --noconfirm"
+          mkdir -p dist
+          cp "$work"/xfce-removable-plugin-[0-9]*.pkg.tar.zst dist/
+          ls -l dist
+
+      - name: Probar que se instala donde lo busca el panel
+        run: |
+          pacman -U --noconfirm dist/*.pkg.tar.zst
+          test -f /usr/lib/xfce4/panel/plugins/libxfce-removable-plugin.so
+          echo "OK: /usr/lib/xfce4/panel/plugins/libxfce-removable-plugin.so"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arch
+          path: dist/*.pkg.tar.zst
+          if-no-files-found: error
+
+  release:
+    name: Borrador de release
+    if: github.ref_type == 'tag'
+    needs: [deb, arch]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Crear el borrador (o actualizar sus archivos si ya existe)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          ls -l dist
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$TAG" dist/* --repo "$GITHUB_REPOSITORY" \
+              --draft --title "${TAG#v}" --generate-notes
+          fi

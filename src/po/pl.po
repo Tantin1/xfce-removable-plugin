@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 21:24+0000\n"
+"POT-Creation-Date: 2026-10-24 22:26+0000\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -148,6 +148,9 @@ msgstr "Właściwości — Urządzenia wymienne"
 msgid "Removable Devices"
 msgstr "Urządzenia wymienne"
 
+msgid "Removable Devices added"
+msgstr "Dodano Urządzenia wymienne"
+
 msgid "Removable device connected"
 msgstr "Podłączono urządzenie wymienne"
 
@@ -188,6 +191,9 @@ msgstr "Urządzenie jest używane przez inną aplikację. Zamknij otwarte na nim
 msgid "The partitions were unmounted, but the drive could not be ejected."
 msgstr "Partycje zostały odmontowane, ale nie udało się wysunąć napędu."
 
+msgid "This button hides when nothing is connected and reappears when you connect a device."
+msgstr "Ten przycisk jest ukryty, gdy nic nie jest podłączone, i pojawia się ponownie po podłączeniu urządzenia."
+
 msgid "USB device"
 msgstr "Urządzenie USB"
 
@@ -212,6 +218,9 @@ msgstr "Odmontowywanie…"
 #. ícono del panel
 msgid "Use panel icon size"
 msgstr "Użyj rozmiaru panelu dla ikony"
+
+msgid "You can now place it wherever you like: right-click → Move."
+msgstr "Możesz go teraz umieścić w dowolnym miejscu: prawy przycisk → Przenieś."
 
 msgid "You can now unplug the device."
 msgstr "Możesz teraz odłączyć urządzenie."

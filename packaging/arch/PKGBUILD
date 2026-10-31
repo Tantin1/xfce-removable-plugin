@@ -1,12 +1,18 @@
 # Maintainer: Juan Sebastian Perez <juanchiperez97@gmail.com>
 #
-# Antes de subirlo al AUR, con la etiqueta v$pkgver ya publicada en GitHub:
+# Esta copia es la plantilla: queda con sha256sums=('SKIP') a propósito, porque
+# la suma del tarball de una etiqueta no se conoce antes de crear la etiqueta.
+# El workflow de GitHub (.github/workflows/paquetes.yml) arma el paquete desde
+# el commit y no necesita la suma.
+#
+# Para el AUR, en una copia aparte y con la etiqueta v$pkgver ya publicada:
 #   updpkgsums                          # reemplaza SKIP por la suma real
 #   makepkg -si                         # probar que compila e instala
 #   makepkg --printsrcinfo > .SRCINFO   # el AUR exige este archivo
+# (no copiar de vuelta al repo la versión con la suma)
 
 pkgname=xfce-removable-plugin
-pkgver=1.0.1
+pkgver=1.0.2
 pkgrel=1
 pkgdesc='Xfce panel plugin for removable drives, phones and other USB devices'
 arch=('x86_64' 'aarch64')
@@ -18,7 +24,7 @@ optdepends=('gvfs-mtp: Android phones in file transfer mode'
             'gvfs-gphoto2: cameras (PTP)'
             'gvfs-afc: iPhone / iPad')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('98c4f6fcd999bdb6bf1813a75c40a83421094f2b1c51582dacf343c54216227f')
+sha256sums=('SKIP')
 
 build() {
   arch-meson "$pkgname-$pkgver/src" build

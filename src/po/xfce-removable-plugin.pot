@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 21:24+0000\n"
+"POT-Creation-Date: 2026-10-24 22:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,109 +17,119 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: plugin.c:369 plugin.c:384 plugin.c:395 plugin.c:405 plugin.c:415
-#: plugin.c:430
+#: plugin.c:377 plugin.c:392 plugin.c:403 plugin.c:413 plugin.c:423
+#: plugin.c:438
 msgid "Unknown"
 msgstr ""
 
-#: plugin.c:371
+#: plugin.c:379
 msgid "Removable device connected"
 msgstr ""
 
-#: plugin.c:386
+#: plugin.c:394
 msgid "USB device connected"
 msgstr ""
 
-#: plugin.c:394
+#: plugin.c:402
 msgid "Phone or camera connected"
 msgstr ""
 
-#: plugin.c:404
+#: plugin.c:412
 msgid "Phone or camera disconnected"
 msgstr ""
 
-#: plugin.c:414
+#: plugin.c:422
 msgid "Removable device disconnected"
 msgstr ""
 
-#: plugin.c:429
+#: plugin.c:437
 msgid "USB device disconnected"
 msgstr ""
 
-#: plugin.c:576
+#: plugin.c:585
 msgid "Properties — Removable Devices"
 msgstr ""
 
-#: plugin.c:579
+#: plugin.c:588
 msgid "Close"
 msgstr ""
 
 #. ---- frame Apariencia ----
-#: plugin.c:587
+#: plugin.c:596
 msgid "Appearance"
 msgstr ""
 
 #. botón cuadrado
-#: plugin.c:597
+#: plugin.c:606
 msgid "Square button"
 msgstr ""
 
 #. tamaño del plugin
-#: plugin.c:603
+#: plugin.c:612
 msgid "Plugin size:"
 msgstr ""
 
 #. ícono del panel
-#: plugin.c:614
+#: plugin.c:623
 msgid "Use panel icon size"
 msgstr ""
 
 #. tamaño del ícono
-#: plugin.c:620
+#: plugin.c:629
 msgid "Icon size:"
 msgstr ""
 
 #. ancho del popup
-#: plugin.c:631
+#: plugin.c:640
 msgid "Popup width:"
 msgstr ""
 
 #. alto del popup
-#: plugin.c:640
+#: plugin.c:649
 msgid "Popup height:"
 msgstr ""
 
 #. ---- frame Comportamiento ----
-#: plugin.c:653
+#: plugin.c:662
 msgid "Behavior"
 msgstr ""
 
-#: plugin.c:662
+#: plugin.c:671
 msgid "Show notifications"
 msgstr ""
 
-#: plugin.c:667
+#: plugin.c:676
 msgid "Hide button when no removable devices"
 msgstr ""
 
-#: plugin.c:674
+#: plugin.c:683
 msgid "Also hide when only other devices are present"
 msgstr ""
 
-#: plugin.c:682
+#: plugin.c:691
 msgid "Notify when devices are connected or disconnected"
 msgstr ""
 
-#: plugin.c:736 xfce-removable-plugin.desktop.in:4
+#: plugin.c:745 xfce-removable-plugin.desktop.in:4
 msgid "Removable Devices"
 msgstr ""
 
-#: plugin.c:739 xfce-removable-plugin.desktop.in:5
+#: plugin.c:748 xfce-removable-plugin.desktop.in:5
 msgid "Mount and safely remove drives, phones and other USB devices"
 msgstr ""
 
-#: plugin.c:820
+#: plugin.c:829
 msgid "Removable devices"
+msgstr ""
+
+#: plugin.c:870
+msgid "Removable Devices added"
+msgstr ""
+
+#: plugin.c:871 popup.c:1713
+msgid ""
+"This button hides when nothing is connected and reappears when you connect a "
+"device."
 msgstr ""
 
 #: popup.c:488
@@ -259,8 +269,12 @@ msgstr ""
 msgid "Other devices"
 msgstr ""
 
-#: popup.c:1694
+#: popup.c:1701
 msgid "No removable devices"
+msgstr ""
+
+#: popup.c:1715
+msgid "You can now place it wherever you like: right-click → Move."
 msgstr ""
 
 #: ud-dbus.c:448
