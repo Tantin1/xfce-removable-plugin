@@ -72,7 +72,7 @@ Build dependencies:
 ```bash
 # Debian / Ubuntu / Mint
 sudo apt install build-essential meson pkgconf gettext \
-     libgtk-3-dev libxfce4panel-2.0-dev libnotify-dev libgudev-1.0-dev
+     libgtk-3-dev libxfce4panel-2.0-dev libxfce4ui-2-dev libnotify-dev libgudev-1.0-dev
 
 # Arch Linux
 sudo pacman -S --needed base-devel meson gettext xfce4-panel gtk3 libnotify libgudev
