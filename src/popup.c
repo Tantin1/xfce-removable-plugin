@@ -15,6 +15,103 @@
 #define POPUP_WIDTH  400
 #define POPUP_HEIGHT 300
 
+/* ---------- marco del popup: se ve como los popovers del tema ----------
+ *
+ * Un GtkWindow común es opaco y rectangular: aunque el tema le ponga
+ * border-radius, las esquinas se pintan con el fondo de la ventana y siguen
+ * viéndose cuadradas. Los menús de GTK se ven redondeados porque usan una
+ * ventana con transparencia y dejan la forma al tema.
+ *
+ * Acá: ventana transparente (si hay compositor) + una caja interna cuyo nodo
+ * CSS se llama "popover" con la clase "background", así le aplican las reglas
+ * que el tema ya tiene para los popovers (fondo, borde, esquinas). Sin
+ * compositor (X11 con xfwm4 sin composición) la ventana queda opaca y el marco
+ * cuadrado, como antes: con transparencia las esquinas saldrían negras.
+ */
+typedef struct { GtkBox parent; } RpFrame;
+typedef struct { GtkBoxClass parent_class; } RpFrameClass;
+G_DEFINE_TYPE (RpFrame, rp_frame, GTK_TYPE_BOX)
+
+static void
+rp_frame_class_init (RpFrameClass *klass)
+{
+    gtk_widget_class_set_css_name (GTK_WIDGET_CLASS (klass), "popover");
+}
+
+static void
+rp_frame_init (RpFrame *self)
+{
+    (void) self;
+}
+
+/* lo mínimo propio: ventana transparente cuando corresponde, sin márgenes
+   heredados de los popovers (algunos temas les ponen margen o flecha), y
+   esquinas rectas en modo opaco */
+static const gchar *POPUP_CSS =
+    "window.rp-popup.rp-rounded { background-color: transparent; }"
+    "popover.rp-frame { margin: 0; }"
+    "popover.rp-frame.rp-square { border-radius: 0; box-shadow: none; }";
+
+static void
+popup_install_css (GtkWidget *win)
+{
+    static GtkCssProvider *provider = NULL;   /* uno por proceso, compartido */
+    if (!provider) {
+        provider = gtk_css_provider_new ();
+        gtk_css_provider_load_from_data (provider, POPUP_CSS, -1, NULL);
+        gtk_style_context_add_provider_for_screen (gtk_widget_get_screen (win),
+            GTK_STYLE_PROVIDER (provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+    }
+}
+
+/* elige ventana transparente o opaca según haya compositor. Solo con la
+   ventana oculta: cambiar el visual exige des-realizarla. */
+static void
+popup_update_shape (RemovablePopup *popup)
+{
+    GtkWidget *win    = popup->window;
+    GdkScreen *screen = gtk_widget_get_screen (win);
+    GdkVisual *rgba   = gdk_screen_get_rgba_visual (screen);
+    gboolean   want   = rgba != NULL && gdk_screen_is_composited (screen);
+
+    if (gtk_widget_get_visible (win))
+        return;
+    if (want == popup->rounded && gtk_widget_get_realized (win))
+        return;
+
+    if (gtk_widget_get_realized (win))
+        gtk_widget_unrealize (win);
+    gtk_widget_set_visual (win, want ? rgba : gdk_screen_get_system_visual (screen));
+    gtk_widget_set_app_paintable (win, want);
+    popup->rounded = want;
+
+    GtkStyleContext *wctx = gtk_widget_get_style_context (win);
+    GtkStyleContext *fctx = gtk_widget_get_style_context (popup->frame);
+    if (want) {
+        gtk_style_context_add_class    (wctx, "rp-rounded");
+        gtk_style_context_remove_class (fctx, "rp-square");
+    } else {
+        gtk_style_context_remove_class (wctx, "rp-rounded");
+        gtk_style_context_add_class    (fctx, "rp-square");
+    }
+}
+
+/* con app_paintable GTK no limpia el fondo: dejarlo transparente antes de
+   que se dibujen los hijos (el marco pinta su propio fondo redondeado) */
+static gboolean
+on_popup_draw (GtkWidget *win, cairo_t *cr, RemovablePopup *popup)
+{
+    (void) win;
+    if (popup->rounded) {
+        cairo_save (cr);
+        cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
+        cairo_set_source_rgba (cr, 0, 0, 0, 0);
+        cairo_paint (cr);
+        cairo_restore (cr);
+    }
+    return GDK_EVENT_PROPAGATE;
+}
+
 /* diagnóstico silencioso: G_MESSAGES_DEBUG=xfce-removable-plugin xfce4-panel */
 #define WL_DEBUG(...) g_log ("xfce-removable-plugin", G_LOG_LEVEL_DEBUG, __VA_ARGS__)
 
@@ -917,8 +1014,9 @@ labeled_button_new (const gchar *icon_name, const gchar *text)
 static gint
 popup_content_width (RemovablePopup *popup)
 {
-    gint avail = popup->popup_width
-               - 2 * (gint) gtk_container_get_border_width (GTK_CONTAINER (popup->window));
+    /* el marco (borde y relleno del tema) queda por fuera del scroll, que
+       mide exactamente popup_width */
+    gint avail = popup->popup_width;
     GtkWidget *vbar = gtk_scrolled_window_get_vscrollbar (GTK_SCROLLED_WINDOW (popup->scroll));
     if (vbar && !gtk_scrolled_window_get_overlay_scrolling (GTK_SCROLLED_WINDOW (popup->scroll))) {
         gint bar_min = 0;
@@ -1773,18 +1871,27 @@ popup_create (XfcePanelPlugin *plugin, GtkWidget *button)
     gtk_window_set_skip_pager_hint   (GTK_WINDOW (win), TRUE);
     gtk_window_set_resizable         (GTK_WINDOW (win), FALSE);
     gtk_window_set_decorated         (GTK_WINDOW (win), FALSE);
-    gtk_container_set_border_width   (GTK_CONTAINER (win), 1);
+    gtk_style_context_add_class (gtk_widget_get_style_context (win), "rp-popup");
+    popup_install_css (win);
+
+    /* marco con el aspecto de los popovers del tema (fondo, borde, esquinas) */
+    GtkWidget *frame = g_object_new (rp_frame_get_type (),
+                                     "orientation", GTK_ORIENTATION_VERTICAL, NULL);
+    gtk_style_context_add_class (gtk_widget_get_style_context (frame), "background");
+    gtk_style_context_add_class (gtk_widget_get_style_context (frame), "rp-frame");
+    gtk_container_add (GTK_CONTAINER (win), frame);
 
     GtkWidget *scroll = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll),
                                     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     gtk_widget_set_size_request (scroll, POPUP_WIDTH, POPUP_HEIGHT);
-    gtk_container_add (GTK_CONTAINER (win), scroll);
+    gtk_box_pack_start (GTK_BOX (frame), scroll, TRUE, TRUE, 0);
 
     GtkWidget *content = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add (GTK_CONTAINER (scroll), content);
 
     popup->window       = win;
+    popup->frame        = frame;
     popup->content_box  = content;
     popup->scroll       = scroll;
     popup->button       = button;
@@ -1795,6 +1902,8 @@ popup_create (XfcePanelPlugin *plugin, GtkWidget *button)
                                                  g_free, NULL);
 
     g_signal_connect (win, "key-press-event", G_CALLBACK (on_key_press), popup);
+    g_signal_connect (win, "draw",            G_CALLBACK (on_popup_draw), popup);
+    popup_update_shape (popup);
 
     if (popup->wayland) {
         /* una sola vez: avisos de que el compositor descartó el popup */
@@ -1864,6 +1973,9 @@ popup_show (RemovablePopup *popup, XfcePanelPlugin *plugin,
     popup->popup_height = (popup_height > 0) ? popup_height : POPUP_HEIGHT;
 
     g_object_set_data (G_OBJECT (popup->window), "conn", conn);
+
+    /* el compositor se puede activar o desactivar entre aperturas */
+    popup_update_shape (popup);
 
     popup_rebuild (popup, conn);
 

@@ -1,3 +1,10 @@
+xfce-removable-plugin (1.0.3-1) unstable; urgency=medium
+
+  * El popup toma del tema el fondo, el borde y las esquinas (como los
+    popovers); con compositor las esquinas se ven redondeadas.
+
+ -- Juan Sebastian Perez <juanchiperez97@gmail.com>  Sun, 01 Nov 2026 09:00:00 -0300
+
 xfce-removable-plugin (1.0.2-1) unstable; urgency=medium
 
   * Al agregarlo por primera vez el botón se ve aunque no haya dispositivos,

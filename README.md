@@ -17,7 +17,7 @@ Inspired by KDE Plasma's Device Notifier, built natively for Xfce using UDisks2,
 - **Other devices** section: gamepads, graphics tablets, security keys, serial boards (Arduino, ESP32), printers, audio and MIDI devices, webcams — classified with udev; built-in devices are left out
 - Desktop notifications on mount, unmount, eject, connect and disconnect (libnotify), configurable
 - Hides the panel button when no devices are present, configurable
-- Scrollable popup with configurable width and height
+- Scrollable popup with configurable width and height; it follows the GTK theme's popover look, with rounded corners when a compositor is running
 - Configurable button size (square or fixed width) and icon size
 - Auto-refresh via UDisks2 DBus signals, gvfs volume monitor and GUdev uevents, with a 300 ms debounce
 - Translated into 13 languages

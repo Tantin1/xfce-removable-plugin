@@ -8,6 +8,8 @@
 typedef struct {
     XfcePanelPlugin *plugin;      /* para arrow_type (lado del panel) */
     GtkWidget       *window;
+    GtkWidget       *frame;       /* caja con fondo, borde y esquinas del tema (nodo CSS "popover") */
+    gboolean         rounded;     /* ventana con transparencia: el tema puede redondear las esquinas */
     GtkWidget       *content_box;
     GtkWidget       *scroll;
     GtkWidget       *button;
