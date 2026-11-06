@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 22:26+0000\n"
+"POT-Creation-Date: 2026-11-01 13:48+0000\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,24 @@ msgstr "%s libres sur %s"
 msgid "Also hide when only other devices are present"
 msgstr "Masquer aussi quand il n'y a que d'autres périphériques"
 
+msgid "Android phone"
+msgstr "Téléphone Android"
+
 #. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "Apparence"
 
+msgid "Attached to the panel"
+msgstr "Collée au tableau de bord"
+
 msgid "Audio device"
 msgstr "Périphérique audio"
+
+msgid "Automatic"
+msgstr "Automatique"
+
+msgid "Automatic: floating with rounded corners when the theme and the compositor allow it, otherwise attached to the panel."
+msgstr "Automatique : flottante avec des coins arrondis quand le thème et le compositeur le permettent, sinon collée au tableau de bord."
 
 #. ---- frame Comportamiento ----
 msgid "Behavior"
@@ -63,6 +75,12 @@ msgstr "Échec de l'éjection"
 msgid "Ejecting…"
 msgstr "Éjection…"
 
+msgid "File transfer is off"
+msgstr "Transfert de fichiers désactivé"
+
+msgid "Floating"
+msgstr "Flottante"
+
 msgid "Gamepad / Joystick"
 msgstr "Manette / Joystick"
 
@@ -75,6 +93,9 @@ msgstr "Masquer le bouton s'il n'y a pas de périphériques amovibles"
 #. tamaño del ícono
 msgid "Icon size:"
 msgstr "Taille de l'icône :"
+
+msgid "Keyboard / Mouse"
+msgstr "Clavier / souris"
 
 msgid "MIDI device"
 msgstr "Périphérique MIDI"
@@ -91,11 +112,20 @@ msgstr "Échec du montage"
 msgid "Mounting…"
 msgstr "Montage…"
 
+msgid "No driver: games may not detect it"
+msgstr "Sans pilote : les jeux risquent de ne pas la détecter"
+
 msgid "No removable devices"
 msgstr "Aucun périphérique amovible"
 
+msgid "No system driver has taken this controller, so most games will not detect it (Steam can still use it). A common cause is a package that blocks the xpad driver, such as xone."
+msgstr "Aucun pilote du système n'a pris en charge cette manette : la plupart des jeux ne la détecteront pas (Steam peut quand même l'utiliser). Une cause fréquente est un paquet qui bloque le pilote xpad, comme xone."
+
 msgid "Not authorized to perform this operation."
 msgstr "Non autorisé à effectuer cette opération."
+
+msgid "Notify about:"
+msgstr "Notifier pour :"
 
 msgid "Notify when devices are connected or disconnected"
 msgstr "Notifier la connexion ou la déconnexion d'un périphérique"
@@ -135,6 +165,10 @@ msgstr "Taille du plugin :"
 msgid "Popup height:"
 msgstr "Hauteur du popup :"
 
+#. estilo de la ventana: el orden de los textos es el de POPUP_STYLE_*
+msgid "Popup style:"
+msgstr "Style de la fenêtre :"
+
 #. ancho del popup
 msgid "Popup width:"
 msgstr "Largeur du popup :"
@@ -172,11 +206,17 @@ msgstr "Vous pouvez débrancher le périphérique."
 msgid "Safely remove"
 msgstr "Retirer en toute sécurité"
 
+msgid "Scanner"
+msgstr "Scanner"
+
 msgid "Security key / Smart card"
 msgstr "Clé de sécurité / Carte à puce"
 
 msgid "Serial device / Board"
 msgstr "Périphérique série / Carte"
+
+msgid "Show keyboards and mice"
+msgstr "Afficher les claviers et les souris"
 
 msgid "Show notifications"
 msgstr "Afficher les notifications"
@@ -190,6 +230,9 @@ msgstr "Le périphérique est utilisé par une autre application. Fermez les fic
 
 msgid "The partitions were unmounted, but the drive could not be ejected."
 msgstr "Les partitions ont été démontées, mais le lecteur n'a pas pu être éjecté."
+
+msgid "The phone is connected only for charging or USB debugging. To see its files, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "Le téléphone est connecté uniquement pour la recharge ou le débogage USB. Pour voir ses fichiers, déverrouillez-le et choisissez « Transfert de fichiers » dans sa notification USB."
 
 msgid "This button hides when nothing is connected and reappears when you connect a device."
 msgstr "Ce bouton se masque quand rien n'est connecté et réapparaît lorsque vous connectez un périphérique."

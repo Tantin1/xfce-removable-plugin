@@ -24,10 +24,36 @@
    los idiomas sin ensanchar el popup (medido con ruso, el más largo) */
 #define MIN_POPUP_WIDTH              320
 #define DEFAULT_POPUP_HEIGHT         300
+#define DEFAULT_POPUP_STYLE          POPUP_STYLE_AUTO
 #define DEFAULT_SHOW_NOTIFY          TRUE
 #define DEFAULT_HIDE_IF_EMPTY        TRUE
 #define DEFAULT_HIDE_IF_ONLY_OTHER   FALSE
 #define DEFAULT_NOTIFY_NEW_DEVICE    TRUE
+#define DEFAULT_SHOW_INPUT           FALSE   /* teclados y mouses en "Other devices" */
+#define DEFAULT_NOTIFY_DRIVES        TRUE
+
+/* Categorías que se pueden silenciar (Propiedades → "Notify about:"), en el
+   orden en que se muestran. La clave es el nombre en [notify] del .rc: un
+   nombre fijo y no el número del tipo, así el archivo se entiende y sobrevive
+   a cambios del enum. Los discos van aparte (notify_drives). */
+static const struct {
+    UdUsbType    type;
+    const gchar *key;
+    gboolean     def;
+} NOTIFY_TYPES[] = {
+    { UD_USB_PHONE,    "phones",         TRUE  },
+    { UD_USB_ANDROID,  "android",        TRUE  },
+    { UD_USB_GAMEPAD,  "gamepads",       TRUE  },
+    { UD_USB_TABLET,   "tablets",        TRUE  },
+    { UD_USB_SECURITY, "security_keys",  TRUE  },
+    { UD_USB_PRINTER,  "printers",       TRUE  },
+    { UD_USB_SCANNER,  "scanners",       TRUE  },
+    { UD_USB_CAMERA,   "cameras",        TRUE  },
+    { UD_USB_AUDIO,    "audio",          TRUE  },
+    { UD_USB_MIDI,     "midi",           TRUE  },
+    { UD_USB_SERIAL,   "serial",         TRUE  },
+    { UD_USB_INPUT,    "keyboards_mice", FALSE },   /* se enchufan y desenchufan seguido */
+};
 
 /* ---------- struct del plugin ---------- */
 
@@ -47,10 +73,14 @@ typedef struct {
     gint             icon_size;
     gint             popup_width;
     gint             popup_height;
+    gint             popup_style;     /* POPUP_STYLE_* (popup.h) */
     gboolean         show_notify;
     gboolean         hide_if_empty;
     gboolean         hide_if_only_other;
     gboolean         notify_new_device;
+    gboolean         show_input;      /* listar teclados y mouses */
+    gboolean         notify_drives;   /* notificar discos (conectar/desconectar) */
+    gboolean         notify_type[UD_USB_N_TYPES];   /* por categoría (NOTIFY_TYPES) */
 
     /* snapshots para detectar enchufado/desenchufado */
     GHashTable      *seen_storage;   /* object_path -> label/device */
@@ -160,10 +190,16 @@ load_config (RemovablePlugin *rp)
     rp->icon_size           = DEFAULT_ICON_SIZE;
     rp->popup_width         = DEFAULT_POPUP_WIDTH;
     rp->popup_height        = DEFAULT_POPUP_HEIGHT;
+    rp->popup_style         = DEFAULT_POPUP_STYLE;
     rp->show_notify         = DEFAULT_SHOW_NOTIFY;
     rp->hide_if_empty       = DEFAULT_HIDE_IF_EMPTY;
     rp->hide_if_only_other  = DEFAULT_HIDE_IF_ONLY_OTHER;
     rp->notify_new_device   = DEFAULT_NOTIFY_NEW_DEVICE;
+    rp->show_input          = DEFAULT_SHOW_INPUT;
+    rp->notify_drives       = DEFAULT_NOTIFY_DRIVES;
+    /* sin categoría (UD_USB_OTHER) nunca se notifica: queda en FALSE */
+    for (gsize i = 0; i < G_N_ELEMENTS (NOTIFY_TYPES); i++)
+        rp->notify_type[NOTIFY_TYPES[i].type] = NOTIFY_TYPES[i].def;
 
     if (!path || !g_key_file_load_from_file (kf, path, G_KEY_FILE_NONE, &err)) {
         g_clear_error (&err);
@@ -177,10 +213,21 @@ load_config (RemovablePlugin *rp)
     rp->popup_width        = MAX (MIN_POPUP_WIDTH,
                                   kf_get_int (kf, "appearance", "popup_width", DEFAULT_POPUP_WIDTH));
     rp->popup_height       = kf_get_int  (kf, "appearance", "popup_height",       DEFAULT_POPUP_HEIGHT);
+    /* kf_get_int toma 0 como "sin valor", y 0 es justo Automático: leer directo y validar */
+    if (g_key_file_has_key (kf, "appearance", "popup_style", NULL)) {
+        gint st = g_key_file_get_integer (kf, "appearance", "popup_style", NULL);
+        rp->popup_style = (st >= POPUP_STYLE_AUTO && st <= POPUP_STYLE_ATTACHED)
+                          ? st : DEFAULT_POPUP_STYLE;
+    }
     rp->show_notify        = kf_get_bool (kf, "behavior",   "show_notify",        DEFAULT_SHOW_NOTIFY);
     rp->hide_if_empty      = kf_get_bool (kf, "behavior",   "hide_if_empty",      DEFAULT_HIDE_IF_EMPTY);
     rp->hide_if_only_other = kf_get_bool (kf, "behavior",   "hide_if_only_other", DEFAULT_HIDE_IF_ONLY_OTHER);
     rp->notify_new_device  = kf_get_bool (kf, "behavior",   "notify_new_device",  DEFAULT_NOTIFY_NEW_DEVICE);
+    rp->show_input         = kf_get_bool (kf, "behavior",   "show_input",         DEFAULT_SHOW_INPUT);
+    rp->notify_drives      = kf_get_bool (kf, "notify",     "drives",             DEFAULT_NOTIFY_DRIVES);
+    for (gsize i = 0; i < G_N_ELEMENTS (NOTIFY_TYPES); i++)
+        rp->notify_type[NOTIFY_TYPES[i].type] =
+            kf_get_bool (kf, "notify", NOTIFY_TYPES[i].key, NOTIFY_TYPES[i].def);
 
 out:
     g_key_file_free (kf);
@@ -206,10 +253,16 @@ save_config (RemovablePlugin *rp)
     g_key_file_set_integer  (kf, "appearance", "icon_size",          rp->icon_size);
     g_key_file_set_integer  (kf, "appearance", "popup_width",        rp->popup_width);
     g_key_file_set_integer  (kf, "appearance", "popup_height",       rp->popup_height);
+    g_key_file_set_integer  (kf, "appearance", "popup_style",        rp->popup_style);
     g_key_file_set_boolean  (kf, "behavior",   "show_notify",        rp->show_notify);
     g_key_file_set_boolean  (kf, "behavior",   "hide_if_empty",      rp->hide_if_empty);
     g_key_file_set_boolean  (kf, "behavior",   "hide_if_only_other", rp->hide_if_only_other);
     g_key_file_set_boolean  (kf, "behavior",   "notify_new_device",  rp->notify_new_device);
+    g_key_file_set_boolean  (kf, "behavior",   "show_input",         rp->show_input);
+    g_key_file_set_boolean  (kf, "notify",     "drives",             rp->notify_drives);
+    for (gsize i = 0; i < G_N_ELEMENTS (NOTIFY_TYPES); i++)
+        g_key_file_set_boolean (kf, "notify", NOTIFY_TYPES[i].key,
+                                rp->notify_type[NOTIFY_TYPES[i].type]);
 
     if (!g_key_file_save_to_file (kf, path, &err)) {
         g_warning ("xfce-removable-plugin: no se pudo guardar config: %s", err->message);
@@ -218,6 +271,19 @@ save_config (RemovablePlugin *rp)
 
     g_key_file_free (kf);
     g_free (path);
+}
+
+/* ---------- escaneo ---------- */
+
+/* ud_scan + lo que el usuario eligió ver. Usarla siempre en vez de ud_scan
+   (popup.c hace lo mismo con el dato "show-input" de su ventana). */
+static UdScan *
+plugin_scan (RemovablePlugin *rp)
+{
+    UdScan *scan = ud_scan (rp->conn);
+    if (!rp->show_input)
+        ud_scan_drop_usb_type (scan, UD_USB_INPUT);
+    return scan;
 }
 
 /* ---------- visibilidad del botón ---------- */
@@ -245,7 +311,7 @@ apply_button_visibility (RemovablePlugin *rp, const UdScan *scan)
 static void
 plugin_update_button_visibility (RemovablePlugin *rp)
 {
-    UdScan *scan = ud_scan (rp->conn);
+    UdScan *scan = plugin_scan (rp);
     apply_button_visibility (rp, scan);
     ud_scan_free (scan);
 }
@@ -295,6 +361,14 @@ notify_simple (const gchar *summary, const gchar *body, const gchar *icon)
     notify_notification_set_timeout (n, NOTIFY_EXPIRES_DEFAULT);
     notify_notification_show (n, NULL);
     g_object_unref (n);
+}
+
+/* ¿se notifica este tipo de "Other devices"? (los snapshots guardan el tipo
+   como entero: validar el rango por si viene de una versión con más tipos) */
+static gboolean
+notify_usb_type (RemovablePlugin *rp, UdUsbType type)
+{
+    return type > UD_USB_OTHER && type < UD_USB_N_TYPES && rp->notify_type[type];
 }
 
 /* construye las tablas con el estado actual y, si silent==FALSE, notifica
@@ -364,8 +438,10 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
         GHashTableIter it;
         gpointer key, value;
 
+        /* las tablas se actualizan igual al final aunque una categoría esté
+           silenciada: así reactivarla no notifica lo que ya estaba enchufado */
         g_hash_table_iter_init (&it, new_storage);
-        while (g_hash_table_iter_next (&it, &key, &value)) {
+        while (rp->notify_drives && g_hash_table_iter_next (&it, &key, &value)) {
             if (!rp->seen_storage || !g_hash_table_contains (rp->seen_storage, key)) {
                 gchar **parts = g_strsplit ((const gchar *) value, "|", 2);
                 guint64 size  = parts[1] ? g_ascii_strtoull (parts[1], NULL, 10) : 0;
@@ -383,8 +459,8 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
                 gchar   **parts = g_strsplit ((const gchar *) value, "|", 2);
                 UdUsbType type  = parts[1] ? (UdUsbType) g_ascii_strtoll (parts[1], NULL, 10)
                                            : UD_USB_OTHER;
-                /* sin categoría: se lista en el popup pero no se notifica */
-                if (type == UD_USB_OTHER) { g_strfreev (parts); continue; }
+                /* sin categoría (o silenciada): se lista pero no se notifica */
+                if (!notify_usb_type (rp, type)) { g_strfreev (parts); continue; }
                 gchar    *body  = g_strdup_printf ("%s — %s",
                                                    (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
                                                    _(ud_usb_type_label (type)));
@@ -394,7 +470,7 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
         }
 
         g_hash_table_iter_init (&it, new_phones);
-        while (g_hash_table_iter_next (&it, &key, &value)) {
+        while (rp->notify_type[UD_USB_PHONE] && g_hash_table_iter_next (&it, &key, &value)) {
             if (!rp->seen_phones || !g_hash_table_contains (rp->seen_phones, key))
                 notify_simple (_("Phone or camera connected"),
                                *(const gchar *) value ? (const gchar *) value : _("Unknown"),
@@ -402,7 +478,7 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
         }
 
         /* desenchufado: en seen pero no en new */
-        if (rp->seen_phones) {
+        if (rp->seen_phones && rp->notify_type[UD_USB_PHONE]) {
             g_hash_table_iter_init (&it, rp->seen_phones);
             while (g_hash_table_iter_next (&it, &key, &value)) {
                 if (!g_hash_table_contains (new_phones, key))
@@ -411,7 +487,7 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
                                    "phone");
             }
         }
-        if (rp->seen_storage) {
+        if (rp->seen_storage && rp->notify_drives) {
             g_hash_table_iter_init (&it, rp->seen_storage);
             while (g_hash_table_iter_next (&it, &key, &value)) {
                 if (!g_hash_table_contains (new_storage, key)) {
@@ -430,7 +506,7 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
                     gchar   **parts = g_strsplit ((const gchar *) value, "|", 2);
                     UdUsbType type  = parts[1] ? (UdUsbType) g_ascii_strtoll (parts[1], NULL, 10)
                                                : UD_USB_OTHER;
-                    if (type == UD_USB_OTHER) { g_strfreev (parts); continue; }
+                    if (!notify_usb_type (rp, type)) { g_strfreev (parts); continue; }
                     notify_simple (_("USB device disconnected"),
                                    (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
                                    ud_usb_type_icon (type));
@@ -454,7 +530,7 @@ static void
 plugin_on_device_change (RemovablePlugin *rp)
 {
     /* un solo escaneo por refresco, compartido por snapshots, botón y popup */
-    UdScan *scan = ud_scan (rp->conn);
+    UdScan *scan = plugin_scan (rp);
 
     update_snapshots (rp, scan, FALSE);
     apply_button_visibility (rp, scan);
@@ -474,11 +550,30 @@ typedef struct {
     GtkWidget       *icon_spin;
     GtkWidget       *popup_width_spin;
     GtkWidget       *popup_height_spin;
+    GtkWidget       *popup_style_combo;
     GtkWidget       *notify_check;
     GtkWidget       *hide_check;
     GtkWidget       *hide_other_check;
     GtkWidget       *notify_new_check;
+    GtkWidget       *show_input_check;
+    GtkWidget       *notify_about_label;
+    GtkWidget       *notify_drives_check;
+    GtkWidget       *notify_type_check[UD_USB_N_TYPES];   /* NULL si no hay casilla */
 } PropsDialog;
+
+/* las casillas por categoría solo valen con las notificaciones de conexión
+   activadas; la de teclados y mouses, además, solo si se muestran */
+static void
+props_update_notify_sensitivity (PropsDialog *pd)
+{
+    gboolean on = pd->rp->notify_new_device;
+    gtk_widget_set_sensitive (pd->notify_about_label,  on);
+    gtk_widget_set_sensitive (pd->notify_drives_check, on);
+    for (gint t = 0; t < UD_USB_N_TYPES; t++)
+        if (pd->notify_type_check[t])
+            gtk_widget_set_sensitive (pd->notify_type_check[t],
+                                      on && (t != UD_USB_INPUT || pd->rp->show_input));
+}
 
 static void
 on_square_toggled (GtkToggleButton *btn, PropsDialog *pd)
@@ -522,6 +617,14 @@ on_popup_width_changed (GtkSpinButton *spin, PropsDialog *pd)
 }
 
 static void
+on_popup_style_changed (GtkComboBox *combo, PropsDialog *pd)
+{
+    pd->rp->popup_style = gtk_combo_box_get_active (combo);
+    save_config (pd->rp);
+    popup_set_style (pd->rp->popup, pd->rp->popup_style);   /* vale desde la próxima apertura */
+}
+
+static void
 on_popup_height_changed (GtkSpinButton *spin, PropsDialog *pd)
 {
     pd->rp->popup_height = gtk_spin_button_get_value_as_int (spin);
@@ -559,6 +662,41 @@ on_notify_new_toggled (GtkToggleButton *btn, PropsDialog *pd)
 {
     pd->rp->notify_new_device = gtk_toggle_button_get_active (btn);
     save_config (pd->rp);
+    props_update_notify_sensitivity (pd);
+}
+
+static void
+on_show_input_toggled (GtkToggleButton *btn, PropsDialog *pd)
+{
+    RemovablePlugin *rp = pd->rp;
+
+    rp->show_input = gtk_toggle_button_get_active (btn);
+    save_config (rp);
+    g_object_set_data (G_OBJECT (rp->popup->window), "show-input",
+                       GINT_TO_POINTER (rp->show_input));
+    props_update_notify_sensitivity (pd);
+
+    /* tomar la foto nueva en silencio: si no, el próximo refresco notificaría
+       como "conectados" (o "desconectados") los teclados que ya estaban */
+    UdScan *scan = plugin_scan (rp);
+    update_snapshots (rp, scan, TRUE);
+    apply_button_visibility (rp, scan);
+    ud_scan_free (scan);
+}
+
+static void
+on_notify_drives_toggled (GtkToggleButton *btn, PropsDialog *pd)
+{
+    pd->rp->notify_drives = gtk_toggle_button_get_active (btn);
+    save_config (pd->rp);
+}
+
+static void
+on_notify_type_toggled (GtkToggleButton *btn, PropsDialog *pd)
+{
+    gint t = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (btn), "notify-type"));
+    pd->rp->notify_type[t] = gtk_toggle_button_get_active (btn);
+    save_config (pd->rp);
 }
 
 static void
@@ -578,6 +716,10 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     PropsDialog *pd = g_new0 (PropsDialog, 1);
     pd->rp = rp;
 
+    /* SIN padre a propósito (NULL): en Wayland el panel es una capa
+       (layer-shell) y con él como padre GTK ubica mal las ventanitas del
+       diálogo; la lista desplegable de "Estilo" saldría en una esquina de la
+       pantalla. No "arreglarlo" poniendo el panel como padre. */
     GtkWidget *dialog = gtk_dialog_new_with_buttons (
         _("Properties — Removable Devices"),
         NULL,
@@ -649,6 +791,21 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     gtk_spin_button_set_value (GTK_SPIN_BUTTON (pd->popup_height_spin), rp->popup_height);
     gtk_grid_attach (GTK_GRID (grid_ap), popup_height_label,   0, row, 1, 1);
     gtk_grid_attach (GTK_GRID (grid_ap), pd->popup_height_spin, 1, row, 1, 1);
+    row++;
+
+    /* estilo de la ventana: el orden de los textos es el de POPUP_STYLE_* */
+    GtkWidget *popup_style_label = gtk_label_new (_("Popup style:"));
+    gtk_label_set_xalign (GTK_LABEL (popup_style_label), 0.0);
+    pd->popup_style_combo = gtk_combo_box_text_new ();
+    gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (pd->popup_style_combo), _("Automatic"));
+    gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (pd->popup_style_combo), _("Floating"));
+    gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (pd->popup_style_combo), _("Attached to the panel"));
+    gtk_combo_box_set_active (GTK_COMBO_BOX (pd->popup_style_combo), rp->popup_style);
+    gtk_widget_set_tooltip_text (pd->popup_style_combo,
+        _("Automatic: floating with rounded corners when the theme and the "
+          "compositor allow it, otherwise attached to the panel."));
+    gtk_grid_attach (GTK_GRID (grid_ap), popup_style_label,     0, row, 1, 1);
+    gtk_grid_attach (GTK_GRID (grid_ap), pd->popup_style_combo, 1, row, 1, 1);
 
     gtk_box_pack_start (GTK_BOX (content), frame_ap, FALSE, FALSE, 0);
     gtk_box_pack_start (GTK_BOX (content),
@@ -684,10 +841,47 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     gtk_grid_attach (GTK_GRID (grid_bh), pd->hide_other_check, 0, row, 2, 1);
     row++;
 
+    pd->show_input_check = gtk_check_button_new_with_label (_("Show keyboards and mice"));
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->show_input_check), rp->show_input);
+    gtk_grid_attach (GTK_GRID (grid_bh), pd->show_input_check, 0, row, 2, 1);
+    row++;
+
     pd->notify_new_check = gtk_check_button_new_with_label (
         _("Notify when devices are connected or disconnected"));
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->notify_new_check), rp->notify_new_device);
     gtk_grid_attach (GTK_GRID (grid_bh), pd->notify_new_check, 0, row, 2, 1);
+    row++;
+
+    /* por categoría, en dos columnas (reusa los nombres de tipo ya traducidos) */
+    pd->notify_about_label = gtk_label_new (_("Notify about:"));
+    gtk_label_set_xalign (GTK_LABEL (pd->notify_about_label), 0.0);
+    gtk_widget_set_margin_start (pd->notify_about_label, 20);
+    gtk_grid_attach (GTK_GRID (grid_bh), pd->notify_about_label, 0, row, 2, 1);
+    row++;
+
+    GtkWidget *grid_types = gtk_grid_new ();
+    gtk_grid_set_row_spacing    (GTK_GRID (grid_types), 2);
+    gtk_grid_set_column_spacing (GTK_GRID (grid_types), 12);
+    gtk_widget_set_margin_start (grid_types, 32);
+    gtk_grid_attach (GTK_GRID (grid_bh), grid_types, 0, row, 2, 1);
+
+    pd->notify_drives_check = gtk_check_button_new_with_label (_("Removable disk"));
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->notify_drives_check), rp->notify_drives);
+    gtk_grid_attach (GTK_GRID (grid_types), pd->notify_drives_check, 0, 0, 1, 1);
+    g_signal_connect (pd->notify_drives_check, "toggled",
+                      G_CALLBACK (on_notify_drives_toggled), pd);
+
+    for (gsize i = 0; i < G_N_ELEMENTS (NOTIFY_TYPES); i++) {
+        UdUsbType  t   = NOTIFY_TYPES[i].type;
+        gint       pos = (gint) i + 1;            /* 0 es "Removable disk" */
+        GtkWidget *chk = gtk_check_button_new_with_label (_(ud_usb_type_label (t)));
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (chk), rp->notify_type[t]);
+        g_object_set_data (G_OBJECT (chk), "notify-type", GINT_TO_POINTER (t));
+        gtk_grid_attach (GTK_GRID (grid_types), chk, pos % 2, pos / 2, 1, 1);
+        g_signal_connect (chk, "toggled", G_CALLBACK (on_notify_type_toggled), pd);
+        pd->notify_type_check[t] = chk;
+    }
+    props_update_notify_sensitivity (pd);
 
     gtk_box_pack_start (GTK_BOX (content), frame_bh, FALSE, FALSE, 0);
 
@@ -698,10 +892,12 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     g_signal_connect (pd->icon_spin,         "value-changed", G_CALLBACK (on_icon_size_changed),    pd);
     g_signal_connect (pd->popup_width_spin,  "value-changed", G_CALLBACK (on_popup_width_changed),  pd);
     g_signal_connect (pd->popup_height_spin, "value-changed", G_CALLBACK (on_popup_height_changed), pd);
+    g_signal_connect (pd->popup_style_combo, "changed",       G_CALLBACK (on_popup_style_changed),  pd);
     g_signal_connect (pd->notify_check,      "toggled",       G_CALLBACK (on_notify_toggled),       pd);
     g_signal_connect (pd->hide_check,        "toggled",       G_CALLBACK (on_hide_toggled),         pd);
     g_signal_connect (pd->hide_other_check,  "toggled",       G_CALLBACK (on_hide_other_toggled),   pd);
     g_signal_connect (pd->notify_new_check,  "toggled",       G_CALLBACK (on_notify_new_toggled),   pd);
+    g_signal_connect (pd->show_input_check,  "toggled",       G_CALLBACK (on_show_input_toggled),   pd);
     g_signal_connect (dialog, "destroy",                      G_CALLBACK (on_props_dialog_destroy), pd);
 
     xfce_panel_plugin_block_menu (plugin);
@@ -838,9 +1034,12 @@ removable_plugin_construct (XfcePanelPlugin *plugin)
     rp->popup = popup_create (plugin, rp->button);
     popup_set_notify      (rp->popup, rp->show_notify);
     popup_set_first_run_hint (rp->popup, rp->first_run && rp->hide_if_empty);
+    popup_set_style       (rp->popup, rp->popup_style);
 
     g_object_set_data (G_OBJECT (rp->popup->window), "closed-cb",   (gpointer) on_popup_closed);
     g_object_set_data (G_OBJECT (rp->popup->window), "closed-data",  rp);
+    g_object_set_data (G_OBJECT (rp->popup->window), "show-input",
+                       GINT_TO_POINTER (rp->show_input));
 
     g_signal_connect (rp->button, "clicked",
                       G_CALLBACK (plugin_popup_toggle), rp);
@@ -851,7 +1050,7 @@ removable_plugin_construct (XfcePanelPlugin *plugin)
 
     /* snapshot inicial silencioso para no notificar lo ya enchufado */
     {
-        UdScan *scan = ud_scan (rp->conn);
+        UdScan *scan = plugin_scan (rp);
         update_snapshots (rp, scan, TRUE);
         apply_button_visibility (rp, scan);
 

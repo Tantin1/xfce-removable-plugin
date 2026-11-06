@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 22:26+0000\n"
+"POT-Creation-Date: 2026-11-01 13:48+0000\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,24 @@ msgstr "%s boş, toplam %s"
 msgid "Also hide when only other devices are present"
 msgstr "Yalnızca diğer aygıtlar varsa da gizle"
 
+msgid "Android phone"
+msgstr "Android telefon"
+
 #. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "Görünüm"
 
+msgid "Attached to the panel"
+msgstr "Panele bitişik"
+
 msgid "Audio device"
 msgstr "Ses aygıtı"
+
+msgid "Automatic"
+msgstr "Otomatik"
+
+msgid "Automatic: floating with rounded corners when the theme and the compositor allow it, otherwise attached to the panel."
+msgstr "Otomatik: tema ve birleştirici izin verdiğinde köşeleri yuvarlatılmış yüzen pencere, aksi hâlde panele bitişik."
 
 #. ---- frame Comportamiento ----
 msgid "Behavior"
@@ -63,6 +75,12 @@ msgstr "Çıkarma başarısız"
 msgid "Ejecting…"
 msgstr "Çıkarılıyor…"
 
+msgid "File transfer is off"
+msgstr "Dosya aktarımı kapalı"
+
+msgid "Floating"
+msgstr "Yüzen"
+
 msgid "Gamepad / Joystick"
 msgstr "Oyun kumandası / Joystick"
 
@@ -75,6 +93,9 @@ msgstr "Çıkarılabilir aygıt yokken düğmeyi gizle"
 #. tamaño del ícono
 msgid "Icon size:"
 msgstr "Simge boyutu:"
+
+msgid "Keyboard / Mouse"
+msgstr "Klavye / fare"
 
 msgid "MIDI device"
 msgstr "MIDI aygıtı"
@@ -91,11 +112,20 @@ msgstr "Bağlama başarısız"
 msgid "Mounting…"
 msgstr "Bağlanıyor…"
 
+msgid "No driver: games may not detect it"
+msgstr "Sürücü yok: oyunlar algılamayabilir"
+
 msgid "No removable devices"
 msgstr "Çıkarılabilir aygıt yok"
 
+msgid "No system driver has taken this controller, so most games will not detect it (Steam can still use it). A common cause is a package that blocks the xpad driver, such as xone."
+msgstr "Bu denetleyiciyi hiçbir sistem sürücüsü üstlenmedi, bu yüzden çoğu oyun onu algılamayacak (Steam yine de kullanabilir). Yaygın bir neden, xpad sürücüsünü engelleyen bir pakettir; örneğin xone."
+
 msgid "Not authorized to perform this operation."
 msgstr "Bu işlemi gerçekleştirme yetkiniz yok."
+
+msgid "Notify about:"
+msgstr "Bildirilecekler:"
 
 msgid "Notify when devices are connected or disconnected"
 msgstr "Aygıtlar bağlandığında veya çıkarıldığında bildir"
@@ -135,6 +165,10 @@ msgstr "Eklenti boyutu:"
 msgid "Popup height:"
 msgstr "Açılır pencere yüksekliği:"
 
+#. estilo de la ventana: el orden de los textos es el de POPUP_STYLE_*
+msgid "Popup style:"
+msgstr "Pencere biçemi:"
+
 #. ancho del popup
 msgid "Popup width:"
 msgstr "Açılır pencere genişliği:"
@@ -172,11 +206,17 @@ msgstr "Aygıtı güvenle çıkarabilirsiniz."
 msgid "Safely remove"
 msgstr "Güvenle kaldır"
 
+msgid "Scanner"
+msgstr "Tarayıcı"
+
 msgid "Security key / Smart card"
 msgstr "Güvenlik anahtarı / Akıllı kart"
 
 msgid "Serial device / Board"
 msgstr "Seri aygıt / Kart"
+
+msgid "Show keyboards and mice"
+msgstr "Klavyeleri ve fareleri göster"
 
 msgid "Show notifications"
 msgstr "Bildirimleri göster"
@@ -190,6 +230,9 @@ msgstr "Aygıt başka bir uygulama tarafından kullanılıyor. Üzerinde açık 
 
 msgid "The partitions were unmounted, but the drive could not be ejected."
 msgstr "Bölümler ayrıldı, ancak sürücü çıkarılamadı."
+
+msgid "The phone is connected only for charging or USB debugging. To see its files, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "Telefon yalnızca şarj veya USB hata ayıklama için bağlı. Dosyalarını görmek için kilidini açın ve USB bildiriminde \"Dosya aktarımı\"nı seçin."
 
 msgid "This button hides when nothing is connected and reappears when you connect a device."
 msgstr "Bu düğme hiçbir şey bağlı değilken gizlenir ve bir aygıt bağladığınızda yeniden görünür."

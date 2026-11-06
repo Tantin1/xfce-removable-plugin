@@ -383,8 +383,13 @@ ud_subscribe (GDBusConnection *conn,
     sd->callback  = callback;
     sd->user_data = user_data;
 
-    /* monitor de uevents para detectar USB no-almacenamiento */
-    const gchar *subsystems[] = { "usb", NULL };
+    /* monitor de uevents para detectar USB no-almacenamiento.
+       "input" y "hidraw" no aportan aparatos nuevos, solo reinician el
+       debounce: las marcas de udev (ID_INPUT_JOYSTICK, ID_SECURITY_TOKEN…)
+       llegan en los hijos DESPUÉS del último evento "usb", cuando el driver
+       terminó y udev corrió sus reglas. Sin esto, si el escaneo llegaba antes,
+       un mando quedaba como "de fabricante" (oculto) hasta el próximo evento. */
+    const gchar *subsystems[] = { "usb", "input", "hidraw", NULL };
     sd->udev_client = g_udev_client_new (subsystems);
     g_signal_connect (sd->udev_client, "uevent",
                       G_CALLBACK (on_udev_uevent), sd);
@@ -454,6 +459,9 @@ ud_usb_type_label (UdUsbType type)
     case UD_USB_SERIAL:   return N_("Serial device / Board");
     case UD_USB_SECURITY: return N_("Security key / Smart card");
     case UD_USB_MIDI:     return N_("MIDI device");
+    case UD_USB_INPUT:    return N_("Keyboard / Mouse");
+    case UD_USB_ANDROID:  return N_("Android phone");
+    case UD_USB_SCANNER:  return N_("Scanner");
     case UD_USB_OTHER:
     default:              return N_("USB device");
     }
@@ -472,6 +480,9 @@ ud_usb_type_icon (UdUsbType type)
     case UD_USB_SERIAL:   return "utilities-terminal";
     case UD_USB_SECURITY: return "dialog-password";
     case UD_USB_MIDI:     return "audio-x-generic";
+    case UD_USB_INPUT:    return "input-keyboard";
+    case UD_USB_ANDROID:  return "phone";
+    case UD_USB_SCANNER:  return "scanner";
     case UD_USB_OTHER:
     default:              return "drive-removable-media";
     }
@@ -563,7 +574,27 @@ typedef struct {
     gboolean cdc_acm;        /* 02/02: módem / serie (Arduino) */
     gboolean serial_driver;  /* cdc_acm, ftdi_sio, ch341, cp210x, pl2303… */
     gboolean unknown_std;    /* alguna clase estándar sin categoría propia */
+    gboolean xbox_pad;       /* ff/5d/01, ff/5d/81 (XInput) o ff/47/d0 (GIP) */
+    gboolean xbox_pad_bound; /* alguna de esas interfaces tiene driver (xpad, xone,
+                                o "usbfs" si la tomó Steam: también cuenta) */
+    gboolean adb;            /* ff/42/01: Android con depuración USB */
 } UsbIfaces;
+
+/* Firma de interfaz de los mandos de Xbox y de los que los emulan (casi todos
+   los genéricos en modo PC: GameSir, 8BitDo, PowerA…). Es la misma que usa el
+   driver xpad para tomarlos, así que vale aunque xpad no esté cargado
+   (p. ej. el paquete xone lo bloquea) o no haya terminado: en ese caso udev
+   no pone ID_INPUT_JOYSTICK y la interfaz HID extra del mando lo hacía pasar
+   por teclado/mouse. */
+static gboolean
+is_xbox_pad_iface (const gchar *cls, const gchar *sub, const gchar *proto)
+{
+    if (g_strcmp0 (cls, "ff") != 0)
+        return FALSE;
+    return (!g_strcmp0 (sub, "5d") && (!g_strcmp0 (proto, "01") ||    /* Xbox 360 con cable */
+                                       !g_strcmp0 (proto, "81"))) ||  /* receptor inalámbrico 360 */
+           (!g_strcmp0 (sub, "47") && !g_strcmp0 (proto, "d0"));     /* Xbox One / Series (GIP) */
+}
 
 static gboolean
 is_serial_driver (const gchar *drv)
@@ -599,8 +630,9 @@ read_interfaces (const gchar *sysfs_path, UsbIfaces *f)
         gchar *cls = read_sysfs_line (sysfs_path, entry, "bInterfaceClass");
         if (!cls)
             continue;                       /* no es una interfaz */
-        gchar *sub  = read_sysfs_line (sysfs_path, entry, "bInterfaceSubClass");
-        gchar *link = g_build_filename (sysfs_path, entry, "driver", NULL);
+        gchar *sub   = read_sysfs_line (sysfs_path, entry, "bInterfaceSubClass");
+        gchar *proto = read_sysfs_line (sysfs_path, entry, "bInterfaceProtocol");
+        gchar *link  = g_build_filename (sysfs_path, entry, "driver", NULL);
         gchar *tgt  = g_file_read_link (link, NULL);
         gchar *drv  = tgt ? g_path_get_basename (tgt) : NULL;
 
@@ -626,6 +658,13 @@ read_interfaces (const gchar *sysfs_path, UsbIfaces *f)
         else
             f->unknown_std = TRUE;
 
+        if (!g_strcmp0 (cls, "ff") && !g_strcmp0 (sub, "42") && !g_strcmp0 (proto, "01"))
+            f->adb = TRUE;
+        if (is_xbox_pad_iface (cls, sub, proto)) {
+            f->xbox_pad = TRUE;
+            if (drv)
+                f->xbox_pad_bound = TRUE;
+        }
         if (is_serial_driver (drv))
             f->serial_driver = TRUE;
         /* almacenamiento: a veces la interfaz es ff con usb-storage/uas */
@@ -635,6 +674,7 @@ read_interfaces (const gchar *sysfs_path, UsbIfaces *f)
         g_free (drv);
         g_free (tgt);
         g_free (link);
+        g_free (proto);
         g_free (sub);
         g_free (cls);
     }
@@ -644,18 +684,27 @@ read_interfaces (const gchar *sysfs_path, UsbIfaces *f)
 /* devuelve TRUE y el tipo si el aparato va en "Otros dispositivos".
    El orden importa: cada regla solo mira lo que no resolvieron las anteriores. */
 static gboolean
-classify_usb (const UsbIfaces *f, guint ch, gboolean mtp, UdUsbType *type)
+classify_usb (const UsbIfaces *f, guint ch, gboolean mtp, gboolean sane, UdUsbType *type)
 {
     /* lo que el usuario enchufa a propósito, de lo más específico a lo menos */
     if (f->image || mtp)              { *type = UD_USB_PHONE;    return TRUE; }
-    if (ch & CH_JOYSTICK)             { *type = UD_USB_GAMEPAD;  return TRUE; }  /* antes que audio: DualSense */
+    /* antes que audio (DualSense) y que teclado/mouse (la interfaz HID extra
+       de los mandos XInput genéricos); la firma vale sin driver cargado */
+    if ((ch & CH_JOYSTICK) || f->xbox_pad)
+                                      { *type = UD_USB_GAMEPAD;  return TRUE; }
     if (ch & CH_TABLET)               { *type = UD_USB_TABLET;   return TRUE; }  /* antes que mouse: Wacom */
     if ((ch & CH_SECURITY) || f->smartcard)
                                       { *type = UD_USB_SECURITY; return TRUE; }
     if (f->printer)                   { *type = UD_USB_PRINTER;  return TRUE; }
+    /* después de impresora: una multifunción se muestra como impresora */
+    if (sane)                         { *type = UD_USB_SCANNER;  return TRUE; }
     if (f->video)                     { *type = UD_USB_CAMERA;   return TRUE; }  /* antes que audio: micrófono de la webcam */
     if (f->audio_stream)              { *type = UD_USB_AUDIO;    return TRUE; }
     if (f->midi)                      { *type = UD_USB_MIDI;     return TRUE; }
+    /* Android sin MTP (con MTP ya salió por la regla 1). Antes que red: con
+       anclaje USB el teléfono también es una placa de red, pero lo que el
+       usuario enchufó es un teléfono */
+    if (f->adb)                       { *type = UD_USB_ANDROID;  return TRUE; }
 
     /* van en otros plugins (red, Bluetooth) o en la sección principal */
     if ((ch & (CH_NET | CH_BT)) || f->bt)
@@ -665,7 +714,9 @@ classify_usb (const UsbIfaces *f, guint ch, gboolean mtp, UdUsbType *type)
     if ((ch & CH_TTY) || f->serial_driver || f->cdc_acm)
                                       { *type = UD_USB_SERIAL;   return TRUE; }
 
-    if (ch & CH_KBMOUSE)              return FALSE;   /* teclados, mouses, receptores */
+    /* teclados, mouses, receptores: se devuelven siempre; quien llama los quita
+       con ud_scan_drop_usb_type() si el usuario no pidió verlos */
+    if (ch & CH_KBMOUSE)              { *type = UD_USB_INPUT;    return TRUE; }
     if (f->storage)                   return FALSE;   /* ya está en la sección principal */
 
     /* sin categoría: solo si tiene alguna clase estándar reconocible. HID puro
@@ -734,13 +785,20 @@ ud_get_usb_devices (void)
         read_interfaces (sysfs_path, &f);
         guint    ch  = GPOINTER_TO_UINT (g_hash_table_lookup (flags, sysfs_path));
         gboolean mtp = g_udev_device_get_property_as_boolean (dev, "ID_MTP_DEVICE");
+        /* las reglas de SANE ponen "yes", que get_property_as_boolean no acepta */
+        gboolean sane = !g_strcmp0 (g_udev_device_get_property (dev, "libsane_matched"), "yes");
 
-        if (classify_usb (&f, ch, mtp, &type)) {
+        if (classify_usb (&f, ch, mtp, sane, &type)) {
             UdUsbDevice *ud = g_new0 (UdUsbDevice, 1);
             ud->name    = usb_display_name (dev);
             ud->type    = type;
             ud->syspath = g_strdup (sysfs_path);
             ud->devfile = g_strdup (g_udev_device_get_device_file (dev));
+            /* Si el escaneo llega mientras xpad todavía se engancha, el aviso
+               dura un instante: cuando termina, el evento "input" que crea
+               vuelve a escanear y lo quita. */
+            ud->no_driver = (type == UD_USB_GAMEPAD && f.xbox_pad &&
+                             !f.xbox_pad_bound && !(ch & CH_JOYSTICK));
             result = g_slist_append (result, ud);
         }
         g_object_unref (dev);
@@ -752,15 +810,32 @@ ud_get_usb_devices (void)
     return result;
 }
 
+static void
+usb_device_free (UdUsbDevice *dev)
+{
+    g_free (dev->name);
+    g_free (dev->syspath);
+    g_free (dev->devfile);
+    g_free (dev);
+}
+
 void
 ud_usb_device_list_free (GSList *list)
 {
-    for (GSList *l = list; l; l = l->next) {
-        UdUsbDevice *dev = l->data;
-        g_free (dev->name);
-        g_free (dev->syspath);
-        g_free (dev->devfile);
-        g_free (dev);
+    g_slist_free_full (list, (GDestroyNotify) usb_device_free);
+}
+
+void
+ud_scan_drop_usb_type (UdScan *scan, UdUsbType type)
+{
+    GSList *l = scan ? scan->usb : NULL;
+    while (l) {
+        GSList      *next = l->next;
+        UdUsbDevice *dev  = l->data;
+        if (dev->type == type) {
+            scan->usb = g_slist_delete_link (scan->usb, l);
+            usb_device_free (dev);
+        }
+        l = next;
     }
-    g_slist_free (list);
 }

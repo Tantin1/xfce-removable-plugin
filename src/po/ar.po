@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 22:26+0000\n"
+"POT-Creation-Date: 2026-11-01 13:48+0000\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,24 @@ msgstr "%s متاح من %s"
 msgid "Also hide when only other devices are present"
 msgstr "إخفاء أيضاً عند وجود أجهزة أخرى فقط"
 
+msgid "Android phone"
+msgstr "هاتف Android"
+
 #. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "المظهر"
 
+msgid "Attached to the panel"
+msgstr "ملتصقة باللوحة"
+
 msgid "Audio device"
 msgstr "جهاز صوت"
+
+msgid "Automatic"
+msgstr "تلقائي"
+
+msgid "Automatic: floating with rounded corners when the theme and the compositor allow it, otherwise attached to the panel."
+msgstr "تلقائي: عائمة بزوايا مستديرة عندما تسمح السمة والمُركِّب بذلك، وإلا فملتصقة باللوحة."
 
 #. ---- frame Comportamiento ----
 msgid "Behavior"
@@ -63,6 +75,12 @@ msgstr "فشل الإخراج"
 msgid "Ejecting…"
 msgstr "جارٍ الإخراج…"
 
+msgid "File transfer is off"
+msgstr "نقل الملفات متوقف"
+
+msgid "Floating"
+msgstr "عائمة"
+
 msgid "Gamepad / Joystick"
 msgstr "ذراع ألعاب / عصا تحكم"
 
@@ -75,6 +93,9 @@ msgstr "إخفاء الزر عند عدم وجود أجهزة قابلة للإ�
 #. tamaño del ícono
 msgid "Icon size:"
 msgstr "حجم الأيقونة:"
+
+msgid "Keyboard / Mouse"
+msgstr "لوحة مفاتيح / فأرة"
 
 msgid "MIDI device"
 msgstr "جهاز MIDI"
@@ -91,11 +112,20 @@ msgstr "فشل التحميل"
 msgid "Mounting…"
 msgstr "جارٍ التحميل…"
 
+msgid "No driver: games may not detect it"
+msgstr "لا يوجد تعريف: قد لا تتعرّف عليها الألعاب"
+
 msgid "No removable devices"
 msgstr "لا توجد أجهزة قابلة للإزالة"
 
+msgid "No system driver has taken this controller, so most games will not detect it (Steam can still use it). A common cause is a package that blocks the xpad driver, such as xone."
+msgstr "لم يتولَّ أي تعريف في النظام هذه الذراع، لذا لن تتعرّف عليها معظم الألعاب (يمكن لـ Steam استخدامها مع ذلك). من الأسباب الشائعة حزمة تحظر تعريف xpad، مثل xone."
+
 msgid "Not authorized to perform this operation."
 msgstr "غير مصرح لك بتنفيذ هذه العملية."
+
+msgid "Notify about:"
+msgstr "الإشعار عن:"
 
 msgid "Notify when devices are connected or disconnected"
 msgstr "إشعار عند توصيل أو فصل الأجهزة"
@@ -135,6 +165,10 @@ msgstr "حجم الإضافة:"
 msgid "Popup height:"
 msgstr "ارتفاع النافذة المنبثقة:"
 
+#. estilo de la ventana: el orden de los textos es el de POPUP_STYLE_*
+msgid "Popup style:"
+msgstr "نمط النافذة:"
+
 #. ancho del popup
 msgid "Popup width:"
 msgstr "عرض النافذة المنبثقة:"
@@ -172,11 +206,17 @@ msgstr "يمكنك الآن فصل الجهاز."
 msgid "Safely remove"
 msgstr "إزالة آمنة"
 
+msgid "Scanner"
+msgstr "ماسح ضوئي"
+
 msgid "Security key / Smart card"
 msgstr "مفتاح أمان / بطاقة ذكية"
 
 msgid "Serial device / Board"
 msgstr "جهاز تسلسلي / لوحة"
+
+msgid "Show keyboards and mice"
+msgstr "إظهار لوحات المفاتيح والفئران"
 
 msgid "Show notifications"
 msgstr "إظهار الإشعارات"
@@ -190,6 +230,9 @@ msgstr "الجهاز قيد الاستخدام من قبل تطبيق آخر. أ
 
 msgid "The partitions were unmounted, but the drive could not be ejected."
 msgstr "تم إلغاء تحميل الأقسام، لكن تعذّر إخراج القرص."
+
+msgid "The phone is connected only for charging or USB debugging. To see its files, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "الهاتف متصل للشحن أو لتصحيح أخطاء USB فقط. لرؤية ملفاته، افتح قفله واختر «نقل الملفات» في إشعار USB الخاص به."
 
 msgid "This button hides when nothing is connected and reappears when you connect a device."
 msgstr "يختفي هذا الزر عندما لا يكون أي جهاز متصلاً ويظهر مجدداً عند توصيل جهاز."

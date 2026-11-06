@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 22:26+0000\n"
+"POT-Creation-Date: 2026-11-01 13:48+0000\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,24 @@ msgstr "%s 可用，共 %s"
 msgid "Also hide when only other devices are present"
 msgstr "仅有其他设备时也隐藏"
 
+msgid "Android phone"
+msgstr "Android 手机"
+
 #. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "外观"
 
+msgid "Attached to the panel"
+msgstr "贴靠面板"
+
 msgid "Audio device"
 msgstr "音频设备"
+
+msgid "Automatic"
+msgstr "自动"
+
+msgid "Automatic: floating with rounded corners when the theme and the compositor allow it, otherwise attached to the panel."
+msgstr "自动：主题和合成器支持时浮动并显示圆角，否则贴靠面板。"
 
 #. ---- frame Comportamiento ----
 msgid "Behavior"
@@ -63,6 +75,12 @@ msgstr "弹出失败"
 msgid "Ejecting…"
 msgstr "正在弹出…"
 
+msgid "File transfer is off"
+msgstr "文件传输未开启"
+
+msgid "Floating"
+msgstr "浮动"
+
 msgid "Gamepad / Joystick"
 msgstr "游戏手柄 / 摇杆"
 
@@ -75,6 +93,9 @@ msgstr "没有可移动设备时隐藏按钮"
 #. tamaño del ícono
 msgid "Icon size:"
 msgstr "图标大小："
+
+msgid "Keyboard / Mouse"
+msgstr "键盘 / 鼠标"
 
 msgid "MIDI device"
 msgstr "MIDI 设备"
@@ -91,11 +112,20 @@ msgstr "挂载失败"
 msgid "Mounting…"
 msgstr "正在挂载…"
 
+msgid "No driver: games may not detect it"
+msgstr "无驱动：游戏可能无法识别"
+
 msgid "No removable devices"
 msgstr "没有可移动设备"
 
+msgid "No system driver has taken this controller, so most games will not detect it (Steam can still use it). A common cause is a package that blocks the xpad driver, such as xone."
+msgstr "没有系统驱动接管此手柄，因此大多数游戏无法识别它（Steam 仍可使用）。常见原因是某个软件包屏蔽了 xpad 驱动，例如 xone。"
+
 msgid "Not authorized to perform this operation."
 msgstr "无权执行此操作。"
+
+msgid "Notify about:"
+msgstr "通知类型："
 
 msgid "Notify when devices are connected or disconnected"
 msgstr "设备连接或断开时通知"
@@ -135,6 +165,10 @@ msgstr "插件大小："
 msgid "Popup height:"
 msgstr "弹出窗口高度："
 
+#. estilo de la ventana: el orden de los textos es el de POPUP_STYLE_*
+msgid "Popup style:"
+msgstr "弹出窗口样式："
+
 #. ancho del popup
 msgid "Popup width:"
 msgstr "弹出窗口宽度："
@@ -172,11 +206,17 @@ msgstr "可以拔出设备。"
 msgid "Safely remove"
 msgstr "安全移除"
 
+msgid "Scanner"
+msgstr "扫描仪"
+
 msgid "Security key / Smart card"
 msgstr "安全密钥 / 智能卡"
 
 msgid "Serial device / Board"
 msgstr "串口设备 / 开发板"
+
+msgid "Show keyboards and mice"
+msgstr "显示键盘和鼠标"
 
 msgid "Show notifications"
 msgstr "显示通知"
@@ -190,6 +230,9 @@ msgstr "设备正被其他应用程序使用。请关闭其上打开的文件或
 
 msgid "The partitions were unmounted, but the drive could not be ejected."
 msgstr "分区已卸载，但无法弹出驱动器。"
+
+msgid "The phone is connected only for charging or USB debugging. To see its files, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "手机仅以充电或 USB 调试模式连接。要查看其中的文件，请解锁手机并在其 USB 通知中选择“文件传输”。"
 
 msgid "This button hides when nothing is connected and reappears when you connect a device."
 msgstr "未连接任何设备时此按钮会隐藏，连接设备后会重新出现。"

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 22:26+0000\n"
+"POT-Creation-Date: 2026-11-01 13:48+0000\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,24 @@ msgstr "%s vrij van %s"
 msgid "Also hide when only other devices are present"
 msgstr "Ook verbergen wanneer er alleen andere apparaten zijn"
 
+msgid "Android phone"
+msgstr "Android-telefoon"
+
 #. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "Uiterlijk"
 
+msgid "Attached to the panel"
+msgstr "Vast aan het paneel"
+
 msgid "Audio device"
 msgstr "Audioapparaat"
+
+msgid "Automatic"
+msgstr "Automatisch"
+
+msgid "Automatic: floating with rounded corners when the theme and the compositor allow it, otherwise attached to the panel."
+msgstr "Automatisch: zwevend met afgeronde hoeken als het thema en de compositor dat toelaten, anders vast aan het paneel."
 
 #. ---- frame Comportamiento ----
 msgid "Behavior"
@@ -63,6 +75,12 @@ msgstr "Uitwerpen mislukt"
 msgid "Ejecting…"
 msgstr "Uitwerpen…"
 
+msgid "File transfer is off"
+msgstr "Bestandsoverdracht staat uit"
+
+msgid "Floating"
+msgstr "Zwevend"
+
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
@@ -75,6 +93,9 @@ msgstr "Knop verbergen als er geen verwijderbare apparaten zijn"
 #. tamaño del ícono
 msgid "Icon size:"
 msgstr "Pictogramgrootte:"
+
+msgid "Keyboard / Mouse"
+msgstr "Toetsenbord / muis"
 
 msgid "MIDI device"
 msgstr "MIDI-apparaat"
@@ -91,11 +112,20 @@ msgstr "Koppelen mislukt"
 msgid "Mounting…"
 msgstr "Koppelen…"
 
+msgid "No driver: games may not detect it"
+msgstr "Geen stuurprogramma: games herkennen hem mogelijk niet"
+
 msgid "No removable devices"
 msgstr "Geen verwijderbare apparaten"
 
+msgid "No system driver has taken this controller, so most games will not detect it (Steam can still use it). A common cause is a package that blocks the xpad driver, such as xone."
+msgstr "Geen systeemstuurprogramma heeft deze controller overgenomen, dus de meeste games herkennen hem niet (Steam kan hem nog wel gebruiken). Een veelvoorkomende oorzaak is een pakket dat het stuurprogramma xpad blokkeert, zoals xone."
+
 msgid "Not authorized to perform this operation."
 msgstr "Niet bevoegd om deze bewerking uit te voeren."
+
+msgid "Notify about:"
+msgstr "Melden bij:"
 
 msgid "Notify when devices are connected or disconnected"
 msgstr "Melden wanneer apparaten worden aangesloten of losgekoppeld"
@@ -135,6 +165,10 @@ msgstr "Plugingrootte:"
 msgid "Popup height:"
 msgstr "Popuphoogte:"
 
+#. estilo de la ventana: el orden de los textos es el de POPUP_STYLE_*
+msgid "Popup style:"
+msgstr "Vensterstijl:"
+
 #. ancho del popup
 msgid "Popup width:"
 msgstr "Popupbreedte:"
@@ -172,11 +206,17 @@ msgstr "U kunt het apparaat nu loskoppelen."
 msgid "Safely remove"
 msgstr "Veilig verwijderen"
 
+msgid "Scanner"
+msgstr "Scanner"
+
 msgid "Security key / Smart card"
 msgstr "Beveiligingssleutel / Smartcard"
 
 msgid "Serial device / Board"
 msgstr "Serieel apparaat / Bord"
+
+msgid "Show keyboards and mice"
+msgstr "Toetsenborden en muizen tonen"
 
 msgid "Show notifications"
 msgstr "Meldingen weergeven"
@@ -190,6 +230,9 @@ msgstr "Het apparaat wordt gebruikt door een ander programma. Sluit geopende bes
 
 msgid "The partitions were unmounted, but the drive could not be ejected."
 msgstr "De partities zijn ontkoppeld, maar het station kon niet worden uitgeworpen."
+
+msgid "The phone is connected only for charging or USB debugging. To see its files, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "De telefoon is alleen verbonden om op te laden of voor USB-foutopsporing. Ontgrendel hem en kies ‘Bestandsoverdracht’ in de USB-melding om de bestanden te zien."
 
 msgid "This button hides when nothing is connected and reappears when you connect a device."
 msgstr "Deze knop wordt verborgen als er niets is aangesloten en verschijnt weer zodra u een apparaat aansluit."
