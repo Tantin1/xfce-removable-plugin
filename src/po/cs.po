@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 22:26+0000\n"
+"POT-Creation-Date: 2026-11-01 13:48+0000\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,24 @@ msgstr "%s volno z %s"
 msgid "Also hide when only other devices are present"
 msgstr "Skrýt také, pokud jsou přítomna pouze ostatní zařízení"
 
+msgid "Android phone"
+msgstr "Telefon s Androidem"
+
 #. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "Vzhled"
 
+msgid "Attached to the panel"
+msgstr "Připojené k panelu"
+
 msgid "Audio device"
 msgstr "Zvukové zařízení"
+
+msgid "Automatic"
+msgstr "Automaticky"
+
+msgid "Automatic: floating with rounded corners when the theme and the compositor allow it, otherwise attached to the panel."
+msgstr "Automaticky: plovoucí se zaoblenými rohy, pokud to motiv a kompozitor dovolí, jinak připojené k panelu."
 
 #. ---- frame Comportamiento ----
 msgid "Behavior"
@@ -63,6 +75,12 @@ msgstr "Vysunutí se nezdařilo"
 msgid "Ejecting…"
 msgstr "Vysouvání…"
 
+msgid "File transfer is off"
+msgstr "Přenos souborů je vypnutý"
+
+msgid "Floating"
+msgstr "Plovoucí"
+
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
@@ -75,6 +93,9 @@ msgstr "Skrýt tlačítko, pokud nejsou připojena žádná vyměnitelná zaří
 #. tamaño del ícono
 msgid "Icon size:"
 msgstr "Velikost ikony:"
+
+msgid "Keyboard / Mouse"
+msgstr "Klávesnice / myš"
 
 msgid "MIDI device"
 msgstr "Zařízení MIDI"
@@ -91,11 +112,20 @@ msgstr "Připojení se nezdařilo"
 msgid "Mounting…"
 msgstr "Připojování…"
 
+msgid "No driver: games may not detect it"
+msgstr "Bez ovladače: hry ho nemusí rozpoznat"
+
 msgid "No removable devices"
 msgstr "Žádná vyměnitelná zařízení"
 
+msgid "No system driver has taken this controller, so most games will not detect it (Steam can still use it). A common cause is a package that blocks the xpad driver, such as xone."
+msgstr "Tento gamepad nepřevzal žádný systémový ovladač, takže ho většina her nerozpozná (Steam ho přesto může používat). Častou příčinou je balíček, který blokuje ovladač xpad, například xone."
+
 msgid "Not authorized to perform this operation."
 msgstr "Nemáte oprávnění k provedení této operace."
+
+msgid "Notify about:"
+msgstr "Upozorňovat na:"
 
 msgid "Notify when devices are connected or disconnected"
 msgstr "Upozornit při připojení nebo odpojení zařízení"
@@ -135,6 +165,10 @@ msgstr "Velikost pluginu:"
 msgid "Popup height:"
 msgstr "Výška vyskakovacího okna:"
 
+#. estilo de la ventana: el orden de los textos es el de POPUP_STYLE_*
+msgid "Popup style:"
+msgstr "Styl okna:"
+
 #. ancho del popup
 msgid "Popup width:"
 msgstr "Šířka vyskakovacího okna:"
@@ -172,11 +206,17 @@ msgstr "Zařízení lze odpojit."
 msgid "Safely remove"
 msgstr "Bezpečně odebrat"
 
+msgid "Scanner"
+msgstr "Skener"
+
 msgid "Security key / Smart card"
 msgstr "Bezpečnostní klíč / Čipová karta"
 
 msgid "Serial device / Board"
 msgstr "Sériové zařízení / Deska"
+
+msgid "Show keyboards and mice"
+msgstr "Zobrazovat klávesnice a myši"
 
 msgid "Show notifications"
 msgstr "Zobrazovat oznámení"
@@ -190,6 +230,9 @@ msgstr "Zařízení používá jiná aplikace. Zavřete na něm otevřené soubo
 
 msgid "The partitions were unmounted, but the drive could not be ejected."
 msgstr "Oddíly byly odpojeny, ale jednotku se nepodařilo vysunout."
+
+msgid "The phone is connected only for charging or USB debugging. To see its files, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "Telefon je připojen jen pro nabíjení nebo ladění přes USB. Chcete-li vidět jeho soubory, odemkněte ho a v jeho oznámení USB zvolte „Přenos souborů“."
 
 msgid "This button hides when nothing is connected and reappears when you connect a device."
 msgstr "Toto tlačítko se skryje, když není nic připojeno, a znovu se objeví po připojení zařízení."

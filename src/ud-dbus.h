@@ -68,6 +68,12 @@ typedef enum {
     UD_USB_SERIAL,    /* placa / adaptador serie: Arduino, ESP32, FTDI, CH340… */
     UD_USB_SECURITY,  /* llave de seguridad FIDO / lector de tarjetas inteligentes */
     UD_USB_MIDI,      /* teclado / controlador MIDI */
+    UD_USB_INPUT,     /* teclado, mouse, touchpad o su receptor inalámbrico:
+                         solo se muestra si el usuario lo activa (ud_scan_drop_usb_type) */
+    UD_USB_ANDROID,   /* Android solo con depuración (ADB, ff/42/01), sin transferencia
+                         de archivos: casi siempre está en "solo carga" */
+    UD_USB_SCANNER,   /* escáner que SANE reconoce (udev: libsane_matched=yes) */
+    UD_USB_N_TYPES    /* cantidad de tipos: siempre el último */
 } UdUsbType;
 
 typedef struct {
@@ -75,6 +81,8 @@ typedef struct {
     UdUsbType  type;
     gchar     *syspath;   /* identificador único del puerto USB ocupado */
     gchar     *devfile;   /* /dev/bus/usb/BBB/DDD (para cruzar con gvfs), puede ser NULL */
+    gboolean   no_driver; /* mando reconocido por su firma que ningún driver tomó:
+                             los juegos no lo ven (aviso en la fila del popup) */
 } UdUsbDevice;
 
 GSList          *ud_get_usb_devices      (void);
@@ -119,6 +127,9 @@ typedef struct {
 
 UdScan          *ud_scan                 (GDBusConnection *conn);
 void             ud_scan_free            (UdScan *scan);
+/* quita de scan->usb los aparatos de ese tipo (p. ej. UD_USB_INPUT si el
+   usuario no pidió ver teclados y mouses) */
+void             ud_scan_drop_usb_type   (UdScan *scan, UdUsbType type);
 gboolean         ud_scan_is_empty        (const UdScan *scan);
 
 #endif /* UD_DBUS_H */

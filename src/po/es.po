@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xfce-removable-plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 22:26+0000\n"
+"POT-Creation-Date: 2026-11-01 13:48+0000\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,12 +16,24 @@ msgstr "%s libres de %s"
 msgid "Also hide when only other devices are present"
 msgstr "Ocultar también cuando solo haya otros dispositivos"
 
+msgid "Android phone"
+msgstr "Teléfono Android"
+
 #. ---- frame Apariencia ----
 msgid "Appearance"
 msgstr "Apariencia"
 
+msgid "Attached to the panel"
+msgstr "Pegada al panel"
+
 msgid "Audio device"
 msgstr "Dispositivo de audio"
+
+msgid "Automatic"
+msgstr "Automático"
+
+msgid "Automatic: floating with rounded corners when the theme and the compositor allow it, otherwise attached to the panel."
+msgstr "Automático: flotante con esquinas redondeadas cuando el tema y el compositor lo permiten; si no, pegada al panel."
 
 #. ---- frame Comportamiento ----
 msgid "Behavior"
@@ -63,6 +75,12 @@ msgstr "Error al expulsar"
 msgid "Ejecting…"
 msgstr "Expulsando…"
 
+msgid "File transfer is off"
+msgstr "Transferencia de archivos desactivada"
+
+msgid "Floating"
+msgstr "Flotante"
+
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
@@ -75,6 +93,9 @@ msgstr "Ocultar botón si no hay dispositivos extraíbles"
 #. tamaño del ícono
 msgid "Icon size:"
 msgstr "Tamaño del ícono:"
+
+msgid "Keyboard / Mouse"
+msgstr "Teclado / mouse"
 
 msgid "MIDI device"
 msgstr "Dispositivo MIDI"
@@ -91,11 +112,20 @@ msgstr "Error al montar"
 msgid "Mounting…"
 msgstr "Montando…"
 
+msgid "No driver: games may not detect it"
+msgstr "Sin driver: los juegos podrían no detectarlo"
+
 msgid "No removable devices"
 msgstr "No hay dispositivos extraíbles"
 
+msgid "No system driver has taken this controller, so most games will not detect it (Steam can still use it). A common cause is a package that blocks the xpad driver, such as xone."
+msgstr "Ningún driver del sistema tomó este mando, así que la mayoría de los juegos no lo detectará (Steam sí puede usarlo). Una causa común es un paquete que bloquea el driver xpad, como xone."
+
 msgid "Not authorized to perform this operation."
 msgstr "No tiene autorización para realizar esta operación."
+
+msgid "Notify about:"
+msgstr "Notificar sobre:"
 
 msgid "Notify when devices are connected or disconnected"
 msgstr "Notificar cuando se conecten o desconecten dispositivos"
@@ -135,6 +165,10 @@ msgstr "Tamaño del plugin:"
 msgid "Popup height:"
 msgstr "Alto del popup:"
 
+#. estilo de la ventana: el orden de los textos es el de POPUP_STYLE_*
+msgid "Popup style:"
+msgstr "Estilo de la ventana:"
+
 #. ancho del popup
 msgid "Popup width:"
 msgstr "Ancho del popup:"
@@ -172,11 +206,17 @@ msgstr "Puede desconectar el dispositivo."
 msgid "Safely remove"
 msgstr "Quitar con seguridad"
 
+msgid "Scanner"
+msgstr "Escáner"
+
 msgid "Security key / Smart card"
 msgstr "Llave de seguridad / Tarjeta inteligente"
 
 msgid "Serial device / Board"
 msgstr "Dispositivo serie / Placa"
+
+msgid "Show keyboards and mice"
+msgstr "Mostrar teclados y mouses"
 
 msgid "Show notifications"
 msgstr "Mostrar notificaciones"
@@ -190,6 +230,9 @@ msgstr "El dispositivo está en uso por otra aplicación. Cierre los archivos o 
 
 msgid "The partitions were unmounted, but the drive could not be ejected."
 msgstr "Las particiones se desmontaron, pero no se pudo expulsar la unidad."
+
+msgid "The phone is connected only for charging or USB debugging. To see its files, unlock it and choose \"File transfer\" in its USB notification."
+msgstr "El teléfono está conectado solo para cargar o para depuración USB. Para ver sus archivos, desbloquéelo y elija «Transferencia de archivos» en su notificación USB."
 
 msgid "This button hides when nothing is connected and reappears when you connect a device."
 msgstr "Este botón se oculta cuando no hay nada conectado y vuelve a aparecer al conectar un dispositivo."
