@@ -108,7 +108,10 @@ apply_config (RemovablePlugin *rp)
     /* tamaño del botón via CSS */
     {
         gchar *css;
-        gint   ps = xfce_panel_plugin_get_size (plugin);
+        /* alto de UNA fila: con el panel en 2 o más filas el plugin ocupa una
+           celda (set_small), y el tamaño del panel es el de todas juntas */
+        gint   ps = xfce_panel_plugin_get_size (plugin) /
+                    MAX (1, (gint) xfce_panel_plugin_get_nrows (plugin));
 
         if (rp->square_button)
             css = g_strdup_printf (
@@ -976,6 +979,14 @@ on_mode_changed (XfcePanelPlugin *plugin, XfcePanelPluginMode mode, RemovablePlu
 }
 
 static void
+on_nrows_changed (XfcePanelPlugin *plugin, guint rows, RemovablePlugin *rp)
+{
+    (void) plugin;
+    (void) rows;
+    apply_config (rp);
+}
+
+static void
 removable_plugin_free (XfcePanelPlugin *plugin, RemovablePlugin *rp)
 {
     (void) plugin;
@@ -1024,6 +1035,10 @@ removable_plugin_construct (XfcePanelPlugin *plugin)
     rp->icon = gtk_image_new_from_icon_name ("drive-removable-media-symbolic",
                                               GTK_ICON_SIZE_MENU);
     gtk_container_add (GTK_CONTAINER (rp->button), rp->icon);
+
+    /* "chico": con el panel en varias filas entra en una sola celda, junto a
+       otros íconos (como volumen, energía o la bandeja); con una fila no cambia nada */
+    xfce_panel_plugin_set_small (plugin, TRUE);
 
     xfce_panel_plugin_add_action_widget (plugin, rp->button);
     gtk_container_add (GTK_CONTAINER (plugin), rp->button);
@@ -1077,6 +1092,7 @@ removable_plugin_construct (XfcePanelPlugin *plugin)
     g_signal_connect (plugin, "about",            G_CALLBACK (on_about),            rp);
     g_signal_connect (plugin, "size-changed",     G_CALLBACK (on_size_changed),     rp);
     g_signal_connect (plugin, "mode-changed",     G_CALLBACK (on_mode_changed),     rp);
+    g_signal_connect (plugin, "nrows-changed",    G_CALLBACK (on_nrows_changed),    rp);
     g_signal_connect (plugin, "free-data",        G_CALLBACK (removable_plugin_free), rp);
 }
 
