@@ -1,3 +1,16 @@
+xfce-removable-plugin (1.0.4-1) unstable; urgency=medium
+
+  * El popup flota separado 6 px del panel y del borde de la pantalla
+    cuando el tema lo redondea.
+  * Nueva opción "Estilo de la ventana": Automático, Flotante o Pegada al
+    panel (el aspecto anterior).
+  * La ventana mide exactamente lo configurado en Propiedades.
+  * Separadores sin margen y ubicación al borde más cercano.
+  * Automático solo flota si el tema redondea de forma visible (6 px o más);
+    pegada al panel siempre es opaca y con esquinas rectas.
+
+ -- Juan Sebastian Perez <juanchiperez97@gmail.com>  Sun, 01 Nov 2026 12:00:00 -0300
+
 xfce-removable-plugin (1.0.3-1) unstable; urgency=medium
 
   * El popup toma del tema el fondo, el borde y las esquinas (como los

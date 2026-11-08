@@ -12,17 +12,18 @@
 # (no copiar de vuelta al repo la versión con la suma)
 
 pkgname=xfce-removable-plugin
-pkgver=1.0.3
+pkgver=1.0.4
 pkgrel=1
 pkgdesc='Xfce panel plugin for removable drives, phones and other USB devices'
 arch=('x86_64' 'aarch64')
 url='https://github.com/Tantin1/xfce-removable-plugin'
 license=('GPL-2.0-only')
-depends=('xfce4-panel' 'gtk3' 'glib2' 'libnotify' 'libgudev' 'udisks2')
+depends=('xfce4-panel' 'gtk3' 'glib2' 'libnotify' 'libgudev' 'libcanberra' 'udisks2')
 makedepends=('meson' 'gettext')
 optdepends=('gvfs-mtp: Android phones in file transfer mode'
             'gvfs-gphoto2: cameras (PTP)'
-            'gvfs-afc: iPhone / iPad')
+            'gvfs-afc: iPhone / iPad'
+            'sound-theme-freedesktop: connect and disconnect sounds')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
 sha256sums=('SKIP')
 
