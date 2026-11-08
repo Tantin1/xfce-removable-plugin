@@ -47,7 +47,8 @@ jobs:
           apt-get update
           apt-get install -y --no-install-recommends \
             build-essential debhelper meson pkgconf gettext \
-            libgtk-3-dev libxfce4panel-2.0-dev libxfce4ui-2-dev libnotify-dev libgudev-1.0-dev
+            libgtk-3-dev libxfce4panel-2.0-dev libxfce4ui-2-dev libnotify-dev libgudev-1.0-dev \
+            libcanberra-gtk3-dev
 
       - uses: actions/checkout@v4
 
@@ -81,7 +82,7 @@ jobs:
       - name: Dependencias
         run: |
           pacman -Syu --noconfirm --needed git meson gettext pacman-contrib \
-            xfce4-panel gtk3 glib2 libnotify libgudev udisks2
+            xfce4-panel gtk3 glib2 libnotify libgudev libcanberra udisks2
 
       - uses: actions/checkout@v4
 
