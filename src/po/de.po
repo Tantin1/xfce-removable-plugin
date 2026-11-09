@@ -154,6 +154,9 @@ msgstr "Telefon oder Kamera getrennt"
 msgid "Phone ready"
 msgstr "Telefon bereit"
 
+msgid "Play a sound when devices are connected or disconnected"
+msgstr "Einen Ton abspielen, wenn Geräte angeschlossen oder getrennt werden"
+
 msgid "Please wait, do not unplug."
 msgstr "Bitte warten, nicht trennen."
 
@@ -261,6 +264,9 @@ msgstr "Wird ausgehängt…"
 #. ícono del panel
 msgid "Use panel icon size"
 msgstr "Panelgröße für Symbol verwenden"
+
+msgid "Uses the desktop sound theme. Nothing plays if event sounds are turned off in the Appearance settings."
+msgstr "Verwendet das Klangthema der Arbeitsumgebung. Es ist nichts zu hören, wenn Ereignisklänge in den Erscheinungsbild-Einstellungen ausgeschaltet sind."
 
 msgid "You can now place it wherever you like: right-click → Move."
 msgstr "Sie können sie jetzt beliebig platzieren: Rechtsklick → Verschieben."

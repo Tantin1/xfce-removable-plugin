@@ -154,6 +154,9 @@ msgstr "Téléphone ou appareil photo déconnecté"
 msgid "Phone ready"
 msgstr "Téléphone prêt"
 
+msgid "Play a sound when devices are connected or disconnected"
+msgstr "Jouer un son à la connexion ou à la déconnexion d'un périphérique"
+
 msgid "Please wait, do not unplug."
 msgstr "Veuillez patienter, ne débranchez pas."
 
@@ -261,6 +264,9 @@ msgstr "Démontage…"
 #. ícono del panel
 msgid "Use panel icon size"
 msgstr "Utiliser la taille du panneau pour l'icône"
+
+msgid "Uses the desktop sound theme. Nothing plays if event sounds are turned off in the Appearance settings."
+msgstr "Utilise le thème sonore du bureau. Aucun son n'est joué si les sons d'événements sont désactivés dans les paramètres d'Apparence."
 
 msgid "You can now place it wherever you like: right-click → Move."
 msgstr "Vous pouvez maintenant le placer où vous voulez : clic droit → Déplacer."

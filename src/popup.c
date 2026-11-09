@@ -1,10 +1,10 @@
 #include "popup.h"
 #include "ud-dbus.h"
+#include "rp-notify.h"
 #include <gdk/gdk.h>
 #ifdef GDK_WINDOWING_WAYLAND
 #include <gdk/gdkwayland.h>
 #endif
-#include <libnotify/notify.h>
 #include <string.h>
 #include <sys/statvfs.h>
 
@@ -537,6 +537,7 @@ typedef struct {
     gchar           *object_path;
     gchar           *drive_path;
     gchar           *mount_point;
+    gchar           *name;         /* para la línea de estado */
     gboolean         mounted;
     GtkWidget       *btn_action;
 } RowData;
@@ -548,6 +549,7 @@ row_data_free (gpointer data)
     g_free (rd->object_path);
     g_free (rd->drive_path);
     g_free (rd->mount_point);
+    g_free (rd->name);
     g_free (rd);
 }
 
@@ -558,6 +560,7 @@ typedef struct {
     GDBusConnection *conn;
     gchar           *drive_path;
     GSList          *partitions;
+    gchar           *name;        /* nombre del disco, para la línea de estado */
     gboolean         power_off;   /* PowerOff en vez de Eject */
 } EjectData;
 
@@ -567,6 +570,7 @@ eject_data_free (gpointer data)
     EjectData *ed = data;
     g_free (ed->drive_path);
     g_slist_free_full (ed->partitions, g_free);
+    g_free (ed->name);
     g_free (ed);
 }
 
@@ -636,15 +640,117 @@ on_expand_clicked (GtkWidget *btn, GdkEventButton *event, ExpandData *ed)
     return FALSE;
 }
 
-/* ---------- notificaciones ---------- */
+/* ---------- notificaciones ----------
+ * rp_notify (rp-notify.c): una burbuja por aparato. La clave es el drive_path
+ * (discos) o UdPhone.key (teléfonos), la misma que usa plugin.c al conectar y
+ * desconectar: "conectado", "montado", "listo para quitar" y los errores del
+ * mismo aparato se reemplazan en vez de apilarse.
+ *
+ * Con el popup ABIERTO, el resultado de una operación (expulsar, desmontar,
+ * errores) no va como burbuja, que lo taparía: va en una línea de estado
+ * arriba de la lista (popup_feedback). Se decide cuando llega el resultado:
+ * si el usuario cerró el popup mientras tanto, sale la notificación. Así el
+ * aviso nunca se pierde, y también lo ve quien tiene las notificaciones
+ * apagadas o en "No molestar". */
+
+/* (re)pone la línea de estado como primer hijo de content_box. La llaman
+   popup_feedback y populate_content: cada refresco borra la lista entera */
+static void
+status_row_update (RemovablePopup *popup)
+{
+    if (popup->status_row)
+        gtk_widget_destroy (popup->status_row);   /* el weak pointer lo deja en NULL */
+    if (!popup->status_title || !popup->content_box)
+        return;
+
+    GtkWidget *outer = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+    GtkWidget *row   = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
+    gtk_widget_set_margin_start  (row, 12);
+    gtk_widget_set_margin_end    (row, 12);
+    gtk_widget_set_margin_top    (row, 8);
+    gtk_widget_set_margin_bottom (row, 8);
+
+    GtkWidget *icon = gtk_image_new_from_icon_name (
+        popup->status_error ? "dialog-error-symbolic" : "emblem-ok-symbolic",
+        GTK_ICON_SIZE_LARGE_TOOLBAR);
+    gtk_widget_set_valign (icon, GTK_ALIGN_START);
+    if (popup->status_error)   /* el color de error del tema (rojo casi siempre) */
+        gtk_style_context_add_class (gtk_widget_get_style_context (icon), "error");
+    gtk_box_pack_start (GTK_BOX (row), icon, FALSE, FALSE, 0);
+
+    GtkWidget *texts = gtk_box_new (GTK_ORIENTATION_VERTICAL, 2);
+    gtk_widget_set_hexpand (texts, TRUE);
+
+    /* el texto se parte en líneas, nunca ensancha el popup (el scroll no
+       tiene barra horizontal: pide solo el ancho mínimo) */
+    GtkWidget *title = gtk_label_new (popup->status_title);
+    gtk_label_set_xalign (GTK_LABEL (title), 0.0);
+    gtk_label_set_line_wrap (GTK_LABEL (title), TRUE);
+    gtk_label_set_line_wrap_mode (GTK_LABEL (title), PANGO_WRAP_WORD_CHAR);
+    gtk_label_set_max_width_chars (GTK_LABEL (title), 40);
+    PangoAttrList *attrs = pango_attr_list_new ();
+    pango_attr_list_insert (attrs, pango_attr_weight_new (PANGO_WEIGHT_BOLD));
+    gtk_label_set_attributes (GTK_LABEL (title), attrs);
+    pango_attr_list_unref (attrs);
+    gtk_box_pack_start (GTK_BOX (texts), title, FALSE, FALSE, 0);
+
+    if (popup->status_text && *popup->status_text) {
+        GtkWidget *text = gtk_label_new (popup->status_text);
+        gtk_label_set_xalign (GTK_LABEL (text), 0.0);
+        gtk_label_set_line_wrap (GTK_LABEL (text), TRUE);
+        gtk_label_set_line_wrap_mode (GTK_LABEL (text), PANGO_WRAP_WORD_CHAR);
+        gtk_label_set_max_width_chars (GTK_LABEL (text), 40);
+        if (!popup->status_error)   /* un error se lee entero, sin atenuar */
+            gtk_style_context_add_class (gtk_widget_get_style_context (text), "dim-label");
+        gtk_box_pack_start (GTK_BOX (texts), text, FALSE, FALSE, 0);
+    }
+    gtk_box_pack_start (GTK_BOX (row), texts, TRUE, TRUE, 0);
+
+    gtk_box_pack_start (GTK_BOX (outer), row, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (outer), gtk_separator_new (GTK_ORIENTATION_HORIZONTAL),
+                        FALSE, FALSE, 0);
+
+    gtk_box_pack_start (GTK_BOX (popup->content_box), outer, FALSE, FALSE, 0);
+    gtk_box_reorder_child (GTK_BOX (popup->content_box), outer, 0);
+    gtk_widget_show_all (outer);
+
+    popup->status_row = outer;
+    g_object_add_weak_pointer (G_OBJECT (outer), (gpointer *) &popup->status_row);
+}
 
 static void
-notify_send (const gchar *summary, const gchar *body, const gchar *icon)
+popup_status_clear (RemovablePopup *popup)
 {
-    NotifyNotification *n = notify_notification_new (summary, body, icon);
-    notify_notification_set_timeout (n, NOTIFY_EXPIRES_DEFAULT);
-    notify_notification_show (n, NULL);
-    g_object_unref (n);
+    g_clear_pointer (&popup->status_title, g_free);
+    g_clear_pointer (&popup->status_text,  g_free);
+    popup->status_error = FALSE;
+}
+
+/* Resultado de una operación sobre un aparato.
+ *   popup abierto → línea de estado (título = nombre del aparato; un error
+ *                   lleva además el resumen, p. ej. "No se pudo expulsar")
+ *   popup cerrado → notificación (si están activadas), una por aparato */
+static void
+popup_feedback (RemovablePopup *popup, const gchar *key, const gchar *name,
+                gboolean error, const gchar *summary, const gchar *body,
+                const gchar *icon)
+{
+    if (popup->window && gtk_widget_get_visible (popup->window)) {
+        gboolean has_name = name && *name;
+        popup_status_clear (popup);
+        popup->status_error = error;
+        popup->status_title = g_strdup (has_name ? name : summary);
+        popup->status_text  = (has_name && error)
+                              ? g_strdup_printf ("%s\n%s", summary, body ? body : "")
+                              : g_strdup (body);
+        status_row_update (popup);
+        /* que se vea aunque la lista estuviera desplazada hacia abajo */
+        gtk_adjustment_set_value (
+            gtk_scrolled_window_get_vadjustment (GTK_SCROLLED_WINDOW (popup->scroll)), 0.0);
+        return;
+    }
+    if (popup->show_notify)
+        rp_notify (key, summary, body, icon);
 }
 
 /* ---------- abrir el gestor de archivos preferido ---------- */
@@ -742,17 +848,22 @@ typedef struct {
     RemovablePopup  *popup;
     GDBusConnection *conn;
     gchar           *object_path;
+    gchar           *drive_path;   /* clave de la notificación (el disco) */
+    gchar           *name;         /* para la línea de estado */
     GtkWidget       *btn;          /* weak: NULL si la fila fue destruida */
 } ActionOp;
 
 static ActionOp *
 action_op_new (RemovablePopup *popup, GDBusConnection *conn,
-               const gchar *object_path, GtkWidget *btn)
+               const gchar *object_path, const gchar *drive_path,
+               const gchar *name, GtkWidget *btn)
 {
     ActionOp *op    = g_new0 (ActionOp, 1);
     op->popup       = popup;
     op->conn        = g_object_ref (conn);
     op->object_path = g_strdup (object_path);
+    op->drive_path  = g_strdup (drive_path);
+    op->name        = g_strdup (name);
     op->btn         = btn;
     g_object_add_weak_pointer (G_OBJECT (btn), (gpointer *) &op->btn);
     popup_op_begin (popup);
@@ -766,6 +877,8 @@ action_op_free (ActionOp *op)
         g_object_remove_weak_pointer (G_OBJECT (op->btn), (gpointer *) &op->btn);
     g_object_unref (op->conn);
     g_free (op->object_path);
+    g_free (op->drive_path);
+    g_free (op->name);
     popup_op_end (op->popup);   /* puede liberar el popup: último uso */
     g_free (op);
 }
@@ -778,25 +891,26 @@ on_mount_done (gboolean ok, const gchar *mount_point,
     RemovablePopup *popup = op->popup;
 
     if (!popup->destroyed) {
-        if (ok) {
-            if (popup->show_notify)
-                notify_send (_("Device mounted"), mount_point, "drive-removable-media");
-            if (mount_point) {
-                /* "Montar" siempre abre el contenido en el gestor de archivos.
-                   Igual que "Abrir carpeta": el popup no queda encima del gestor
-                   (popup_show reconstruye al volver a abrir) */
-                open_file_manager (mount_point);
-                popup_hide (popup);
-            } else if (op->btn) {
-                /* si la señal de cambio todavía no reconstruyó la fila, forzarlo */
+        if (ok && mount_point) {
+            /* "Montar" siempre abre el contenido en el gestor de archivos.
+               Igual que "Abrir carpeta": el popup no queda encima del gestor
+               (popup_show reconstruye al volver a abrir). Se cierra ANTES de
+               avisar: con el popup cerrado el aviso va como notificación */
+            open_file_manager (mount_point);
+            popup_hide (popup);
+            popup_feedback (popup, op->drive_path, op->name, FALSE,
+                            _("Device mounted"), mount_point, "drive-removable-media");
+        } else if (ok) {
+            popup_feedback (popup, op->drive_path, op->name, FALSE,
+                            _("Device mounted"), NULL, "drive-removable-media");
+            /* si la señal de cambio todavía no reconstruyó la fila, forzarlo */
+            if (op->btn)
                 popup_rebuild (popup, op->conn);
-            }
         } else {
-            if (popup->show_notify) {
-                gchar *msg = describe_error (error, _("Could not mount the device."));
-                notify_send (_("Mount failed"), msg, "dialog-error");
-                g_free (msg);
-            }
+            gchar *msg = describe_error (error, _("Could not mount the device."));
+            popup_feedback (popup, op->drive_path, op->name, TRUE,
+                            _("Mount failed"), msg, "dialog-error");
+            g_free (msg);
             if (op->btn) {
                 gtk_button_set_label (GTK_BUTTON (op->btn), _("Mount"));
                 gtk_widget_set_sensitive (op->btn, TRUE);
@@ -817,17 +931,15 @@ on_unmount_done (gboolean ok, const gchar *result,
 
     if (!popup->destroyed) {
         if (ok) {
-            if (popup->show_notify)
-                notify_send (_("Safe to remove"), _("You can now unplug the device."),
-                             "drive-removable-media");
+            popup_feedback (popup, op->drive_path, op->name, FALSE, _("Safe to remove"),
+                            _("You can now unplug the device."), "drive-removable-media");
             if (op->btn)
                 popup_rebuild (popup, op->conn);
         } else {
-            if (popup->show_notify) {
-                gchar *msg = describe_error (error, _("Could not unmount the device."));
-                notify_send (_("Unmount failed"), msg, "dialog-error");
-                g_free (msg);
-            }
+            gchar *msg = describe_error (error, _("Could not unmount the device."));
+            popup_feedback (popup, op->drive_path, op->name, TRUE,
+                            _("Unmount failed"), msg, "dialog-error");
+            g_free (msg);
             if (op->btn) {
                 gtk_button_set_label (GTK_BUTTON (op->btn), _("Unmount"));
                 gtk_widget_set_sensitive (op->btn, TRUE);
@@ -844,7 +956,8 @@ on_mount_clicked (GtkWidget *btn, RowData *rd)
     gtk_widget_set_sensitive (btn, FALSE);
     gtk_button_set_label (GTK_BUTTON (btn), _("Mounting…"));
     ud_mount_async (rd->conn, rd->object_path, on_mount_done,
-                    action_op_new (rd->popup, rd->conn, rd->object_path, btn));
+                    action_op_new (rd->popup, rd->conn, rd->object_path, rd->drive_path,
+                                   rd->name, btn));
 }
 
 static void
@@ -853,7 +966,8 @@ on_unmount_clicked (GtkWidget *btn, RowData *rd)
     gtk_widget_set_sensitive (btn, FALSE);
     gtk_button_set_label (GTK_BUTTON (btn), _("Unmounting…"));
     ud_unmount_async (rd->conn, rd->object_path, on_unmount_done,
-                      action_op_new (rd->popup, rd->conn, rd->object_path, btn));
+                      action_op_new (rd->popup, rd->conn, rd->object_path, rd->drive_path,
+                                     rd->name, btn));
 }
 
 /* ---------- eject: desmonta en cadena y después expulsa ----------
@@ -866,6 +980,7 @@ typedef struct {
     RemovablePopup  *popup;
     GDBusConnection *conn;
     gchar           *drive_path;
+    gchar           *name;      /* nombre del disco, para la línea de estado */
     GSList          *pending;   /* object_paths que faltan desmontar */
     gboolean         power_off; /* PowerOff en vez de Eject */
     GtkWidget       *btn;       /* weak */
@@ -878,6 +993,7 @@ eject_op_free (EjectOp *op)
         g_object_remove_weak_pointer (G_OBJECT (op->btn), (gpointer *) &op->btn);
     g_object_unref (op->conn);
     g_free (op->drive_path);
+    g_free (op->name);
     g_slist_free_full (op->pending, g_free);
     popup_op_end (op->popup);   /* puede liberar el popup: último uso */
     g_free (op);
@@ -905,11 +1021,10 @@ on_eject_unmount_done (gboolean ok, const gchar *result,
     }
 
     if (!ok) {
-        if (op->popup->show_notify) {
-            gchar *msg = describe_error (error, _("Could not unmount the device."));
-            notify_send (_("Eject failed"), msg, "dialog-error");
-            g_free (msg);
-        }
+        gchar *msg = describe_error (error, _("Could not unmount the device."));
+        popup_feedback (op->popup, op->drive_path, op->name, TRUE,
+                        _("Eject failed"), msg, "dialog-error");
+        g_free (msg);
         if (op->btn)
             gtk_widget_set_sensitive (op->btn, TRUE);
         /* alguna partición pudo haberse desmontado antes del fallo */
@@ -929,15 +1044,18 @@ on_eject_done (gboolean ok, const gchar *result,
     EjectOp *op = data;
 
     if (!op->popup->destroyed) {
-        if (op->popup->show_notify) {
-            if (ok) {
-                notify_send (_("Device ejected"), _("Safe to unplug."), "drive-removable-media");
-            } else {
-                gchar *msg = describe_error (error,
-                    _("The partitions were unmounted, but the drive could not be ejected."));
-                notify_send (_("Eject failed"), msg, "dialog-error");
-                g_free (msg);
-            }
+        /* el disco desaparece enseguida: que su "desconectado" no tape este aviso */
+        if (ok)
+            rp_notify_expect_removal (op->drive_path);
+        if (ok) {
+            popup_feedback (op->popup, op->drive_path, op->name, FALSE,
+                            _("Device ejected"), _("Safe to unplug."), "drive-removable-media");
+        } else {
+            gchar *msg = describe_error (error,
+                _("The partitions were unmounted, but the drive could not be ejected."));
+            popup_feedback (op->popup, op->drive_path, op->name, TRUE,
+                            _("Eject failed"), msg, "dialog-error");
+            g_free (msg);
         }
         if (!ok && op->btn)
             gtk_widget_set_sensitive (op->btn, TRUE);
@@ -969,13 +1087,19 @@ on_eject_clicked (GtkWidget *btn, EjectData *ed)
 {
     gtk_widget_set_sensitive (btn, FALSE);
 
-    if (ed->popup->show_notify)
-        notify_send (_("Ejecting…"), _("Please wait, do not unplug."), "drive-removable-media");
+    /* mientras tanto lo dice el botón, como "Montando…" (el popup está
+       abierto: una burbuja "Expulsando…" lo taparía). Si falla, el popup se
+       reconstruye y el botón vuelve a su texto */
+    GtkWidget *label = g_object_get_data (G_OBJECT (btn), "btn-label");
+    if (label)
+        gtk_label_set_text (GTK_LABEL (label), _("Ejecting…"));
+    gtk_widget_set_tooltip_text (btn, _("Please wait, do not unplug."));
 
     EjectOp *op    = g_new0 (EjectOp, 1);
     op->popup      = ed->popup;
     op->conn       = g_object_ref (ed->conn);
     op->drive_path = g_strdup (ed->drive_path);
+    op->name       = g_strdup (ed->name);
     op->power_off  = ed->power_off;
     op->pending    = g_slist_copy_deep (ed->partitions, copy_path, NULL);
     op->btn        = btn;
@@ -1039,6 +1163,7 @@ build_partition_row (RemovablePopup *popup, GDBusConnection *conn, UdDevice *dev
     rd->drive_path  = g_strdup (dev->drive_path);
     rd->mount_point = g_strdup (dev->mount_point);
     rd->mounted     = dev->mounted;
+    rd->name        = g_strdup ((dev->label && *dev->label) ? dev->label : dev->device);
 
     GtkWidget *row = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
     gtk_widget_set_margin_start  (row, 32);
@@ -1327,6 +1452,7 @@ build_eject_button (RemovablePopup *popup, GDBusConnection *conn,
         ejd->conn       = conn;
         ejd->drive_path = g_strdup (drive_path);
         ejd->partitions = mounted_paths;
+        ejd->name       = drive_title (partitions);
         ejd->power_off  = !ejectable;
 
         GtkWidget *btn_eject = labeled_button_new (
@@ -1391,6 +1517,7 @@ build_single_drive_row (RemovablePopup *popup, GDBusConnection *conn,
     GtkWidget *name_label = gtk_label_new (drive_name);
     setup_elastic_name (name_label, drive_name);
     g_object_set_data (G_OBJECT (row), "elastic-name", name_label);
+    rd->name = g_strdup (drive_name);
 
     /* detalle: "ETIQUETA · tamaño · tipo" (la etiqueta solo si dice algo distinto) */
     gdouble  fraction;
@@ -1536,6 +1663,8 @@ typedef struct {
     GVolume         *volume;   /* ref o NULL */
     GMount          *mount;    /* ref o NULL */
     gchar           *uri;
+    gchar           *key;      /* UdPhone.key: clave de la notificación */
+    gchar           *name;     /* para la línea de estado */
 } PhoneRowData;
 
 static void
@@ -1545,6 +1674,8 @@ phone_row_data_free (gpointer data)
     if (pd->volume) g_object_unref (pd->volume);
     if (pd->mount)  g_object_unref (pd->mount);
     g_free (pd->uri);
+    g_free (pd->key);
+    g_free (pd->name);
     g_free (pd);
 }
 
@@ -1553,6 +1684,8 @@ typedef struct {
     GDBusConnection *conn;
     GtkWidget       *btn;          /* weak */
     gchar           *restore;      /* etiqueta a reponer si falla (NULL: botón de ícono) */
+    gchar           *key;          /* clave de la notificación (el aparato) */
+    gchar           *name;         /* para la línea de estado */
     gboolean         eject;        /* g_mount_eject en vez de g_mount_unmount */
 } PhoneOp;
 
@@ -1564,6 +1697,8 @@ phone_op_new (PhoneRowData *pd, GtkWidget *btn, const gchar *restore)
     op->conn    = pd->conn ? g_object_ref (pd->conn) : NULL;
     op->btn     = btn;
     op->restore = g_strdup (restore);
+    op->key     = g_strdup (pd->key);
+    op->name    = g_strdup (pd->name);
     g_object_add_weak_pointer (G_OBJECT (btn), (gpointer *) &op->btn);
     popup_op_begin (op->popup);
     return op;
@@ -1577,6 +1712,8 @@ phone_op_free (PhoneOp *op)
     if (op->conn)
         g_object_unref (op->conn);
     g_free (op->restore);
+    g_free (op->key);
+    g_free (op->name);
     popup_op_end (op->popup);   /* puede liberar el popup: último uso */
     g_free (op);
 }
@@ -1586,10 +1723,9 @@ phone_op_failed (PhoneOp *op, const GError *err, const gchar *summary,
                  const gchar *fallback)
 {
     /* FAILED_HANDLED: el usuario canceló un diálogo de gvfs, no es un error */
-    if (op->popup->show_notify &&
-        !g_error_matches (err, G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED)) {
+    if (!g_error_matches (err, G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED)) {
         gchar *msg = describe_error (err, fallback);
-        notify_send (summary, msg, "dialog-error");
+        popup_feedback (op->popup, op->key, op->name, TRUE, summary, msg, "dialog-error");
         g_free (msg);
     }
     if (op->btn) {
@@ -1620,12 +1756,12 @@ on_phone_mount_done (GObject *source, GAsyncResult *res, gpointer data)
             if (!uri)
                 g_warning ("xfce-removable-plugin: teléfono montado sin URI para abrir");
 
-            if (op->popup->show_notify)
-                notify_send (_("Phone ready"), name, "phone");
             if (uri) {   /* "Montar" siempre abre el gestor de archivos */
                 open_file_manager (uri);
-                popup_hide (op->popup);
-            } else if (op->btn) {
+                popup_hide (op->popup);   /* antes del aviso: así va como notificación */
+            }
+            popup_feedback (op->popup, op->key, op->name, FALSE, _("Phone ready"), name, "phone");
+            if (!uri && op->btn) {
                 /* sin bus del sistema conn es NULL: popup_rebuild lo tolera */
                 popup_rebuild (op->popup, op->conn);
             }
@@ -1657,8 +1793,11 @@ on_phone_unmount_done (GObject *source, GAsyncResult *res, gpointer data)
 
     if (!op->popup->destroyed) {
         if (ok) {
-            if (op->popup->show_notify)
-                notify_send (_("Safe to remove"), _("You can now unplug the device."), "phone");
+            /* con eject gvfs puede quitar el aparato: que su "desconectado" no
+               tape este aviso (con unmount sigue en la lista y no pasa nada) */
+            rp_notify_expect_removal (op->key);
+            popup_feedback (op->popup, op->key, op->name, FALSE, _("Safe to remove"),
+                            _("You can now unplug the device."), "phone");
             popup_rebuild (op->popup, op->conn);
         } else {
             g_warning ("xfce-removable-plugin: desmontar teléfono: %s", err->message);
@@ -1731,6 +1870,8 @@ build_phone_row (RemovablePopup *popup, GDBusConnection *conn, UdPhone *ph)
     pd->volume = ph->volume ? g_object_ref (ph->volume) : NULL;
     pd->mount  = ph->mount  ? g_object_ref (ph->mount)  : NULL;
     pd->uri    = g_strdup (ph->uri);
+    pd->key    = g_strdup (ph->key);
+    pd->name   = g_strdup ((ph->name && *ph->name) ? ph->name : _("Phone"));
 
     /* mismos márgenes que el encabezado de disco: es un aparato, no una partición */
     GtkWidget *row = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
@@ -1956,6 +2097,9 @@ populate_content (RemovablePopup *popup, GDBusConnection *conn, const UdScan *sc
         gtk_widget_destroy (k->data);
     g_list_free (kids);
 
+    /* resultado de la última operación (si lo hay), siempre arriba */
+    status_row_update (popup);
+
     if (ud_scan_is_empty (scan)) {
         GtkWidget *box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
         gtk_widget_set_margin_top    (box, 16);
@@ -2158,6 +2302,10 @@ popup_show (RemovablePopup *popup, XfcePanelPlugin *plugin,
 
     g_object_set_data (G_OBJECT (popup->window), "conn", conn);
 
+    /* las burbujas del plugin que estén en pantalla taparían el popup, y lo
+       que dicen ya se ve en la lista */
+    rp_notify_close_all ();
+
     /* el compositor se puede activar o desactivar entre aperturas */
     popup_apply_style (popup);
 
@@ -2223,6 +2371,10 @@ popup_hide (RemovablePopup *popup)
     }
 
     gtk_widget_hide (popup->window);
+
+    /* la línea de estado es de esta apertura: la próxima arranca limpia
+       (un resultado que llegue con el popup cerrado va como notificación) */
+    popup_status_clear (popup);
 
     /* Wayland: el botón no recibió "el mouse se fue" durante la captura (§4.8) */
     if (popup->wayland && popup->button) {
@@ -2290,6 +2442,7 @@ popup_destroy (RemovablePopup *popup)
         g_hash_table_destroy (popup->expanded);
         popup->expanded = NULL;
     }
+    popup_status_clear (popup);
     /* si hay mount/unmount/eject en vuelo, el último callback libera el struct */
     popup->destroyed = TRUE;
     if (popup->pending_ops == 0)

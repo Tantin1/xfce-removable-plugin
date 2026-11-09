@@ -154,6 +154,9 @@ msgstr "手机或相机已断开"
 msgid "Phone ready"
 msgstr "手机已就绪"
 
+msgid "Play a sound when devices are connected or disconnected"
+msgstr "设备连接或断开时播放声音"
+
 msgid "Please wait, do not unplug."
 msgstr "请稍候，请勿拔出。"
 
@@ -261,6 +264,9 @@ msgstr "正在卸载…"
 #. ícono del panel
 msgid "Use panel icon size"
 msgstr "使用面板大小作为图标大小"
+
+msgid "Uses the desktop sound theme. Nothing plays if event sounds are turned off in the Appearance settings."
+msgstr "使用桌面的声音主题。如果在外观设置中关闭了事件声音，则不会播放。"
 
 msgid "You can now place it wherever you like: right-click → Move."
 msgstr "现在可以把它放到任意位置：右键 → 移动。"

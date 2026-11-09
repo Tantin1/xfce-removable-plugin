@@ -10,7 +10,8 @@ Build-Depends: debhelper-compat (= 13),
                libxfce4panel-2.0-dev,
                libxfce4ui-2-dev,
                libnotify-dev,
-               libgudev-1.0-dev
+               libgudev-1.0-dev,
+               libcanberra-gtk3-dev
 Standards-Version: 4.6.2
 Homepage: https://github.com/Tantin1/xfce-removable-plugin
 Rules-Requires-Root: no
@@ -18,7 +19,7 @@ Rules-Requires-Root: no
 Package: xfce-removable-plugin
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, xfce4-panel, udisks2
-Recommends: gvfs-backends
+Recommends: gvfs-backends, sound-theme-freedesktop
 Description: Xfce panel plugin for removable drives, phones and USB devices
  Lists removable drives grouped by disk, with mount, unmount and safe
  removal; Android phones (MTP), cameras (PTP) and iPhones through gvfs;

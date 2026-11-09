@@ -34,6 +34,14 @@ typedef struct {
     gboolean         destroyed;   /* popup_destroy llamado con ops pendientes */
     gboolean         hiding;      /* dentro de popup_hide: cortar re-entradas */
     gboolean         wayland;     /* sesión Wayland (se decide al crear) */
+
+    /* resultado de la última operación, mostrado arriba de la lista mientras
+       el popup está abierto (en vez de una notificación que lo taparía).
+       Se guarda aparte porque cada refresco rearma la lista. */
+    gchar           *status_title;
+    gchar           *status_text;
+    gboolean         status_error;
+    GtkWidget       *status_row;  /* weak: la línea en content_box, o NULL */
 } RemovablePopup;
 
 RemovablePopup *popup_create  (XfcePanelPlugin *plugin, GtkWidget *button);

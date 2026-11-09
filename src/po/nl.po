@@ -154,6 +154,9 @@ msgstr "Telefoon of camera losgekoppeld"
 msgid "Phone ready"
 msgstr "Telefoon gereed"
 
+msgid "Play a sound when devices are connected or disconnected"
+msgstr "Een geluid afspelen wanneer apparaten worden aangesloten of losgekoppeld"
+
 msgid "Please wait, do not unplug."
 msgstr "Even geduld, niet loskoppelen."
 
@@ -261,6 +264,9 @@ msgstr "Ontkoppelen…"
 #. ícono del panel
 msgid "Use panel icon size"
 msgstr "Panelgrootte gebruiken voor pictogram"
+
+msgid "Uses the desktop sound theme. Nothing plays if event sounds are turned off in the Appearance settings."
+msgstr "Gebruikt het geluidsthema van het bureaublad. Er klinkt niets als gebeurtenisgeluiden uitgeschakeld zijn in de instellingen voor Uiterlijk."
 
 msgid "You can now place it wherever you like: right-click → Move."
 msgstr "U kunt hem nu plaatsen waar u wilt: rechtsklik → Verplaatsen."

@@ -339,3 +339,9 @@ msgstr ""
 #: ud-dbus.c:458
 msgid "USB device"
 msgstr ""
+
+msgid "Play a sound when devices are connected or disconnected"
+msgstr ""
+
+msgid "Uses the desktop sound theme. Nothing plays if event sounds are turned off in the Appearance settings."
+msgstr ""

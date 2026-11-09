@@ -5,9 +5,11 @@
 #include <libxfce4panel/libxfce4panel.h>
 #include <gtk/gtk.h>
 #include <libnotify/notify.h>
+#include <canberra-gtk.h>
 
 #include "popup.h"
 #include "ud-dbus.h"
+#include "rp-notify.h"
 
 /* _() = dgettext (GETTEXT_PACKAGE, …): en Wayland todos los plugins comparten
    el proceso del panel, y textdomain() cambiaría el idioma de los demás */
@@ -31,6 +33,7 @@
 #define DEFAULT_NOTIFY_NEW_DEVICE    TRUE
 #define DEFAULT_SHOW_INPUT           FALSE   /* teclados y mouses en "Other devices" */
 #define DEFAULT_NOTIFY_DRIVES        TRUE
+#define DEFAULT_PLAY_SOUNDS          TRUE    /* sonido al conectar/desconectar */
 
 /* Categorías que se pueden silenciar (Propiedades → "Notify about:"), en el
    orden en que se muestran. La clave es el nombre en [notify] del .rc: un
@@ -80,6 +83,7 @@ typedef struct {
     gboolean         notify_new_device;
     gboolean         show_input;      /* listar teclados y mouses */
     gboolean         notify_drives;   /* notificar discos (conectar/desconectar) */
+    gboolean         play_sounds;     /* sonido al conectar/desconectar (libcanberra) */
     gboolean         notify_type[UD_USB_N_TYPES];   /* por categoría (NOTIFY_TYPES) */
 
     /* snapshots para detectar enchufado/desenchufado */
@@ -200,6 +204,7 @@ load_config (RemovablePlugin *rp)
     rp->notify_new_device   = DEFAULT_NOTIFY_NEW_DEVICE;
     rp->show_input          = DEFAULT_SHOW_INPUT;
     rp->notify_drives       = DEFAULT_NOTIFY_DRIVES;
+    rp->play_sounds         = DEFAULT_PLAY_SOUNDS;
     /* sin categoría (UD_USB_OTHER) nunca se notifica: queda en FALSE */
     for (gsize i = 0; i < G_N_ELEMENTS (NOTIFY_TYPES); i++)
         rp->notify_type[NOTIFY_TYPES[i].type] = NOTIFY_TYPES[i].def;
@@ -227,6 +232,7 @@ load_config (RemovablePlugin *rp)
     rp->hide_if_only_other = kf_get_bool (kf, "behavior",   "hide_if_only_other", DEFAULT_HIDE_IF_ONLY_OTHER);
     rp->notify_new_device  = kf_get_bool (kf, "behavior",   "notify_new_device",  DEFAULT_NOTIFY_NEW_DEVICE);
     rp->show_input         = kf_get_bool (kf, "behavior",   "show_input",         DEFAULT_SHOW_INPUT);
+    rp->play_sounds        = kf_get_bool (kf, "behavior",   "play_sounds",        DEFAULT_PLAY_SOUNDS);
     rp->notify_drives      = kf_get_bool (kf, "notify",     "drives",             DEFAULT_NOTIFY_DRIVES);
     for (gsize i = 0; i < G_N_ELEMENTS (NOTIFY_TYPES); i++)
         rp->notify_type[NOTIFY_TYPES[i].type] =
@@ -262,6 +268,7 @@ save_config (RemovablePlugin *rp)
     g_key_file_set_boolean  (kf, "behavior",   "hide_if_only_other", rp->hide_if_only_other);
     g_key_file_set_boolean  (kf, "behavior",   "notify_new_device",  rp->notify_new_device);
     g_key_file_set_boolean  (kf, "behavior",   "show_input",         rp->show_input);
+    g_key_file_set_boolean  (kf, "behavior",   "play_sounds",        rp->play_sounds);
     g_key_file_set_boolean  (kf, "notify",     "drives",             rp->notify_drives);
     for (gsize i = 0; i < G_N_ELEMENTS (NOTIFY_TYPES); i++)
         g_key_file_set_boolean (kf, "notify", NOTIFY_TYPES[i].key,
@@ -357,13 +364,39 @@ format_size_short (guint64 bytes)
     return g_strdup_printf ("%.0f KB", bytes / 1e3);
 }
 
+/* Sonidos de conectar/desconectar con libcanberra: nombres del tema de sonidos
+   de freedesktop ("device-added" / "device-removed"), o los del tema que eligió
+   el usuario. libcanberra-gtk sigue sola el interruptor de Xfce "sonidos de
+   eventos" (gtk-enable-event-sounds): si está apagado no suena nada, sin que el
+   plugin tenga que mirarlo. */
 static void
-notify_simple (const gchar *summary, const gchar *body, const gchar *icon)
+play_device_sound (RemovablePlugin *rp, gboolean added)
 {
-    NotifyNotification *n = notify_notification_new (summary, body, icon);
-    notify_notification_set_timeout (n, NOTIFY_EXPIRES_DEFAULT);
-    notify_notification_show (n, NULL);
-    g_object_unref (n);
+    ca_context *ctx = ca_gtk_context_get_for_screen (gtk_widget_get_screen (rp->button));
+    if (!ctx)
+        return;
+    ca_context_play (ctx, 0,
+                     CA_PROP_EVENT_ID, added ? "device-added" : "device-removed",
+                     CA_PROP_EVENT_DESCRIPTION, added ? "Device connected" : "Device disconnected",
+                     NULL);
+}
+
+/* Un cambio de conexión: notificación (si están activadas) y marca para el
+   sonido, que se reproduce una sola vez por refresco aunque cambien varios.
+   key = el aparato: su burbuja reemplaza a la anterior del mismo aparato.
+   Una desconexión esperada (se acaba de expulsar desde el popup) no se
+   notifica: taparía el "Ya puede desenchufarlo". Con el popup abierto
+   tampoco: la lista ya se actualiza sola y la burbuja lo taparía.
+   El sonido suena igual en los dos casos. */
+static void
+announce (RemovablePlugin *rp, gboolean *changed, const gchar *key, gboolean removal,
+          const gchar *summary, const gchar *body, const gchar *icon)
+{
+    *changed = TRUE;
+    if (removal && rp_notify_removal_expected (key))   /* consume la marca siempre */
+        return;
+    if (rp->notify_new_device && !rp->popup_open)
+        rp_notify (key, summary, body, icon);
 }
 
 /* ¿se notifica este tipo de "Other devices"? (los snapshots guardan el tipo
@@ -436,10 +469,12 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
         g_hash_table_replace (new_usb, g_strdup (u->syspath), value);
     }
 
-    if (!silent && rp->notify_new_device) {
+    /* los sonidos siguen los mismos filtros por categoría que las notificaciones */
+    if (!silent && (rp->notify_new_device || rp->play_sounds)) {
         /* enchufado: en new pero no en seen */
         GHashTableIter it;
         gpointer key, value;
+        gboolean added = FALSE, removed = FALSE;
 
         /* las tablas se actualizan igual al final aunque una categoría esté
            silenciada: así reactivarla no notifica lo que ya estaba enchufado */
@@ -452,7 +487,7 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
                 gchar  *body  = g_strdup_printf ("%s (%s)",
                                                  (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
                                                  sz);
-                notify_simple (_("Removable device connected"), body, "drive-removable-media");
+                announce (rp, &added, key, FALSE, _("Removable device connected"), body, "drive-removable-media");
                 g_free (body); g_free (sz); g_strfreev (parts);
             }
         }
@@ -467,7 +502,7 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
                 gchar    *body  = g_strdup_printf ("%s — %s",
                                                    (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
                                                    _(ud_usb_type_label (type)));
-                notify_simple (_("USB device connected"), body, ud_usb_type_icon (type));
+                announce (rp, &added, key, FALSE, _("USB device connected"), body, ud_usb_type_icon (type));
                 g_free (body); g_strfreev (parts);
             }
         }
@@ -475,9 +510,9 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
         g_hash_table_iter_init (&it, new_phones);
         while (rp->notify_type[UD_USB_PHONE] && g_hash_table_iter_next (&it, &key, &value)) {
             if (!rp->seen_phones || !g_hash_table_contains (rp->seen_phones, key))
-                notify_simple (_("Phone or camera connected"),
-                               *(const gchar *) value ? (const gchar *) value : _("Unknown"),
-                               "phone");
+                announce (rp, &added, key, FALSE, _("Phone or camera connected"),
+                          *(const gchar *) value ? (const gchar *) value : _("Unknown"),
+                          "phone");
         }
 
         /* desenchufado: en seen pero no en new */
@@ -485,9 +520,9 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
             g_hash_table_iter_init (&it, rp->seen_phones);
             while (g_hash_table_iter_next (&it, &key, &value)) {
                 if (!g_hash_table_contains (new_phones, key))
-                    notify_simple (_("Phone or camera disconnected"),
-                                   *(const gchar *) value ? (const gchar *) value : _("Unknown"),
-                                   "phone");
+                    announce (rp, &removed, key, TRUE, _("Phone or camera disconnected"),
+                              *(const gchar *) value ? (const gchar *) value : _("Unknown"),
+                              "phone");
             }
         }
         if (rp->seen_storage && rp->notify_drives) {
@@ -495,9 +530,9 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
             while (g_hash_table_iter_next (&it, &key, &value)) {
                 if (!g_hash_table_contains (new_storage, key)) {
                     gchar **parts = g_strsplit ((const gchar *) value, "|", 2);
-                    notify_simple (_("Removable device disconnected"),
-                                   (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
-                                   "drive-removable-media");
+                    announce (rp, &removed, key, TRUE, _("Removable device disconnected"),
+                              (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
+                              "drive-removable-media");
                     g_strfreev (parts);
                 }
             }
@@ -510,13 +545,18 @@ update_snapshots (RemovablePlugin *rp, const UdScan *scan, gboolean silent)
                     UdUsbType type  = parts[1] ? (UdUsbType) g_ascii_strtoll (parts[1], NULL, 10)
                                                : UD_USB_OTHER;
                     if (!notify_usb_type (rp, type)) { g_strfreev (parts); continue; }
-                    notify_simple (_("USB device disconnected"),
-                                   (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
-                                   ud_usb_type_icon (type));
+                    announce (rp, &removed, key, TRUE, _("USB device disconnected"),
+                              (parts[0] && *parts[0]) ? parts[0] : _("Unknown"),
+                              ud_usb_type_icon (type));
                     g_strfreev (parts);
                 }
             }
         }
+
+        /* un solo sonido por refresco; si a la vez se conectó uno y se quitó
+           otro (raro: el debounce los junta), gana "conectado" */
+        if (rp->play_sounds && (added || removed))
+            play_device_sound (rp, added);
     }
 
     if (rp->seen_storage) g_hash_table_destroy (rp->seen_storage);
@@ -558,18 +598,20 @@ typedef struct {
     GtkWidget       *hide_check;
     GtkWidget       *hide_other_check;
     GtkWidget       *notify_new_check;
+    GtkWidget       *sounds_check;
     GtkWidget       *show_input_check;
     GtkWidget       *notify_about_label;
     GtkWidget       *notify_drives_check;
     GtkWidget       *notify_type_check[UD_USB_N_TYPES];   /* NULL si no hay casilla */
 } PropsDialog;
 
-/* las casillas por categoría solo valen con las notificaciones de conexión
-   activadas; la de teclados y mouses, además, solo si se muestran */
+/* las casillas por categoría valen para las notificaciones de conexión y para
+   los sonidos: activas si hay alguna de las dos; la de teclados y mouses,
+   además, solo si se muestran */
 static void
 props_update_notify_sensitivity (PropsDialog *pd)
 {
-    gboolean on = pd->rp->notify_new_device;
+    gboolean on = pd->rp->notify_new_device || pd->rp->play_sounds;
     gtk_widget_set_sensitive (pd->notify_about_label,  on);
     gtk_widget_set_sensitive (pd->notify_drives_check, on);
     for (gint t = 0; t < UD_USB_N_TYPES; t++)
@@ -664,6 +706,14 @@ static void
 on_notify_new_toggled (GtkToggleButton *btn, PropsDialog *pd)
 {
     pd->rp->notify_new_device = gtk_toggle_button_get_active (btn);
+    save_config (pd->rp);
+    props_update_notify_sensitivity (pd);
+}
+
+static void
+on_sounds_toggled (GtkToggleButton *btn, PropsDialog *pd)
+{
+    pd->rp->play_sounds = gtk_toggle_button_get_active (btn);
     save_config (pd->rp);
     props_update_notify_sensitivity (pd);
 }
@@ -855,6 +905,15 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     gtk_grid_attach (GTK_GRID (grid_bh), pd->notify_new_check, 0, row, 2, 1);
     row++;
 
+    pd->sounds_check = gtk_check_button_new_with_label (
+        _("Play a sound when devices are connected or disconnected"));
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->sounds_check), rp->play_sounds);
+    gtk_widget_set_tooltip_text (pd->sounds_check,
+        _("Uses the desktop sound theme. Nothing plays if event sounds are "
+          "turned off in the Appearance settings."));
+    gtk_grid_attach (GTK_GRID (grid_bh), pd->sounds_check, 0, row, 2, 1);
+    row++;
+
     /* por categoría, en dos columnas (reusa los nombres de tipo ya traducidos) */
     pd->notify_about_label = gtk_label_new (_("Notify about:"));
     gtk_label_set_xalign (GTK_LABEL (pd->notify_about_label), 0.0);
@@ -900,6 +959,7 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     g_signal_connect (pd->hide_check,        "toggled",       G_CALLBACK (on_hide_toggled),         pd);
     g_signal_connect (pd->hide_other_check,  "toggled",       G_CALLBACK (on_hide_other_toggled),   pd);
     g_signal_connect (pd->notify_new_check,  "toggled",       G_CALLBACK (on_notify_new_toggled),   pd);
+    g_signal_connect (pd->sounds_check,      "toggled",       G_CALLBACK (on_sounds_toggled),       pd);
     g_signal_connect (pd->show_input_check,  "toggled",       G_CALLBACK (on_show_input_toggled),   pd);
     g_signal_connect (dialog, "destroy",                      G_CALLBACK (on_props_dialog_destroy), pd);
 
@@ -1078,10 +1138,10 @@ removable_plugin_construct (XfcePanelPlugin *plugin)
             gboolean would_hide = rp->hide_if_empty && !scan->storage && !scan->phones &&
                                   (rp->hide_if_only_other || !scan->usb);
             if (would_hide && rp->show_notify)
-                notify_simple (_("Removable Devices added"),
-                               _("This button hides when nothing is connected and "
-                                 "reappears when you connect a device."),
-                               "drive-removable-media");
+                rp_notify (NULL, _("Removable Devices added"),
+                           _("This button hides when nothing is connected and "
+                             "reappears when you connect a device."),
+                           "drive-removable-media");
         }
         ud_scan_free (scan);
     }

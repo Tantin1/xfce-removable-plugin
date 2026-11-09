@@ -154,6 +154,9 @@ msgstr "تم فصل هاتف أو كاميرا"
 msgid "Phone ready"
 msgstr "الهاتف جاهز"
 
+msgid "Play a sound when devices are connected or disconnected"
+msgstr "تشغيل صوت عند توصيل أو فصل الأجهزة"
+
 msgid "Please wait, do not unplug."
 msgstr "يرجى الانتظار، لا تفصل الجهاز."
 
@@ -261,6 +264,9 @@ msgstr "جارٍ إلغاء التحميل…"
 #. ícono del panel
 msgid "Use panel icon size"
 msgstr "استخدام حجم اللوحة للأيقونة"
+
+msgid "Uses the desktop sound theme. Nothing plays if event sounds are turned off in the Appearance settings."
+msgstr "يستخدم سمة أصوات سطح المكتب. لن يُشغَّل أي صوت إذا كانت أصوات الأحداث معطّلة في إعدادات المظهر."
 
 msgid "You can now place it wherever you like: right-click → Move."
 msgstr "يمكنك الآن وضعه حيث تشاء: نقرة يمنى ← نقل."

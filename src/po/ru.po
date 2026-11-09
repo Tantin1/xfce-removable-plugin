@@ -154,6 +154,9 @@ msgstr "Телефон или камера отключены"
 msgid "Phone ready"
 msgstr "Телефон готов"
 
+msgid "Play a sound when devices are connected or disconnected"
+msgstr "Воспроизводить звук при подключении и отключении устройств"
+
 msgid "Please wait, do not unplug."
 msgstr "Подождите, не отключайте устройство."
 
@@ -261,6 +264,9 @@ msgstr "Отключение…"
 #. ícono del panel
 msgid "Use panel icon size"
 msgstr "Использовать размер панели для значка"
+
+msgid "Uses the desktop sound theme. Nothing plays if event sounds are turned off in the Appearance settings."
+msgstr "Используется звуковая тема рабочего стола. Звука не будет, если звуки событий отключены в настройках внешнего вида."
 
 msgid "You can now place it wherever you like: right-click → Move."
 msgstr "Теперь её можно разместить где угодно: правый щелчок → Переместить."
