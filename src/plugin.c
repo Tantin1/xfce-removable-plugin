@@ -991,7 +991,7 @@ on_about (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     }
 
     static const gchar *authors[] = {
-        "Juan Sebastian Perez <juanchiperez97@gmail.com>",
+        "Tantin1 <juanperez33840@gmail.com>",
         NULL,
     };
 
@@ -1003,7 +1003,7 @@ on_about (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     gtk_about_dialog_set_comments       (about,
         _("Mount and safely remove drives, phones and other USB devices"));
     gtk_about_dialog_set_logo_icon_name (about, "drive-removable-media");
-    gtk_about_dialog_set_copyright      (about, "© 2025–2026 Juan Sebastian Perez");
+    gtk_about_dialog_set_copyright      (about, "© 2025–2026 Tantin1");
     gtk_about_dialog_set_license_type   (about, GTK_LICENSE_GPL_2_0_ONLY);
     gtk_about_dialog_set_website        (about, "https://github.com/Tantin1/xfce-removable-plugin");
     gtk_about_dialog_set_website_label  (about, "github.com/Tantin1/xfce-removable-plugin");

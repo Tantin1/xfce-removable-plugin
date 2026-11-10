@@ -1,347 +1,390 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the xfce-removable-plugin package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Translation template for xfce-removable-plugin.
+# This file is distributed under the same license as xfce-removable-plugin.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: xfce-removable-plugin\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 13:48+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Project-Id-Version: xfce-removable-plugin 1.0.4\n"
+"Report-Msgid-Bugs-To: https://github.com/Tantin1/xfce-removable-"
+"plugin/issues\n"
+"POT-Creation-Date: 2026-11-10 14:06-0300\n"
+"PO-Revision-Date: 2026-11-10 14:06-0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
 
-#: plugin.c:384 plugin.c:399 plugin.c:410 plugin.c:420 plugin.c:430
-#: plugin.c:445
+#: plugin.c:488 plugin.c:503 plugin.c:514 plugin.c:524 plugin.c:534 plugin.c:549
 msgid "Unknown"
 msgstr ""
 
-#: plugin.c:386
+#: plugin.c:490
 msgid "Removable device connected"
 msgstr ""
 
-#: plugin.c:401
+#: plugin.c:505
 msgid "USB device connected"
 msgstr ""
 
-#: plugin.c:409
+#: plugin.c:513
 msgid "Phone or camera connected"
 msgstr ""
 
-#: plugin.c:419
+#: plugin.c:523
 msgid "Phone or camera disconnected"
 msgstr ""
 
-#: plugin.c:429
+#: plugin.c:533
 msgid "Removable device disconnected"
 msgstr ""
 
-#: plugin.c:444
+#: plugin.c:548
 msgid "USB device disconnected"
 msgstr ""
 
-#: plugin.c:605
+#: plugin.c:777
 msgid "Properties — Removable Devices"
 msgstr ""
 
-#: plugin.c:608
+#: plugin.c:780
 msgid "Close"
 msgstr ""
 
 #. ---- frame Apariencia ----
-#: plugin.c:616
+#: plugin.c:788
 msgid "Appearance"
 msgstr ""
 
 #. botón cuadrado
-#: plugin.c:626
+#: plugin.c:798
 msgid "Square button"
 msgstr ""
 
 #. tamaño del plugin
-#: plugin.c:632
+#: plugin.c:804
 msgid "Plugin size:"
 msgstr ""
 
 #. ícono del panel
-#: plugin.c:643
+#: plugin.c:815
 msgid "Use panel icon size"
 msgstr ""
 
 #. tamaño del ícono
-#: plugin.c:649
+#: plugin.c:821
 msgid "Icon size:"
 msgstr ""
 
 #. ancho del popup
-#: plugin.c:660
+#: plugin.c:832
 msgid "Popup width:"
 msgstr ""
 
 #. alto del popup
-#: plugin.c:669
+#: plugin.c:841
 msgid "Popup height:"
 msgstr ""
 
 #. estilo de la ventana: el orden de los textos es el de POPUP_STYLE_*
-#: plugin.c:678
+#: plugin.c:850
 msgid "Popup style:"
 msgstr ""
 
-#: plugin.c:681
+#: plugin.c:853
 msgid "Automatic"
 msgstr ""
 
-#: plugin.c:682
+#: plugin.c:854
 msgid "Floating"
 msgstr ""
 
-#: plugin.c:683
+#: plugin.c:855
 msgid "Attached to the panel"
 msgstr ""
 
-#: plugin.c:686
+#: plugin.c:858
 msgid ""
 "Automatic: floating with rounded corners when the theme and the compositor "
 "allow it, otherwise attached to the panel."
 msgstr ""
 
 #. ---- frame Comportamiento ----
-#: plugin.c:697
+#: plugin.c:869
 msgid "Behavior"
 msgstr ""
 
-#: plugin.c:706
+#: plugin.c:878
 msgid "Show notifications"
 msgstr ""
 
-#: plugin.c:711
+#: plugin.c:883
 msgid "Hide button when no removable devices"
 msgstr ""
 
-#: plugin.c:718
+#: plugin.c:890
 msgid "Also hide when only other devices are present"
 msgstr ""
 
-#: plugin.c:726
+#: plugin.c:897
+msgid "Show keyboards and mice"
+msgstr ""
+
+#: plugin.c:903
 msgid "Notify when devices are connected or disconnected"
 msgstr ""
 
-#: plugin.c:781 xfce-removable-plugin.desktop.in:4
+#: plugin.c:909
+msgid "Play a sound when devices are connected or disconnected"
+msgstr ""
+
+#: plugin.c:912
+msgid ""
+"Uses the desktop sound theme. Nothing plays if event sounds are turned off "
+"in the Appearance settings."
+msgstr ""
+
+#: plugin.c:918
+msgid "Notify about:"
+msgstr ""
+
+#: plugin.c:930 popup.c:1386
+msgid "Removable disk"
+msgstr ""
+
+#: plugin.c:1001 xfce-removable-plugin.desktop.in:3
 msgid "Removable Devices"
 msgstr ""
 
-#: plugin.c:784 xfce-removable-plugin.desktop.in:5
+#: plugin.c:1004 xfce-removable-plugin.desktop.in:4
 msgid "Mount and safely remove drives, phones and other USB devices"
 msgstr ""
 
-#: plugin.c:865
+#: plugin.c:1093
 msgid "Removable devices"
 msgstr ""
 
-#: plugin.c:907
+#: plugin.c:1141
 msgid "Removable Devices added"
 msgstr ""
 
-#: plugin.c:908 popup.c:1868
+#: plugin.c:1142 popup.c:2123
 msgid ""
-"This button hides when nothing is connected and reappears when you connect a "
-"device."
+"This button hides when nothing is connected and reappears when you connect "
+"a device."
 msgstr ""
 
-#: popup.c:641
+#: popup.c:830
 msgid ""
 "The device is in use by another application. Close any open files or "
 "terminals on it and try again."
 msgstr ""
 
-#: popup.c:644
+#: popup.c:833
 msgid "Not authorized to perform this operation."
 msgstr ""
 
-#: popup.c:700
+#: popup.c:902 popup.c:905
 msgid "Device mounted"
 msgstr ""
 
-#: popup.c:713
+#: popup.c:910
 msgid "Could not mount the device."
 msgstr ""
 
-#: popup.c:714 popup.c:1528
+#: popup.c:912 popup.c:1775
 msgid "Mount failed"
 msgstr ""
 
-#: popup.c:718 popup.c:1025 popup.c:1362 popup.c:1573 popup.c:1685
+#: popup.c:915 popup.c:1233 popup.c:1572 popup.c:1823 popup.c:1937
 msgid "Mount"
 msgstr ""
 
-#: popup.c:738 popup.c:1550
+#: popup.c:934 popup.c:1799
 msgid "Safe to remove"
 msgstr ""
 
-#: popup.c:738 popup.c:1550
+#: popup.c:935 popup.c:1800
 msgid "You can now unplug the device."
 msgstr ""
 
-#: popup.c:744 popup.c:826
+#: popup.c:939 popup.c:1024
 msgid "Could not unmount the device."
 msgstr ""
 
-#: popup.c:745 popup.c:1554
+#: popup.c:941 popup.c:1804
 msgid "Unmount failed"
 msgstr ""
 
-#: popup.c:749 popup.c:1022 popup.c:1359
+#: popup.c:944 popup.c:1230 popup.c:1569
 msgid "Unmount"
 msgstr ""
 
-#: popup.c:762 popup.c:1569
+#: popup.c:957 popup.c:1819
 msgid "Mounting…"
 msgstr ""
 
-#: popup.c:771
+#: popup.c:967
 msgid "Unmounting…"
 msgstr ""
 
-#: popup.c:827 popup.c:855
+#: popup.c:1026 popup.c:1057
 msgid "Eject failed"
 msgstr ""
 
-#: popup.c:851
+#: popup.c:1052
 msgid "Device ejected"
 msgstr ""
 
-#: popup.c:851
+#: popup.c:1052
 msgid "Safe to unplug."
 msgstr ""
 
-#: popup.c:854
+#: popup.c:1055
 msgid "The partitions were unmounted, but the drive could not be ejected."
 msgstr ""
 
-#: popup.c:890
+#: popup.c:1095
 msgid "Ejecting…"
 msgstr ""
 
-#: popup.c:890
+#: popup.c:1096
 msgid "Please wait, do not unplug."
 msgstr ""
 
-#: popup.c:932
-#, c-format
+#: popup.c:1139
+#, c-format, python-format
 msgid "%s free of %s"
 msgstr ""
 
-#: popup.c:1014 popup.c:1350 popup.c:1671
+#: popup.c:1222 popup.c:1560 popup.c:1923
 msgid "Open folder"
 msgstr ""
 
-#: popup.c:1178
-msgid "Removable disk"
-msgstr ""
-
-#: popup.c:1250
+#: popup.c:1459
 msgid "Eject"
 msgstr ""
 
-#: popup.c:1250 popup.c:1679
+#: popup.c:1459 popup.c:1931
 msgid "Safely remove"
 msgstr ""
 
-#: popup.c:1513
+#: popup.c:1625
+msgid "No driver: games may not detect it"
+msgstr ""
+
+#: popup.c:1631
+msgid ""
+"No system driver has taken this controller, so most games will not detect "
+"it (Steam can still use it). A common cause is a package that blocks the "
+"xpad driver, such as xone."
+msgstr ""
+
+#: popup.c:1638
+msgid "File transfer is off"
+msgstr ""
+
+#: popup.c:1644
+msgid ""
+"The phone is connected only for charging or USB debugging. To see its "
+"files, unlock it and choose \"File transfer\" in its USB notification."
+msgstr ""
+
+#: popup.c:1763
 msgid "Phone ready"
 msgstr ""
 
-#: popup.c:1529
+#: popup.c:1776
 msgid ""
 "Could not open the device. If it is a phone, unlock it and choose \"File "
 "transfer\" in its USB notification."
 msgstr ""
 
-#: popup.c:1555
+#: popup.c:1805
 msgid "Could not close the connection to the device."
 msgstr ""
 
-#: popup.c:1607
+#: popup.c:1857
 msgid "Camera (PTP)"
 msgstr ""
 
-#: popup.c:1608
+#: popup.c:1858
 msgid "iPhone / iPad"
 msgstr ""
 
-#: popup.c:1610
+#: popup.c:1860
 msgid "Phone (MTP)"
 msgstr ""
 
-#: popup.c:1648
+#: popup.c:1874 popup.c:1900
 msgid "Phone"
 msgstr ""
 
-#: popup.c:1655
+#: popup.c:1907
 msgid "not mounted"
 msgstr ""
 
-#: popup.c:1736
+#: popup.c:1988
 msgid "Other devices"
 msgstr ""
 
-#: popup.c:1856
+#: popup.c:2111
 msgid "No removable devices"
 msgstr ""
 
-#: popup.c:1870
+#: popup.c:2125
 msgid "You can now place it wherever you like: right-click → Move."
 msgstr ""
 
-#: ud-dbus.c:448
+#: ud-dbus.c:453
 msgid "Printer"
 msgstr ""
 
-#: ud-dbus.c:449
+#: ud-dbus.c:454
 msgid "Audio device"
 msgstr ""
 
-#: ud-dbus.c:450
+#: ud-dbus.c:455
 msgid "Camera / Webcam"
 msgstr ""
 
-#: ud-dbus.c:451
+#: ud-dbus.c:456
 msgid "Gamepad / Joystick"
 msgstr ""
 
-#: ud-dbus.c:452
+#: ud-dbus.c:457
 msgid "Phone / Camera"
 msgstr ""
 
-#: ud-dbus.c:453
+#: ud-dbus.c:458
 msgid "Graphics tablet"
 msgstr ""
 
-#: ud-dbus.c:454
+#: ud-dbus.c:459
 msgid "Serial device / Board"
 msgstr ""
 
-#: ud-dbus.c:455
+#: ud-dbus.c:460
 msgid "Security key / Smart card"
 msgstr ""
 
-#: ud-dbus.c:456
+#: ud-dbus.c:461
 msgid "MIDI device"
 msgstr ""
 
-#: ud-dbus.c:458
+#: ud-dbus.c:462
+msgid "Keyboard / Mouse"
+msgstr ""
+
+#: ud-dbus.c:463
+msgid "Android phone"
+msgstr ""
+
+#: ud-dbus.c:464
+msgid "Scanner"
+msgstr ""
+
+#: ud-dbus.c:466
 msgid "USB device"
-msgstr ""
-
-msgid "Play a sound when devices are connected or disconnected"
-msgstr ""
-
-msgid "Uses the desktop sound theme. Nothing plays if event sounds are turned off in the Appearance settings."
 msgstr ""

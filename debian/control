@@ -1,7 +1,7 @@
 Source: xfce-removable-plugin
 Section: xfce
 Priority: optional
-Maintainer: Juan Sebastian Perez <juanchiperez97@gmail.com>
+Maintainer: Tantin1 <juanperez33840@gmail.com>
 Build-Depends: debhelper-compat (= 13),
                meson,
                pkgconf | pkg-config,

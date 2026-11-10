@@ -11,7 +11,7 @@ pkg=xfce-removable-plugin
 if ! dpkg-checkbuilddeps 2>/dev/null; then
     echo "Faltan dependencias de compilación. Instalalas con:"
     echo "  sudo apt install build-essential debhelper meson pkgconf gettext \\"
-    echo "       libgtk-3-dev libxfce4panel-2.0-dev libxfce4ui-2-dev libnotify-dev libgudev-1.0-dev"
+    echo "       libgtk-3-dev libxfce4panel-2.0-dev libxfce4ui-2-dev libnotify-dev libgudev-1.0-dev libcanberra-gtk3-dev"
     exit 1
 fi
 

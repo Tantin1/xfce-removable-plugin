@@ -2323,13 +2323,21 @@ popup_show (RemovablePopup *popup, XfcePanelPlugin *plugin,
         return;
     }
 
-    /* ---- X11 (sin cambios de comportamiento) ---- */
+    /* ---- X11: prueba aislada para el estilo pegado al panel ---- */
 
-    /* mostrar ventana, scroll y content_box — pero NO sus hijos (populate_content
-       ya los mostró selectivamente) */
-    gtk_widget_show_all (popup->window);
-
-    position_popup (popup, button);
+    if (popup->gap == 0) {
+        /* Experimento: preparar y posicionar antes de mapear el toplevel.
+           Algunos gestores de ventanas ignoran la posición inicial;
+           el resultado visual debe verificarse en X11. */
+        gtk_widget_show_all (popup->frame);
+        gtk_widget_realize (popup->window);
+        position_popup (popup, button);
+        gtk_widget_show (popup->window);
+    } else {
+        /* El estilo flotante conserva exactamente la secuencia original. */
+        gtk_widget_show_all (popup->window);
+        position_popup (popup, button);
+    }
 
     GdkDisplay      *display = gtk_widget_get_display (popup->window);
     GdkSeat         *seat    = gdk_display_get_default_seat (display);
