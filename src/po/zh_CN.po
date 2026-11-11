@@ -84,6 +84,9 @@ msgstr "浮动"
 msgid "Gamepad / Joystick"
 msgstr "游戏手柄 / 摇杆"
 
+msgid "General"
+msgstr "常规"
+
 msgid "Graphics tablet"
 msgstr "数位板"
 
@@ -123,6 +126,9 @@ msgstr "没有系统驱动接管此手柄，因此大多数游戏无法识别它
 
 msgid "Not authorized to perform this operation."
 msgstr "无权执行此操作。"
+
+msgid "Notifications"
+msgstr "通知"
 
 msgid "Notify about:"
 msgstr "通知类型："

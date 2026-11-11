@@ -84,6 +84,9 @@ msgstr "عائمة"
 msgid "Gamepad / Joystick"
 msgstr "ذراع ألعاب / عصا تحكم"
 
+msgid "General"
+msgstr "عام"
+
 msgid "Graphics tablet"
 msgstr "لوح رسم"
 
@@ -123,6 +126,9 @@ msgstr "لم يتولَّ أي تعريف في النظام هذه الذراع�
 
 msgid "Not authorized to perform this operation."
 msgstr "غير مصرح لك بتنفيذ هذه العملية."
+
+msgid "Notifications"
+msgstr "الإشعارات"
 
 msgid "Notify about:"
 msgstr "الإشعار عن:"

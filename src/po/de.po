@@ -84,6 +84,9 @@ msgstr "Schwebend"
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
+msgid "General"
+msgstr "Allgemein"
+
 msgid "Graphics tablet"
 msgstr "Grafiktablett"
 
@@ -123,6 +126,9 @@ msgstr "Kein Systemtreiber hat diesen Controller übernommen, daher erkennen ihn
 
 msgid "Not authorized to perform this operation."
 msgstr "Keine Berechtigung für diesen Vorgang."
+
+msgid "Notifications"
+msgstr "Benachrichtigungen"
 
 msgid "Notify about:"
 msgstr "Benachrichtigen bei:"

@@ -84,6 +84,9 @@ msgstr "Zwevend"
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
+msgid "General"
+msgstr "Algemeen"
+
 msgid "Graphics tablet"
 msgstr "Tekentablet"
 
@@ -123,6 +126,9 @@ msgstr "Geen systeemstuurprogramma heeft deze controller overgenomen, dus de mee
 
 msgid "Not authorized to perform this operation."
 msgstr "Niet bevoegd om deze bewerking uit te voeren."
+
+msgid "Notifications"
+msgstr "Meldingen"
 
 msgid "Notify about:"
 msgstr "Melden bij:"

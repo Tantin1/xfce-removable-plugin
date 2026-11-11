@@ -84,6 +84,9 @@ msgstr "Plovoucí"
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
+msgid "General"
+msgstr "Obecné"
+
 msgid "Graphics tablet"
 msgstr "Grafický tablet"
 
@@ -123,6 +126,9 @@ msgstr "Tento gamepad nepřevzal žádný systémový ovladač, takže ho větš
 
 msgid "Not authorized to perform this operation."
 msgstr "Nemáte oprávnění k provedení této operace."
+
+msgid "Notifications"
+msgstr "Oznámení"
 
 msgid "Notify about:"
 msgstr "Upozorňovat na:"

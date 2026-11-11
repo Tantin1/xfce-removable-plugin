@@ -84,6 +84,9 @@ msgstr "Pływające"
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
+msgid "General"
+msgstr "Ogólne"
+
 msgid "Graphics tablet"
 msgstr "Tablet graficzny"
 
@@ -123,6 +126,9 @@ msgstr "Żaden sterownik systemowy nie obsłużył tego kontrolera, więc więks
 
 msgid "Not authorized to perform this operation."
 msgstr "Brak uprawnień do wykonania tej operacji."
+
+msgid "Notifications"
+msgstr "Powiadomienia"
 
 msgid "Notify about:"
 msgstr "Powiadamiaj o:"

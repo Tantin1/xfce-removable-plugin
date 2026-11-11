@@ -84,6 +84,9 @@ msgstr "Flutuante"
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
+msgid "General"
+msgstr "Geral"
+
 msgid "Graphics tablet"
 msgstr "Mesa digitalizadora"
 
@@ -123,6 +126,9 @@ msgstr "Nenhum driver do sistema assumiu este controle, então a maioria dos jog
 
 msgid "Not authorized to perform this operation."
 msgstr "Sem autorização para realizar esta operação."
+
+msgid "Notifications"
+msgstr "Notificações"
 
 msgid "Notify about:"
 msgstr "Notificar sobre:"

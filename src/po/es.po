@@ -84,6 +84,9 @@ msgstr "Flotante"
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
+msgid "General"
+msgstr "General"
+
 msgid "Graphics tablet"
 msgstr "Tableta gráfica"
 
@@ -123,6 +126,9 @@ msgstr "Ningún driver del sistema tomó este mando, así que la mayoría de los
 
 msgid "Not authorized to perform this operation."
 msgstr "No tiene autorización para realizar esta operación."
+
+msgid "Notifications"
+msgstr "Notificaciones"
 
 msgid "Notify about:"
 msgstr "Notificar sobre:"

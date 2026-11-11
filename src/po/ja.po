@@ -84,6 +84,9 @@ msgstr "フローティング"
 msgid "Gamepad / Joystick"
 msgstr "ゲームパッド / ジョイスティック"
 
+msgid "General"
+msgstr "全般"
+
 msgid "Graphics tablet"
 msgstr "ペンタブレット"
 
@@ -123,6 +126,9 @@ msgstr "このコントローラーを扱うシステムドライバーがない
 
 msgid "Not authorized to perform this operation."
 msgstr "この操作を実行する権限がありません。"
+
+msgid "Notifications"
+msgstr "通知"
 
 msgid "Notify about:"
 msgstr "通知する種類："

@@ -84,6 +84,9 @@ msgstr "Flottante"
 msgid "Gamepad / Joystick"
 msgstr "Manette / Joystick"
 
+msgid "General"
+msgstr "Général"
+
 msgid "Graphics tablet"
 msgstr "Tablette graphique"
 
@@ -123,6 +126,9 @@ msgstr "Aucun pilote du système n'a pris en charge cette manette : la plupart d
 
 msgid "Not authorized to perform this operation."
 msgstr "Non autorisé à effectuer cette opération."
+
+msgid "Notifications"
+msgstr "Notifications"
 
 msgid "Notify about:"
 msgstr "Notifier pour :"

@@ -84,6 +84,9 @@ msgstr "Yüzen"
 msgid "Gamepad / Joystick"
 msgstr "Oyun kumandası / Joystick"
 
+msgid "General"
+msgstr "Genel"
+
 msgid "Graphics tablet"
 msgstr "Grafik tableti"
 
@@ -123,6 +126,9 @@ msgstr "Bu denetleyiciyi hiçbir sistem sürücüsü üstlenmedi, bu yüzden ço
 
 msgid "Not authorized to perform this operation."
 msgstr "Bu işlemi gerçekleştirme yetkiniz yok."
+
+msgid "Notifications"
+msgstr "Bildirimler"
 
 msgid "Notify about:"
 msgstr "Bildirilecekler:"

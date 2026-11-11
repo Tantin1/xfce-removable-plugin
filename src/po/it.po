@@ -84,6 +84,9 @@ msgstr "Fluttuante"
 msgid "Gamepad / Joystick"
 msgstr "Gamepad / Joystick"
 
+msgid "General"
+msgstr "Generale"
+
 msgid "Graphics tablet"
 msgstr "Tavoletta grafica"
 
@@ -123,6 +126,9 @@ msgstr "Nessun driver di sistema ha preso in carico questo controller, quindi la
 
 msgid "Not authorized to perform this operation."
 msgstr "Non autorizzato a eseguire questa operazione."
+
+msgid "Notifications"
+msgstr "Notifiche"
 
 msgid "Notify about:"
 msgstr "Notifica per:"

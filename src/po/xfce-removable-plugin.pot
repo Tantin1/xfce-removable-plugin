@@ -52,6 +52,15 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
+#. pestañas de Propiedades
+#: plugin.c:822
+msgid "General"
+msgstr ""
+
+#: plugin.c:827
+msgid "Notifications"
+msgstr ""
+
 #. ---- frame Apariencia ----
 #: plugin.c:788
 msgid "Appearance"

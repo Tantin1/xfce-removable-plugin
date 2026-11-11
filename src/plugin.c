@@ -20,7 +20,7 @@
 #define DEFAULT_SQUARE_BUTTON        FALSE
 #define DEFAULT_PLUGIN_SIZE          24
 #define DEFAULT_USE_PANEL_ICON       FALSE
-#define DEFAULT_ICON_SIZE            16
+#define DEFAULT_ICON_SIZE            22   /* entra en el botón de 24 (padding 0) */
 #define DEFAULT_POPUP_WIDTH          400
 /* con Montar/Desmontar + Expulsar en una fila, menos de esto no entra en todos
    los idiomas sin ensanchar el popup (medido con ruso, el más largo) */
@@ -809,6 +809,23 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     GtkWidget *content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
     gtk_container_set_border_width (GTK_CONTAINER (content), 12);
 
+    /* Dos pestañas: "General" (Apariencia + Comportamiento) y "Notificaciones"
+       (burbujas, sonidos y las categorías, que valen para los dos). Así la
+       ventana mide la mitad de alto. */
+    GtkWidget *notebook = gtk_notebook_new ();
+    gtk_widget_set_margin_bottom (notebook, 6);   /* aire antes de "Cerrar" */
+    gtk_box_pack_start (GTK_BOX (content), notebook, TRUE, TRUE, 0);
+
+    GtkWidget *page_general = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_set_border_width (GTK_CONTAINER (page_general), 12);
+    gtk_notebook_append_page (GTK_NOTEBOOK (notebook), page_general,
+                              gtk_label_new (_("General")));
+
+    GtkWidget *page_notify = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+    gtk_container_set_border_width (GTK_CONTAINER (page_notify), 12);
+    gtk_notebook_append_page (GTK_NOTEBOOK (notebook), page_notify,
+                              gtk_label_new (_("Notifications")));
+
     /* ---- frame Apariencia ---- */
     GtkWidget *frame_ap = gtk_frame_new (_("Appearance"));
     GtkWidget *grid_ap  = gtk_grid_new ();
@@ -885,8 +902,8 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     gtk_grid_attach (GTK_GRID (grid_ap), popup_style_label,     0, row, 1, 1);
     gtk_grid_attach (GTK_GRID (grid_ap), pd->popup_style_combo, 1, row, 1, 1);
 
-    gtk_box_pack_start (GTK_BOX (content), frame_ap, FALSE, FALSE, 0);
-    gtk_box_pack_start (GTK_BOX (content),
+    gtk_box_pack_start (GTK_BOX (page_general), frame_ap, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (page_general),
                         gtk_separator_new (GTK_ORIENTATION_HORIZONTAL),
                         FALSE, FALSE, 6);
 
@@ -899,11 +916,6 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     gtk_container_add (GTK_CONTAINER (frame_bh), grid_bh);
 
     row = 0;
-
-    pd->notify_check = gtk_check_button_new_with_label (_("Show notifications"));
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->notify_check), rp->show_notify);
-    gtk_grid_attach (GTK_GRID (grid_bh), pd->notify_check, 0, row, 2, 1);
-    row++;
 
     pd->hide_check = gtk_check_button_new_with_label (_("Hide button when no removable devices"));
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->hide_check), rp->hide_if_empty);
@@ -922,12 +934,27 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     pd->show_input_check = gtk_check_button_new_with_label (_("Show keyboards and mice"));
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->show_input_check), rp->show_input);
     gtk_grid_attach (GTK_GRID (grid_bh), pd->show_input_check, 0, row, 2, 1);
+
+    gtk_box_pack_start (GTK_BOX (page_general), frame_bh, FALSE, FALSE, 0);
+
+    /* ---- pestaña Notificaciones ---- */
+    GtkWidget *grid_nt = gtk_grid_new ();
+    gtk_grid_set_row_spacing    (GTK_GRID (grid_nt), 6);
+    gtk_grid_set_column_spacing (GTK_GRID (grid_nt), 12);
+    gtk_box_pack_start (GTK_BOX (page_notify), grid_nt, FALSE, FALSE, 0);
+
+    row = 0;
+
+    /* resultados de montar, desmontar y expulsar (con el popup cerrado) */
+    pd->notify_check = gtk_check_button_new_with_label (_("Show notifications"));
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->notify_check), rp->show_notify);
+    gtk_grid_attach (GTK_GRID (grid_nt), pd->notify_check, 0, row, 2, 1);
     row++;
 
     pd->notify_new_check = gtk_check_button_new_with_label (
         _("Notify when devices are connected or disconnected"));
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->notify_new_check), rp->notify_new_device);
-    gtk_grid_attach (GTK_GRID (grid_bh), pd->notify_new_check, 0, row, 2, 1);
+    gtk_grid_attach (GTK_GRID (grid_nt), pd->notify_new_check, 0, row, 2, 1);
     row++;
 
     pd->sounds_check = gtk_check_button_new_with_label (
@@ -936,21 +963,21 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
     gtk_widget_set_tooltip_text (pd->sounds_check,
         _("Uses the desktop sound theme. Nothing plays if event sounds are "
           "turned off in the Appearance settings."));
-    gtk_grid_attach (GTK_GRID (grid_bh), pd->sounds_check, 0, row, 2, 1);
+    gtk_grid_attach (GTK_GRID (grid_nt), pd->sounds_check, 0, row, 2, 1);
     row++;
 
     /* por categoría, en dos columnas (reusa los nombres de tipo ya traducidos) */
     pd->notify_about_label = gtk_label_new (_("Notify about:"));
     gtk_label_set_xalign (GTK_LABEL (pd->notify_about_label), 0.0);
     gtk_widget_set_margin_start (pd->notify_about_label, 20);
-    gtk_grid_attach (GTK_GRID (grid_bh), pd->notify_about_label, 0, row, 2, 1);
+    gtk_grid_attach (GTK_GRID (grid_nt), pd->notify_about_label, 0, row, 2, 1);
     row++;
 
     GtkWidget *grid_types = gtk_grid_new ();
     gtk_grid_set_row_spacing    (GTK_GRID (grid_types), 2);
     gtk_grid_set_column_spacing (GTK_GRID (grid_types), 12);
     gtk_widget_set_margin_start (grid_types, 32);
-    gtk_grid_attach (GTK_GRID (grid_bh), grid_types, 0, row, 2, 1);
+    gtk_grid_attach (GTK_GRID (grid_nt), grid_types, 0, row, 2, 1);
 
     pd->notify_drives_check = gtk_check_button_new_with_label (_("Removable disk"));
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (pd->notify_drives_check), rp->notify_drives);
@@ -969,8 +996,6 @@ on_configure_plugin (XfcePanelPlugin *plugin, RemovablePlugin *rp)
         pd->notify_type_check[t] = chk;
     }
     props_update_notify_sensitivity (pd);
-
-    gtk_box_pack_start (GTK_BOX (content), frame_bh, FALSE, FALSE, 0);
 
     /* señales */
     g_signal_connect (pd->square_check,      "toggled",       G_CALLBACK (on_square_toggled),      pd);

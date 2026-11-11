@@ -84,6 +84,9 @@ msgstr "Плавающее"
 msgid "Gamepad / Joystick"
 msgstr "Геймпад / джойстик"
 
+msgid "General"
+msgstr "Общие"
+
 msgid "Graphics tablet"
 msgstr "Графический планшет"
 
@@ -123,6 +126,9 @@ msgstr "Ни один системный драйвер не подключил 
 
 msgid "Not authorized to perform this operation."
 msgstr "Нет прав на выполнение этой операции."
+
+msgid "Notifications"
+msgstr "Уведомления"
 
 msgid "Notify about:"
 msgstr "Уведомлять о:"
