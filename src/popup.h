@@ -45,9 +45,11 @@ typedef struct {
 } RemovablePopup;
 
 RemovablePopup *popup_create  (XfcePanelPlugin *plugin, GtkWidget *button);
+/* scan: la última revisión de plugin.c (ya filtrada); NULL = revisar ahora */
 void            popup_show    (RemovablePopup *popup, XfcePanelPlugin *plugin,
                                GtkWidget *button, GDBusConnection *conn,
-                               gint popup_width, gint popup_height);
+                               gint popup_width, gint popup_height,
+                               const UdScan *scan);
 void            popup_hide    (RemovablePopup *popup);
 void            popup_refresh        (RemovablePopup *popup, GDBusConnection *conn,
                                       const UdScan *scan);

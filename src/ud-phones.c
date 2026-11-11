@@ -156,9 +156,17 @@ UdScan *
 ud_scan (GDBusConnection *conn)
 {
     UdScan *scan  = g_new0 (UdScan, 1);
+    /* medición (parche 30, temporal): solo con G_MESSAGES_DEBUG */
+    gint64 t0 = g_get_monotonic_time ();
     scan->storage = ud_get_devices (conn);
+    gint64 t1 = g_get_monotonic_time ();
     scan->phones  = ud_get_phones ();
+    gint64 t2 = g_get_monotonic_time ();
     scan->usb     = ud_get_usb_devices ();
+    gint64 t3 = g_get_monotonic_time ();
+    g_log ("xfce-removable-plugin", G_LOG_LEVEL_DEBUG,
+           "medir:   escaneo: discos %.1f ms · teléfonos %.1f ms · USB %.1f ms",
+           (t1 - t0) / 1000.0, (t2 - t1) / 1000.0, (t3 - t2) / 1000.0);
 
     /* el aparato que gvfs ya muestra como teléfono no se repite en "Otros" */
     GHashTable *taken = g_hash_table_new (g_str_hash, g_str_equal);

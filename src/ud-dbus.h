@@ -53,6 +53,8 @@ UdSubscription  *ud_subscribe        (GDBusConnection *conn,
                                       UdSignalCallback callback,
                                       gpointer         user_data);
 void             ud_unsubscribe      (GDBusConnection *conn, UdSubscription *sub);
+/* TRUE si llegó un evento y el refresco todavía espera el debounce */
+gboolean         ud_refresh_pending  (const UdSubscription *sub);
 
 /* --- otros dispositivos USB --- */
 

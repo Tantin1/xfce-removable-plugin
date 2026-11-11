@@ -91,6 +91,11 @@ typedef struct {
     GHashTable      *seen_usb;       /* syspath     -> name|type    */
     GHashTable      *seen_phones;    /* devfile/URI -> name         */
 
+    /* última revisión de dispositivos (ya sin teclados/mouses si no se piden).
+       El popup abre con esta en vez de revisar de nuevo: la de USB tarda
+       ~75 ms (medido, parche 30). Se renueva en cada refresco por señal. */
+    UdScan          *last_scan;
+
     /* CSS tamaño del botón */
     GtkCssProvider  *button_css;
 
@@ -296,6 +301,16 @@ plugin_scan (RemovablePlugin *rp)
     return scan;
 }
 
+/* guarda `scan` como la última revisión (se queda con ella: no liberarla) */
+static void
+plugin_keep_scan (RemovablePlugin *rp, UdScan *scan)
+{
+    if (rp->last_scan == scan)
+        return;
+    ud_scan_free (rp->last_scan);
+    rp->last_scan = scan;
+}
+
 /* ---------- visibilidad del botón ---------- */
 
 static void
@@ -323,7 +338,7 @@ plugin_update_button_visibility (RemovablePlugin *rp)
 {
     UdScan *scan = plugin_scan (rp);
     apply_button_visibility (rp, scan);
-    ud_scan_free (scan);
+    plugin_keep_scan (rp, scan);
 }
 
 /* ---------- toggle del popup ---------- */
@@ -340,8 +355,18 @@ plugin_popup_toggle (GtkWidget *button, RemovablePlugin *rp)
 
     rp->popup_open = TRUE;
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (rp->button), TRUE);
+    /* La revisión guardada solo si está al día:
+     *   sin refresco pendiente  → la guardada (~10 ms)
+     *   con refresco pendiente  → el popup revisa ahora (~75 ms): acaba de
+     *                             pasar algo y la guardada puede estar vieja
+     *   sin suscripción (no hay bus del sistema) → nada la renueva: revisar
+     * El refresco pendiente igual llega después y actualiza la lista
+     * guardada, el botón y las notificaciones. */
+    gboolean fresh = rp->subscription && rp->last_scan &&
+                     !ud_refresh_pending (rp->subscription);
     popup_show (rp->popup, rp->plugin, rp->button, rp->conn,
-                rp->popup_width, rp->popup_height);
+                rp->popup_width, rp->popup_height,
+                fresh ? rp->last_scan : NULL);
 }
 
 /* callback para cerrar el popup desde popup.c */
@@ -580,7 +605,7 @@ plugin_on_device_change (RemovablePlugin *rp)
     if (rp->popup_open)
         popup_refresh (rp->popup, rp->conn, scan);
 
-    ud_scan_free (scan);
+    plugin_keep_scan (rp, scan);
 }
 
 /* ---------- ventana de Propiedades ---------- */
@@ -734,7 +759,7 @@ on_show_input_toggled (GtkToggleButton *btn, PropsDialog *pd)
     UdScan *scan = plugin_scan (rp);
     update_snapshots (rp, scan, TRUE);
     apply_button_visibility (rp, scan);
-    ud_scan_free (scan);
+    plugin_keep_scan (rp, scan);   /* con o sin teclados, según la opción nueva */
 }
 
 static void
@@ -1065,6 +1090,7 @@ removable_plugin_free (XfcePanelPlugin *plugin, RemovablePlugin *rp)
         g_hash_table_destroy (rp->seen_usb);
     if (rp->seen_phones)
         g_hash_table_destroy (rp->seen_phones);
+    ud_scan_free (rp->last_scan);
     g_free (rp);
 }
 
@@ -1143,7 +1169,7 @@ removable_plugin_construct (XfcePanelPlugin *plugin)
                              "reappears when you connect a device."),
                            "drive-removable-media");
         }
-        ud_scan_free (scan);
+        plugin_keep_scan (rp, scan);
     }
 
     xfce_panel_plugin_menu_show_configure (plugin);

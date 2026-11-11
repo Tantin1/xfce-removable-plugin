@@ -31,7 +31,7 @@ if patch -p1 -R --dry-run -s < "$PARCHE" >/dev/null 2>&1; then
 fi
 # ¿aplica limpio? (si no, no se toca nada)
 if ! patch -p1 --dry-run -s < "$PARCHE" >/dev/null 2>&1; then
-    echo "ERROR: el parche no aplica. No se tocó nada. Mandale a Claude esto:"
+    echo "ERROR: el parche no aplica. No se tocó nada. Revisá el siguiente error:"
     patch -p1 --dry-run < "$PARCHE"
     exit 1
 fi
@@ -41,7 +41,7 @@ patch -p1 < "$PARCHE" || exit 1
 
 echo "== Compilando"
 if ! meson compile -C build; then
-    echo "ERROR al compilar. Mandale a Claude lo de arriba."
+    echo "ERROR al compilar. Revisá el error de compilación anterior."
     exit 1
 fi
 

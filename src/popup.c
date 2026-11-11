@@ -220,6 +220,47 @@ popup_apply_style (RemovablePopup *popup)
 /* diagnóstico silencioso: G_MESSAGES_DEBUG=xfce-removable-plugin xfce4-panel */
 #define WL_DEBUG(...) g_log ("xfce-removable-plugin", G_LOG_LEVEL_DEBUG, __VA_ARGS__)
 
+/* ---------- medición de la apertura (parche 30, temporal) ----------
+ * Cuánto tarda cada paso de popup_show, hasta que la ventana termina de
+ * dibujarse. Solo escribe con G_MESSAGES_DEBUG=xfce-removable-plugin (ver
+ * tools/medir-apertura.sh); si no, no hace nada visible. Todas las líneas
+ * empiezan con "medir:". Variables del proceso: alcanza para medir. */
+static gint64   medir_t0, medir_prev;
+static gboolean medir_esperando_dibujo;
+
+static void
+medir_inicio (void)
+{
+    medir_t0 = medir_prev = g_get_monotonic_time ();
+    medir_esperando_dibujo = FALSE;
+    g_log ("xfce-removable-plugin", G_LOG_LEVEL_DEBUG, "medir: ---- apertura ----");
+}
+
+static void
+medir_paso (const gchar *paso)
+{
+    if (medir_t0 == 0)
+        return;
+    gint64 now = g_get_monotonic_time ();
+    g_log ("xfce-removable-plugin", G_LOG_LEVEL_DEBUG,
+           "medir: %-26s %7.1f ms   (total: %7.1f ms)",
+           paso, (now - medir_prev) / 1000.0, (now - medir_t0) / 1000.0);
+    medir_prev = now;
+}
+
+/* después de que GTK dibujó la ventana entera: lo que de verdad se ve */
+static gboolean
+on_medir_draw (GtkWidget *win, cairo_t *cr, gpointer popup)
+{
+    (void) win; (void) cr; (void) popup;
+    if (medir_esperando_dibujo) {
+        medir_esperando_dibujo = FALSE;
+        medir_paso ("primer dibujo terminado");
+        medir_t0 = 0;
+    }
+    return GDK_EVENT_PROPAGATE;
+}
+
 static gboolean
 popup_is_wayland (GtkWidget *w)
 {
@@ -418,8 +459,12 @@ on_popup_size_allocate (GtkWidget *win, GtkAllocation *alloc, RemovablePopup *po
         return;
     gint w, h;
     gtk_window_get_size (GTK_WINDOW (win), &w, &h);
-    if (w != popup->placed_w || h != popup->placed_h)
+    if (w != popup->placed_w || h != popup->placed_h) {
+        g_log ("xfce-removable-plugin", G_LOG_LEVEL_DEBUG,
+               "medir: reubicada al aparecer (%dx%d en vez de %dx%d)",
+               w, h, popup->placed_w, popup->placed_h);
         position_popup_x11 (popup, popup->button);   /* vuelve a guardar el tamaño: no se repite */
+    }
 }
 
 static void
@@ -2167,7 +2212,13 @@ popup_rebuild (RemovablePopup *popup, GDBusConnection *conn)
        "closed-cb"): sin él, teclados y mouses no se listan */
     if (!GPOINTER_TO_INT (g_object_get_data (G_OBJECT (popup->window), "show-input")))
         ud_scan_drop_usb_type (scan, UD_USB_INPUT);
+    medir_paso ("revisar dispositivos");
+    g_log ("xfce-removable-plugin", G_LOG_LEVEL_DEBUG,
+           "medir:   en la lista: %u particiones, %u teléfonos, %u otros",
+           g_slist_length (scan->storage), g_slist_length (scan->phones),
+           g_slist_length (scan->usb));
     populate_content (popup, conn, scan);
+    medir_paso ("armar la lista");
     ud_scan_free (scan);
 }
 
@@ -2227,6 +2278,7 @@ popup_create (XfcePanelPlugin *plugin, GtkWidget *button)
 
     g_signal_connect (win, "key-press-event", G_CALLBACK (on_key_press), popup);
     g_signal_connect (win, "draw",            G_CALLBACK (on_popup_draw), popup);
+    g_signal_connect_after (win, "draw",      G_CALLBACK (on_medir_draw), popup);
     g_signal_connect (win, "size-allocate",   G_CALLBACK (on_popup_size_allocate), popup);
     popup_apply_style (popup);
 
@@ -2291,8 +2343,10 @@ popup_show_wayland (RemovablePopup *popup, GtkWidget *button)
 void
 popup_show (RemovablePopup *popup, XfcePanelPlugin *plugin,
             GtkWidget *button, GDBusConnection *conn,
-            gint popup_width, gint popup_height)
+            gint popup_width, gint popup_height, const UdScan *scan)
 {
+    medir_inicio ();
+
     if (plugin)
         popup->plugin = plugin;
 
@@ -2305,11 +2359,27 @@ popup_show (RemovablePopup *popup, XfcePanelPlugin *plugin,
     /* las burbujas del plugin que estén en pantalla taparían el popup, y lo
        que dicen ya se ve en la lista */
     rp_notify_close_all ();
+    medir_paso ("cerrar burbujas");
 
     /* el compositor se puede activar o desactivar entre aperturas */
     popup_apply_style (popup);
+    medir_paso (popup->gap ? "estilo (flotante)" : "estilo (pegada)");
 
-    popup_rebuild (popup, conn);
+    /* Con la revisión que plugin.c ya tiene (la renueva cada señal de
+       UDisks2, udev o gvfs) no se espera la de USB, que tarda ~75 ms.
+       Lo que cambia sin aviso, el espacio libre, se lee igual al armar las
+       filas (statvfs en partition_detail). */
+    if (scan) {
+        medir_paso ("revisar dispositivos");
+        g_log ("xfce-removable-plugin", G_LOG_LEVEL_DEBUG,
+               "medir:   (usó la última revisión del plugin) %u particiones, %u teléfonos, %u otros",
+               g_slist_length (scan->storage), g_slist_length (scan->phones),
+               g_slist_length (scan->usb));
+        populate_content (popup, conn, scan);
+        medir_paso ("armar la lista");
+    } else {
+        popup_rebuild (popup, conn);
+    }
 
     /* la ventana mide lo configurado: el borde y el relleno del marco salen de la lista */
     gint fw, fh;
@@ -2320,6 +2390,8 @@ popup_show (RemovablePopup *popup, XfcePanelPlugin *plugin,
 
     if (popup->wayland) {
         popup_show_wayland (popup, button);
+        medir_paso ("mostrar y capturar (Wayland)");
+        medir_esperando_dibujo = TRUE;
         return;
     }
 
@@ -2338,6 +2410,7 @@ popup_show (RemovablePopup *popup, XfcePanelPlugin *plugin,
         gtk_widget_show_all (popup->window);
         position_popup (popup, button);
     }
+    medir_paso ("ubicar y mostrar");
 
     GdkDisplay      *display = gtk_widget_get_display (popup->window);
     GdkSeat         *seat    = gdk_display_get_default_seat (display);
@@ -2356,6 +2429,8 @@ popup_show (RemovablePopup *popup, XfcePanelPlugin *plugin,
         popup->press_handler = g_signal_connect (popup->window, "focus-out-event",
                                                  G_CALLBACK (on_focus_out), popup);
     }
+    medir_paso ("capturar mouse y teclado");
+    medir_esperando_dibujo = TRUE;
 }
 
 /* ---------- ocultar / destruir ---------- */

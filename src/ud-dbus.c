@@ -426,6 +426,14 @@ ud_subscribe (GDBusConnection *conn,
     return sd;
 }
 
+/* Mientras hay un refresco esperando, la última revisión puede estar vieja
+   (cada evento nuevo reinicia la espera: puede pasar de 300 ms). */
+gboolean
+ud_refresh_pending (const UdSubscription *sub)
+{
+    return sub && sub->debounce_id != 0;
+}
+
 void
 ud_unsubscribe (GDBusConnection *conn, UdSubscription *sub)
 {
